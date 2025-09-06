@@ -63,7 +63,8 @@ export function LoginForm() {
           title: "Login Successful",
           description: "Welcome back!",
         });
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
+        router.refresh(); 
       } else {
         toast({
           title: "Login Failed",
