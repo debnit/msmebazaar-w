@@ -1,23 +1,37 @@
 import {NextRequest, NextResponse} from 'next/server';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {orderId, paymentId, signature} = body;
+    const {razorpay_order_id, razorpay_payment_id, razorpay_signature} = body;
 
-    if (!orderId || !paymentId || !signature) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json(
         {error: 'Missing payment verification details'},
         {status: 400}
       );
     }
 
-    console.log('Verifying payment:', {orderId, paymentId});
+    const text = razorpay_order_id + '|' + razorpay_payment_id;
+    const generated_signature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+      .update(text)
+      .digest('hex');
 
-    // In a real application, you would verify the payment signature with your payment provider.
-    // For this prototype, we'll assume the payment is always valid.
-
-    return NextResponse.json({status: 'success', message: 'Payment verified successfully'}, {status: 200});
+    if (generated_signature === razorpay_signature) {
+      // In a real application, you would update the payment status in your database
+      console.log('Payment verified successfully for order:', razorpay_order_id);
+      return NextResponse.json(
+        {status: 'success', message: 'Payment verified successfully'},
+        {status: 200}
+      );
+    } else {
+      return NextResponse.json(
+        {status: 'error', message: 'Invalid signature'},
+        {status: 400}
+      );
+    }
   } catch (error) {
     console.error('Payment verification error:', error);
     return NextResponse.json(

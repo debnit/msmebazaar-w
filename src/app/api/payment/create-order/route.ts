@@ -1,4 +1,10 @@
 import {NextRequest, NextResponse} from 'next/server';
+import Razorpay from 'razorpay';
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,18 +15,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error: 'Amount is required'}, {status: 400});
     }
 
-    console.log('Creating payment order for:', {amount, currency});
+    const options = {
+      amount: amount * 100, // amount in the smallest currency unit
+      currency,
+      receipt: `receipt_order_${Date.now()}`,
+    };
 
-    // In a real application, you would interact with a payment provider like Razorpay or Stripe.
-    // We will simulate creating an order and return a mock order ID.
-    const mockOrderId = `order_${Date.now()}`;
+    const order = await razorpay.orders.create(options);
 
     return NextResponse.json(
       {
-        orderId: mockOrderId,
-        amount: amount,
-        currency: currency,
-        message: 'Order created successfully',
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
       },
       {status: 201}
     );

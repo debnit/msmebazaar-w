@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Landmark, Building } from "lucide-react";
-import Link from "next/link";
+import RazorpayCheckout from "@/components/RazorpayCheckout";
 
 const fixedServices = [
   {
@@ -27,7 +30,31 @@ const fixedServices = [
   },
 ];
 
+type PaymentDetails = {
+  amount: number;
+  serviceName: string;
+} | null;
+
 export default function PaymentsPage() {
+  const [customAmount, setCustomAmount] = useState("");
+  const [customServiceName, setCustomServiceName] = useState("");
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>(null);
+
+  const handlePay = (amount: number, serviceName: string) => {
+    setPaymentDetails({ amount, serviceName });
+  };
+
+  const handleCustomPay = () => {
+    const amount = parseFloat(customAmount);
+    if (amount > 0 && customServiceName) {
+      handlePay(amount, customServiceName);
+    }
+  };
+  
+  if (paymentDetails) {
+    return <RazorpayCheckout amount={paymentDetails.amount} serviceName={paymentDetails.serviceName} />;
+  }
+
   return (
     <div className="container py-12 md:py-24">
       <div className="text-center mb-10">
@@ -54,8 +81,8 @@ export default function PaymentsPage() {
                 <p className="text-3xl font-bold">₹{service.price.toLocaleString('en-IN')}</p>
               </CardContent>
               <CardFooter>
-                <Button asChild className="w-full">
-                  <Link href={`/payments/success?amount=${service.price}`}>Pay Now</Link>
+                <Button className="w-full" onClick={() => handlePay(service.price, service.title)}>
+                  Pay Now
                 </Button>
               </CardFooter>
             </Card>
@@ -76,16 +103,27 @@ export default function PaymentsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="service-name">Service Name</Label>
-                <Input id="service-name" placeholder="e.g., Consultation Fee" />
+                <Input 
+                  id="service-name" 
+                  placeholder="e.g., Consultation Fee" 
+                  value={customServiceName}
+                  onChange={(e) => setCustomServiceName(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="amount">Amount (₹)</Label>
-                <Input id="amount" type="number" placeholder="e.g., 500" />
+                <Input 
+                  id="amount" 
+                  type="number" 
+                  placeholder="e.g., 500" 
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                />
               </div>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Link href="/payments/success?amount=500">Proceed to Pay</Link>
+              <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCustomPay}>
+                Proceed to Pay
               </Button>
             </CardFooter>
           </Card>
