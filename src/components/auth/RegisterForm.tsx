@@ -72,8 +72,8 @@ export function RegisterForm() {
           title: "Registration Successful",
           description: "Welcome! You are now logged in.",
         });
-        router.push("/dashboard");
-        router.refresh(); // Refresh to update session state in header
+        // A full page reload is the most reliable way to update the session in the header
+        window.location.href = "/dashboard";
       } else {
         toast({
           title: "Registration Failed",
