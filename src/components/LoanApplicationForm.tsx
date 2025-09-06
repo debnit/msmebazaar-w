@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
@@ -57,7 +58,9 @@ const steps = [
 
 export function LoanApplicationForm() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -80,14 +83,47 @@ export function LoanApplicationForm() {
     setCurrentStep(currentStep - 1);
   };
 
-  function onSubmit(values: FormData) {
-    console.log(values);
-    toast({
-      title: "Application Submitted!",
-      description: "We have received your loan application and will review it shortly.",
-    });
-    form.reset();
-    setCurrentStep(1);
+  async function onSubmit(values: FormData) {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/loan-application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Application Submitted!",
+          description: "We have received your loan application and will review it shortly.",
+        });
+        router.push("/dashboard");
+      } else {
+        const data = await response.json();
+        if (response.status === 401) {
+          toast({
+            title: "Authentication Error",
+            description: "Please log in to submit a loan application.",
+            variant: "destructive",
+          });
+          router.push("/login");
+        } else {
+          toast({
+            title: "Submission Failed",
+            description: data.error || "An unexpected error occurred.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const progress = (currentStep / steps.length) * 100;
@@ -132,7 +168,9 @@ export function LoanApplicationForm() {
               {currentStep < steps.length ? (
                 <Button type="button" onClick={handleNext} className="bg-primary hover:bg-primary/90">Next</Button>
               ) : (
-                <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground">Submit Application</Button>
+                <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                </Button>
               )}
             </CardFooter>
           </form>

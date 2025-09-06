@@ -1,4 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
+import {prisma} from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { login } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,13 +15,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('Login attempt for:', email);
+    const user = await prisma.user.findUnique({
+      where: {email},
+    });
 
-    // In a real application, you would verify the user's credentials against the database.
-    // For this prototype, we'll simulate a successful login.
+    if (!user) {
+      return NextResponse.json({error: 'Invalid credentials'}, {status: 401});
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return NextResponse.json({error: 'Invalid credentials'}, {status: 401});
+    }
+
+    await login({ id: user.id, email: user.email, name: user.name });
 
     return NextResponse.json(
-      {message: 'Login successful', token: 'mock-jwt-token'},
+      {message: 'Login successful'},
       {status: 200}
     );
   } catch (error) {

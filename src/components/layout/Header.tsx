@@ -13,8 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { getSession, logout } from "@/lib/auth-actions";
 
 const navLinks = [
   { href: "/loan-application", label: "Loans" },
@@ -23,11 +24,31 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
 ];
 
+interface SessionUser {
+  name: string;
+  email: string;
+}
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  // Mock authentication state
-  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
+  const [session, setSession] = React.useState<{ user: SessionUser } | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setSession(sessionData);
+    };
+    fetchSession();
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    await logout();
+    setSession(null);
+    router.push('/login');
+    router.refresh();
+  };
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
@@ -41,7 +62,7 @@ export default function Header() {
       {label}
     </Link>
   );
-
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -57,7 +78,7 @@ export default function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          {isAuthenticated ? (
+          {session?.user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -67,9 +88,9 @@ export default function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
+                    <p className="text-sm font-medium leading-none">{session.user.name}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      john.doe@example.com
+                      {session.user.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -81,7 +102,7 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsAuthenticated(false)}>
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -112,7 +133,7 @@ export default function Header() {
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
-             {!isAuthenticated && (
+             {!session?.user && (
               <div className="flex flex-col space-y-2 pt-4 border-t">
                   <Button asChild variant="outline">
                     <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>

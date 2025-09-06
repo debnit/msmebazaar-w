@@ -1,20 +1,26 @@
 import {NextRequest, NextResponse} from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getSession } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    console.log('New loan application received:', body);
+    const session = await getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
+    const body = await req.json();
+    
     // Basic validation
+    const {
+      fullName, email, phone, pan, businessName, businessType,
+      yearsInBusiness, annualTurnover, loanAmount, loanPurpose
+    } = body;
+
     if (
-      !body.fullName ||
-      !body.email ||
-      !body.phone ||
-      !body.pan ||
-      !body.businessName ||
-      !body.businessType ||
-      !body.loanAmount ||
-      !body.loanPurpose
+      !fullName || !email || !phone || !pan || !businessName ||
+      !businessType || !yearsInBusiness || !annualTurnover ||
+      !loanAmount || !loanPurpose
     ) {
       return NextResponse.json(
         {error: 'Missing required fields'},
@@ -22,8 +28,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // In a real application, save the loan application to the database.
-    // For now, we simulate success.
+    await prisma.loanApplication.create({
+      data: {
+        ...body,
+        userId: session.user.id,
+      },
+    });
 
     return NextResponse.json(
       {message: 'Loan application submitted successfully'},

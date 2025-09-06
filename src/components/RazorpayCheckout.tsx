@@ -54,7 +54,18 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
             });
 
             if (!orderRes.ok) {
-                throw new Error("Failed to create payment order.");
+                const errorData = await orderRes.json();
+                if (orderRes.status === 401) {
+                    toast({
+                        title: "Authentication Error",
+                        description: "Please log in to make a payment.",
+                        variant: "destructive",
+                    });
+                    router.push("/login");
+                } else {
+                    throw new Error(errorData.error || "Failed to create payment order.");
+                }
+                return;
             }
 
             const orderData = await orderRes.json();
@@ -76,6 +87,8 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
+                            serviceName,
+                            amount: orderData.amount,
                         }),
                     });
 
@@ -109,9 +122,10 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
 
         } catch (error) {
             console.error("Payment initiation failed:", error);
+            const errorMessage = error instanceof Error ? error.message : "An error occurred while initiating payment.";
             toast({
                 title: "Payment Failed",
-                description: "An error occurred while initiating payment.",
+                description: errorMessage,
                 variant: "destructive",
             });
             router.push("/payments/failure");

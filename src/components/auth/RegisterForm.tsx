@@ -25,6 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Chrome } from "lucide-react";
+import React from "react";
 
 const formSchema = z
   .object({
@@ -41,6 +42,7 @@ const formSchema = z
 export function RegisterForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,13 +54,41 @@ export function RegisterForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: "Registration Successful",
-      description: "You can now log in with your credentials.",
-    });
-    router.push("/login");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Registration Successful",
+          description: "You can now log in with your credentials.",
+        });
+        router.push("/login");
+      } else {
+        toast({
+          title: "Registration Failed",
+          description: data.error || "An unexpected error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -124,8 +154,8 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-              Create account
+            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating Account...' : 'Create account'}
             </Button>
           </form>
         </Form>

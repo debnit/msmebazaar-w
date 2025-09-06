@@ -25,6 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Chrome } from "lucide-react";
+import React from "react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -34,7 +35,8 @@ const formSchema = z.object({
 export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
-  
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,13 +45,42 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: "Login Successful",
-      description: "Welcome back!",
-    });
-    router.push("/dashboard");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        router.push("/dashboard");
+        router.refresh(); // Refresh to update session state in header
+      } else {
+        toast({
+          title: "Login Failed",
+          description: data.error || "Invalid credentials.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -97,8 +128,8 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-              Login
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </Form>

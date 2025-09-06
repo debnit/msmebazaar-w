@@ -1,10 +1,17 @@
 import {NextRequest, NextResponse} from 'next/server';
 import crypto from 'crypto';
+import { prisma } from '@/lib/prisma';
+import { getSession } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
-    const {razorpay_order_id, razorpay_payment_id, razorpay_signature} = body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, serviceName, amount } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json(
@@ -20,13 +27,35 @@ export async function POST(req: NextRequest) {
       .digest('hex');
 
     if (generated_signature === razorpay_signature) {
-      // In a real application, you would update the payment status in your database
-      console.log('Payment verified successfully for order:', razorpay_order_id);
+      // Payment is successful, save to DB
+      await prisma.paymentTransaction.create({
+        data: {
+          userId: session.user.id,
+          serviceName,
+          amount: amount / 100, // Convert from paise to rupees
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+          status: 'Success',
+        }
+      });
       return NextResponse.json(
         {status: 'success', message: 'Payment verified successfully'},
         {status: 200}
       );
     } else {
+      // Payment failed
+      await prisma.paymentTransaction.create({
+        data: {
+          userId: session.user.id,
+          serviceName,
+          amount: amount / 100,
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+          status: 'Failed',
+        }
+      });
       return NextResponse.json(
         {status: 'error', message: 'Invalid signature'},
         {status: 400}

@@ -1,7 +1,10 @@
 import {NextRequest, NextResponse} from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getSession } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSession();
     const body = await req.json();
     const {name, email, phone, subject, message} = body;
 
@@ -12,10 +15,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('New enquiry received:', body);
+    const enquiryData: any = {
+      name,
+      email,
+      phone,
+      subject,
+      message,
+    };
 
-    // Here you would typically save the enquiry to your database.
-    // We'll simulate a successful submission.
+    if (session?.user?.id) {
+      enquiryData.userId = session.user.id;
+    }
+
+    await prisma.enquiry.create({
+      data: enquiryData,
+    });
 
     return NextResponse.json(
       {message: 'Enquiry submitted successfully'},

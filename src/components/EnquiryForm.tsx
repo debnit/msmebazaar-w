@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import React from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -34,6 +35,7 @@ const formSchema = z.object({
 
 export function EnquiryForm() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,13 +48,38 @@ export function EnquiryForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: "Enquiry Submitted",
-      description: "Thank you! We will get back to you soon.",
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Enquiry Submitted",
+          description: "Thank you! We will get back to you soon.",
+        });
+        form.reset();
+      } else {
+        const data = await response.json();
+        toast({
+          title: "Submission Failed",
+          description: data.error || "An unexpected error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -142,8 +169,8 @@ export function EnquiryForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-              Submit Enquiry
+            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
             </Button>
           </form>
         </Form>

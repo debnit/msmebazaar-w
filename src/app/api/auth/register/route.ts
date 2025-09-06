@@ -1,4 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
+import {prisma} from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,13 +14,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('User registration data:', {name, email});
+    const existingUser = await prisma.user.findUnique({
+      where: {email},
+    });
 
-    // In a real application, you would hash the password and save the user to the database.
-    // For now, we'll just simulate a successful registration.
+    if (existingUser) {
+      return NextResponse.json(
+        {error: 'User with this email already exists'},
+        {status: 409}
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
 
     return NextResponse.json(
-      {message: 'User registered successfully'},
+      {message: 'User registered successfully', userId: user.id},
       {status: 201}
     );
   } catch (error) {

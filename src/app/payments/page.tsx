@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,23 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Landmark, Building } from "lucide-react";
+import { CreditCard, Star, BarChart, Route } from "lucide-react";
 import RazorpayCheckout from "@/components/RazorpayCheckout";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const fixedServices = [
-  {
-    icon: <Building className="h-8 w-8 text-primary" />,
-    title: "Business Registration",
-    description: "Complete package for registering your new business.",
-    price: 4999,
-  },
-  {
-    icon: <Landmark className="h-8 w-8 text-primary" />,
-    title: "GST Filing (Quarterly)",
-    description: "Hassle-free GST return filing by our experts.",
-    price: 1499,
-  },
-];
+const serviceIcons: { [key: string]: React.ReactNode } = {
+  "Pro-Membership": <Star className="h-8 w-8 text-primary" />,
+  "Valuation Service": <BarChart className="h-8 w-8 text-primary" />,
+  "Exit Strategy (NavArambh)": <Route className="h-8 w-8 text-primary" />,
+};
+
+type Service = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+};
 
 type PaymentDetails = {
   amount: number;
@@ -36,9 +35,31 @@ type PaymentDetails = {
 } | null;
 
 export default function PaymentsPage() {
+  const [fixedServices, setFixedServices] = useState<Service[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
   const [customAmount, setCustomAmount] = useState("");
   const [customServiceName, setCustomServiceName] = useState("");
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        // In a real app, this would be an API call
+        // For now, simulating API call
+        await new Promise(res => setTimeout(res, 500));
+        setFixedServices([
+          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and support.", price: 99 },
+          { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 199 },
+          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 },
+        ]);
+      } catch (error) {
+        console.error("Failed to fetch services", error);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handlePay = (amount: number, serviceName: string) => {
     setPaymentDetails({ amount, serviceName });
@@ -67,26 +88,33 @@ export default function PaymentsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {fixedServices.map((service) => (
-            <Card key={service.title}>
-              <CardHeader className="flex flex-row items-center gap-4">
-                {service.icon}
-                <div>
-                  <CardTitle className="font-headline">{service.title}</CardTitle>
-                  <CardDescription>{service.description}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">₹{service.price.toLocaleString('en-IN')}</p>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" onClick={() => handlePay(service.price, service.title)}>
-                  Pay Now
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          {loadingServices ? (
+            <>
+              <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-10 w-1/2" /></CardContent><CardFooter><Skeleton className="h-10 w-full" /></CardFooter></Card>
+              <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-10 w-1/2" /></CardContent><CardFooter><Skeleton className="h-10 w-full" /></CardFooter></Card>
+            </>
+          ) : (
+            fixedServices.map((service) => (
+              <Card key={service.id}>
+                <CardHeader className="flex flex-row items-center gap-4">
+                  {serviceIcons[service.name] || <CreditCard className="h-8 w-8 text-primary" />}
+                  <div>
+                    <CardTitle className="font-headline">{service.name}</CardTitle>
+                    <CardDescription>{service.description}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold">₹{service.price.toLocaleString('en-IN')}</p>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => handlePay(service.price, service.name)}>
+                    Pay Now
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))
+          )}
         </div>
         
         <div>

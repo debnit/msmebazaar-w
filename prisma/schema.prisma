@@ -30,7 +30,6 @@ model Enquiry {
   subject   String
   message   String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
 }
@@ -47,35 +46,30 @@ model LoanApplication {
   annualTurnover  Float
   loanAmount      Float
   loanPurpose     String
-  status          String   @default("Pending")
+  status          String   @default("Processing")
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
   userId          String?
   user            User?    @relation(fields: [userId], references: [id])
 }
 
-model PaymentTransaction {
-  id             String   @id @default(cuid())
-  amount         Float
-  currency       String
-  status         String
-  orderId        String
-  paymentId      String?
-  signature      String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  userId         String?
-  user           User?    @relation(fields: [userId], references: [id])
-  serviceId      String?
-  service        Service? @relation(fields: [serviceId], references: [id])
-}
-
 model Service {
-  id          String   @id @default(cuid())
-  name        String
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String
   price       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  transactions PaymentTransaction[]
+  isFixed     Boolean @default(true)
+}
+
+model PaymentTransaction {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  serviceName       String
+  amount            Float
+  razorpayOrderId   String   @unique
+  razorpayPaymentId String   @unique
+  razorpaySignature String
+  status            String   @default("Created") // Created, Success, Failed
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

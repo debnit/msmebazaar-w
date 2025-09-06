@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -21,32 +24,82 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { getSession } from "@/lib/auth-actions";
 
-// Mock data
-const enquiries = [
-  { id: "ENQ001", subject: "Loan Interest Rates", date: "2023-10-26", status: "Answered" },
-  { id: "ENQ002", subject: "Payment Gateway", date: "2023-10-24", status: "Pending" },
-];
+interface Enquiry {
+  id: string;
+  subject: string;
+  date: string;
+  status: string;
+}
 
-const loanApplications = [
-  { id: "LOAN001", amount: "₹5,00,000", date: "2023-10-20", status: "Approved" },
-  { id: "LOAN002", amount: "₹2,50,000", date: "2023-09-15", status: "Rejected" },
-  { id: "LOAN003", amount: "₹10,00,000", date: "2023-10-25", status: "Processing" },
-];
+interface LoanApplication {
+  id: string;
+  amount: string;
+  date: string;
+  status: string;
+}
 
-const payments = [
-  { id: "PAY001", service: "Business Registration", amount: "₹1,499", date: "2023-10-18", status: "Success" },
-  { id: "PAY002", service: "GST Filing", amount: "₹499", date: "2023-09-30", status: "Success" },
-  { id: "PAY003", service: "Custom Service", amount: "₹2,000", date: "2023-10-22", status: "Failed" },
-];
+interface Payment {
+  id: string;
+  service: string;
+  amount: string;
+  date: string;
+  status: string;
+}
+
+interface DashboardData {
+  user: {
+    name: string;
+    email: string;
+  };
+  enquiries: Enquiry[];
+  loanApplications: LoanApplication[];
+  paymentTransactions: Payment[];
+}
 
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/user/dashboard');
+        if (response.ok) {
+          const result = await response.json();
+          setData(result);
+        } else {
+          console.error("Failed to fetch dashboard data");
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container py-12 flex justify-center items-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <div className="container py-12">Failed to load dashboard.</div>;
+  }
+  
   return (
     <div className="container py-12">
       <div className="space-y-2 mb-8">
         <h1 className="text-3xl font-headline font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, John! Here's an overview of your account.</p>
+        <p className="text-muted-foreground">Welcome back, {data.user.name}! Here's an overview of your account.</p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
@@ -65,10 +118,8 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div><span className="font-semibold">Name:</span> John Doe</div>
-                <div><span className="font-semibold">Email:</span> john.doe@example.com</div>
-                <div><span className="font-semibold">Phone:</span> +91 98765 43210</div>
-                <div><span className="font-semibold">Member Since:</span> January 1, 2023</div>
+                <div><span className="font-semibold">Name:</span> {data.user.name}</div>
+                <div><span className="font-semibold">Email:</span> {data.user.email}</div>
               </div>
               <Button>Edit Profile</Button>
             </CardContent>
@@ -92,16 +143,18 @@ export default function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {enquiries.map((enquiry) => (
+                  {data.enquiries.length > 0 ? data.enquiries.map((enquiry) => (
                     <TableRow key={enquiry.id}>
-                      <TableCell>{enquiry.id}</TableCell>
+                      <TableCell>{enquiry.id.substring(0, 8)}</TableCell>
                       <TableCell>{enquiry.subject}</TableCell>
-                      <TableCell>{enquiry.date}</TableCell>
+                      <TableCell>{new Date(enquiry.date).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Badge variant={enquiry.status === 'Answered' ? 'default' : 'secondary'}>{enquiry.status}</Badge>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow><TableCell colSpan={4} className="text-center">No enquiries found.</TableCell></TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -125,11 +178,11 @@ export default function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {loanApplications.map((loan) => (
+                  {data.loanApplications.length > 0 ? data.loanApplications.map((loan) => (
                     <TableRow key={loan.id}>
-                      <TableCell>{loan.id}</TableCell>
-                      <TableCell>{loan.amount}</TableCell>
-                      <TableCell>{loan.date}</TableCell>
+                      <TableCell>{loan.id.substring(0, 8)}</TableCell>
+                      <TableCell>₹{loan.amount}</TableCell>
+                      <TableCell>{new Date(loan.date).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
@@ -143,7 +196,9 @@ export default function DashboardPage() {
                         </Badge>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                     <TableRow><TableCell colSpan={4} className="text-center">No loan applications found.</TableCell></TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -169,12 +224,12 @@ export default function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment) => (
+                  {data.paymentTransactions.length > 0 ? data.paymentTransactions.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell>{payment.id}</TableCell>
+                      <TableCell>{payment.id.substring(0, 8)}</TableCell>
                       <TableCell>{payment.service}</TableCell>
-                      <TableCell>{payment.amount}</TableCell>
-                      <TableCell>{payment.date}</TableCell>
+                      <TableCell>₹{payment.amount}</TableCell>
+                      <TableCell>{new Date(payment.date).toLocaleDateString()}</TableCell>
                       <TableCell>
                       <Badge
                           variant={
@@ -194,7 +249,9 @@ export default function DashboardPage() {
                         )}
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow><TableCell colSpan={6} className="text-center">No payments found.</TableCell></TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
