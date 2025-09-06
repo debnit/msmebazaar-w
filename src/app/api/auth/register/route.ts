@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {prisma} from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { login } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,8 +36,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Automatically log the user in after registration
+    await login({ id: user.id, email: user.email, name: user.name });
+
     return NextResponse.json(
-      {message: 'User registered successfully', userId: user.id},
+      {message: 'User registered and logged in successfully', userId: user.id},
       {status: 201}
     );
   } catch (error) {

@@ -70,9 +70,10 @@ export function RegisterForm() {
       if (response.ok) {
         toast({
           title: "Registration Successful",
-          description: "You can now log in with your credentials.",
+          description: "Welcome! You are now logged in.",
         });
-        router.push("/login");
+        router.push("/dashboard");
+        router.refresh(); // Refresh to update session state in header
       } else {
         toast({
           title: "Registration Failed",
