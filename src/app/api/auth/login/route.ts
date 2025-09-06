@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error: 'Invalid credentials'}, {status: 401});
     }
 
+    // The user object must be passed inside a 'user' key.
     await login({ id: user.id, email: user.email, name: user.name });
 
     return NextResponse.json(
