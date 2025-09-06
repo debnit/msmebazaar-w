@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Chrome } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -111,8 +112,11 @@ export function LoginForm() {
             </span>
           </div>
         </div>
-        <Button variant="outline" className="w-full">
-          Login with Google
+        <Button variant="outline" className="w-full" asChild>
+          <Link href="/api/auth/google">
+            <Chrome className="mr-2 h-4 w-4" />
+            Login with Google
+          </Link>
         </Button>
       </CardContent>
       <CardFooter>
