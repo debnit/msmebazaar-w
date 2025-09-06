@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu, X, UserCircle, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, UserCircle, LogOut, LayoutDashboard, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "./Logo";
 import {
@@ -99,6 +99,12 @@ export default function Header() {
                   <Link href="/dashboard">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/notifications">
+                    <Bell className="mr-2 h-4 w-4" />
+                    <span>Notifications</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

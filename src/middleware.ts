@@ -15,6 +15,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!session) {
+    // Allow access to notifications API for webhooks/backend processes
+    if (pathname.startsWith('/api/notifications')) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
