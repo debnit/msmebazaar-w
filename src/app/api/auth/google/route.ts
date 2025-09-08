@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
   );
   googleLoginUrl.searchParams.set('response_type', 'code');
-  googleLoginUrl.searchParams.set('redirect_uri', 'http://localhost:9002/api/auth/google/callback');
+  googleLoginUrl.searchParams.set('redirect_uri', 'https://www.vyapaarmitra.in/api/auth/google/callback');
   googleLoginUrl.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID!);
 
   return NextResponse.redirect(googleLoginUrl);
