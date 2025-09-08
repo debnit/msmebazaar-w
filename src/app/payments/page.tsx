@@ -48,9 +48,9 @@ export default function PaymentsPage() {
         // For now, simulating API call
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
-          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and support.", price: 99 },
-          { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 199 },
-          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 },
+          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and support.", price: 999 },
+          { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 1999 },
+          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 2999 },
         ]);
       } catch (error) {
         console.error("Failed to fetch services", error);
