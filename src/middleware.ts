@@ -7,6 +7,11 @@ export async function middleware(request: NextRequest) {
   
   const { pathname } = request.nextUrl;
 
+  // If user is logged in, redirect from landing page to dashboard
+  if (session && pathname === '/') {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   // Protect all /api/admin routes
   if (pathname.startsWith('/api/admin')) {
     if (!session?.user?.isAdmin) {
@@ -23,7 +28,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const publicPaths = ["/", "/login", "/register", "/enquiry", "/api/auth/login", "/api/auth/register", "/api/enquiry", "/payments/success", "/payments/failure", "/sign-in"];
+  const publicPaths = ["/", "/login", "/register", "/enquiry", "/api/auth/login", "/api/auth/register", "/api/enquiry", "/payments/success", "/payments/failure", "/sign-in", "/forgot-password"];
   
   const isPublicPath = publicPaths.some(path => pathname === path || (path.endsWith('/') && pathname.startsWith(path))) || pathname.startsWith('/api/auth/google') || pathname.startsWith('/api/payment');
 
