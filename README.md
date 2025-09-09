@@ -19,7 +19,8 @@ This is a Next.js application for MSMEConnect, providing financial services for 
     cd <repository-name>
     ```
 
-2.  **Install dependencies:**
+2.  **Install dependencies:**us
+
 
     ```bash
     npm install
