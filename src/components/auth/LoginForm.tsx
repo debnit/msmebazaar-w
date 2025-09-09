@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -115,7 +116,7 @@ export function LoginForm() {
                   <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
                     <Link
-                      href="#"
+                      href="/forgot-password"
                       className="ml-auto inline-block text-sm underline"
                     >
                       Forgot your password?

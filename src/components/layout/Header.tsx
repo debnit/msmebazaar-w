@@ -1,6 +1,6 @@
-"use client";
 
-import * as React from "react";
+"use server"
+
 import Link from "next/link";
 import { Menu, X, UserCircle, LogOut, LayoutDashboard, Bell, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { getSession, logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/auth-actions";
+import { MobileNav } from "./MobileNav";
+import { Session } from "jose";
 
 const navLinks = [
   { href: "/loan-application", label: "Loans" },
@@ -24,45 +25,28 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
 ];
 
-interface SessionUser {
-  name: string;
-  email: string;
-  isAdmin?: boolean;
-}
+const NavLink = ({ href, label, pathname }: { href: string; label: string; pathname: string }) => (
+  <Link
+    href={href}
+    className={cn(
+      "text-sm font-medium transition-colors hover:text-primary",
+      pathname.startsWith(href) ? "text-primary" : "text-muted-foreground"
+    )}
+  >
+    {label}
+  </Link>
+);
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [session, setSession] = React.useState<{ user: SessionUser } | null>(null);
-  const pathname = usePathname();
-  const router = useRouter();
-
-  React.useEffect(() => {
-    const fetchSession = async () => {
-      const sessionData = await getSession();
-      setSession(sessionData);
-    };
-    fetchSession();
-  }, [pathname]);
+export default async function Header({ session }: { session: Session | null }) {
+  // We can't use usePathname() in a server component, so we will pass it down or handle differently
+  // For now, we will omit active state styling on server.
+  // A more complex solution might involve a client component wrapper.
+  const pathname = ""; // Placeholder
 
   const handleLogout = async () => {
+    "use server"
     await logout();
-    setSession(null);
-    router.push('/login');
-    router.refresh();
   };
-
-  const NavLink = ({ href, label }: { href: string; label: string }) => (
-    <Link
-      href={href}
-      className={cn(
-        "text-sm font-medium transition-colors hover:text-primary",
-        pathname.startsWith(href) ? "text-primary" : "text-muted-foreground"
-      )}
-      onClick={() => setIsMenuOpen(false)}
-    >
-      {label}
-    </Link>
-  );
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
@@ -73,7 +57,7 @@ export default function Header() {
           </Link>
           <nav className="hidden items-center space-x-6 md:flex">
             {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
+              <NavLink key={link.href} {...link} pathname={pathname}/>
             ))}
           </nav>
         </div>
@@ -117,10 +101,14 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
+                <form action={handleLogout}>
+                    <button type="submit" className="w-full">
+                        <DropdownMenuItem>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Log out</span>
+                        </DropdownMenuItem>
+                    </button>
+                </form>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -133,34 +121,9 @@ export default function Header() {
               </Button>
             </nav>
           )}
-          <Button
-            variant="ghost"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X /> : <Menu />}
-          </Button>
+          <MobileNav session={session} navLinks={navLinks} />
         </div>
       </div>
-      {isMenuOpen && (
-        <div className="container md:hidden pb-4">
-          <nav className="flex flex-col space-y-4">
-            {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-             {!session?.user && (
-              <div className="flex flex-col space-y-2 pt-4 border-t">
-                  <Button asChild variant="outline">
-                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
-                  </Button>
-                  <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <Link href="/register" onClick={() => setIsMenuOpen(false)}>Register</Link>
-                  </Button>
-              </div>
-            )}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
