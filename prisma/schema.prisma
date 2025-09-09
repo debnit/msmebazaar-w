@@ -1,25 +1,27 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model User {
-  id                String              @id @default(cuid())
-  name              String
-  email             String              @unique
-  password          String
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  enquiries         Enquiry[]
-  loanApplications  LoanApplication[]
+  id                  String                @id @default(cuid())
+  name                String
+  email               String                @unique
+  password            String
+  isAdmin             Boolean               @default(false)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  enquiries           Enquiry[]
+  loanApplications    LoanApplication[]
   paymentTransactions PaymentTransaction[]
+  notifications       Notification[]
 }
 
 model Enquiry {
@@ -29,9 +31,11 @@ model Enquiry {
   phone     String
   subject   String
   message   String
-  createdAt DateTime @default(now())
+  status    String   @default("Pending") // Added status
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model LoanApplication {
@@ -46,10 +50,25 @@ model LoanApplication {
   annualTurnover  Float
   loanAmount      Float
   loanPurpose     String
-  status          String   @default("Processing")
+  status          String   @default("Pending")
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
   createdAt       DateTime @default(now())
-  userId          String?
-  user            User?    @relation(fields: [userId], references: [id])
+  updatedAt       DateTime @updatedAt
+}
+
+model PaymentTransaction {
+  id                String   @id @default(cuid())
+  serviceName       String
+  amount            Float
+  status            String
+  razorpayOrderId   String
+  razorpayPaymentId String
+  razorpaySignature String
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Service {
@@ -57,19 +76,17 @@ model Service {
   name        String  @unique
   description String
   price       Float
-  isFixed     Boolean @default(true)
+  isFixed     Boolean @default(true) // To distinguish between fixed and dynamic services
+  isActive    Boolean @default(true)
 }
 
-model PaymentTransaction {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id])
-  serviceName       String
-  amount            Float
-  razorpayOrderId   String   @unique
-  razorpayPaymentId String   @unique
-  razorpaySignature String
-  status            String   @default("Created") // Created, Success, Failed
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

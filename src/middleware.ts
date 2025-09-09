@@ -6,6 +6,14 @@ export async function middleware(request: NextRequest) {
   
   const { pathname } = request.nextUrl;
 
+  // Admin routes protection
+  if (pathname.startsWith('/admin')) {
+    if (!session?.user?.isAdmin) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
   const publicPaths = ["/", "/login", "/register", "/enquiry", "/api/auth/login", "/api/auth/register", "/api/enquiry", "/payments/success", "/payments/failure", "/sign-in"];
   
   const isPublicPath = publicPaths.some(path => pathname === path || (path.endsWith('/') && pathname.startsWith(path))) || pathname.startsWith('/api/auth/google') || pathname.startsWith('/api/payment');
