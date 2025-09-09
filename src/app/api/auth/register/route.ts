@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Automatically log the user in after registration
-    await login({ id: user.id, email: user.email, name: user.name });
+    await login({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin });
 
     return NextResponse.json(
       {message: 'User registered and logged in successfully', userId: user.id},

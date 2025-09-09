@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu, X, UserCircle, LogOut, LayoutDashboard, Bell } from "lucide-react";
+import { Menu, X, UserCircle, LogOut, LayoutDashboard, Bell, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "./Logo";
 import {
@@ -27,6 +27,7 @@ const navLinks = [
 interface SessionUser {
   name: string;
   email: string;
+  isAdmin?: boolean;
 }
 
 export default function Header() {
@@ -95,6 +96,14 @@ export default function Header() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {session.user.isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">
                     <LayoutDashboard className="mr-2 h-4 w-4" />

@@ -21,7 +21,7 @@ export async function decrypt(input: string): Promise<any> {
 }
 
 export async function login(formData: any) {
-  const user = { email: formData.email, name: formData.name, id: formData.id };
+  const user = { email: formData.email, name: formData.name, id: formData.id, isAdmin: formData.isAdmin };
 
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const session = await encrypt({ user, expires });
