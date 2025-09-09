@@ -105,7 +105,7 @@ export default function PaymentsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-bold">₹{service.price.toLocaleString('en-IN')}</p>
+                  <p className="text-3xl font-bold">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(service.price)}</p>
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" onClick={() => handlePay(service.price, service.name)}>
