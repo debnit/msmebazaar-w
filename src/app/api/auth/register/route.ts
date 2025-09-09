@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
         {status: 409}
       );
     }
+    
+    // Check if this is the first user
+    const userCount = await prisma.user.count();
+    const isAdmin = userCount === 0;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,6 +37,7 @@ export async function POST(req: NextRequest) {
         name,
         email,
         password: hashedPassword,
+        isAdmin,
       },
     });
 
