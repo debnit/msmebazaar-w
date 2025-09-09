@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
         id: e.id,
         subject: e.subject,
         date: e.createdAt.toISOString(),
-        status: 'Pending', // This could be a field in the model
+        status: e.status,
       })),
       loanApplications: loanApplications.map(l => ({
         id: l.id,

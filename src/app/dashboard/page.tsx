@@ -149,7 +149,7 @@ export default function DashboardPage() {
                       <TableCell>{enquiry.subject}</TableCell>
                       <TableCell>{new Date(enquiry.date).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <Badge variant={enquiry.status === 'Answered' ? 'default' : 'secondary'}>{enquiry.status}</Badge>
+                        <Badge variant={enquiry.status === 'Closed' ? 'default' : enquiry.status === 'Pending' ? 'secondary': 'outline'}>{enquiry.status}</Badge>
                       </TableCell>
                     </TableRow>
                   )) : (

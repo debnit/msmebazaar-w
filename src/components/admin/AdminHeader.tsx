@@ -48,7 +48,7 @@ export default function AdminHeader() {
                 <SheetContent side="left" className="flex flex-col">
                     <nav className="grid gap-2 text-lg font-medium">
                         <Link
-                            href="#"
+                            href="/admin"
                             className="flex items-center gap-2 text-lg font-semibold mb-4"
                         >
                             <Briefcase className="h-6 w-6" />
@@ -70,7 +70,7 @@ export default function AdminHeader() {
                         </Link>
                         <Link
                             href="/admin/loans"
-                            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                         >
                             <Briefcase className="h-5 w-5" />
                             Loan Applications

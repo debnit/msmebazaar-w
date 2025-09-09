@@ -32,7 +32,7 @@ async function getDashboardData() {
     const totalUsers = await prisma.user.count();
     const totalEnquiries = await prisma.enquiry.count();
     const totalLoans = await prisma.loanApplication.count();
-    const totalRevenue = await prisma.paymentTransaction.aggregate({
+    const totalRevenueResult = await prisma.paymentTransaction.aggregate({
         _sum: {
             amount: true,
         },
@@ -40,6 +40,8 @@ async function getDashboardData() {
             status: 'Success',
         }
     });
+    const totalRevenue = totalRevenueResult._sum.amount ?? 0;
+
 
     const recentLoans = await prisma.loanApplication.findMany({
         take: 5,
@@ -56,7 +58,7 @@ async function getDashboardData() {
         totalUsers,
         totalEnquiries,
         totalLoans,
-        totalRevenue: totalRevenue._sum.amount ?? 0,
+        totalRevenue,
         recentLoans,
         recentUsers
     }
@@ -144,7 +146,14 @@ export default async function AdminDashboard() {
                         </TableCell>
                         <TableCell>₹{loan.loanAmount.toLocaleString()}</TableCell>
                         <TableCell>
-                          <Badge className="text-xs" variant={loan.status === 'Approved' ? 'default' : loan.status === 'Rejected' ? 'destructive' : 'secondary'}>
+                           <Badge
+                             variant={
+                                loan.status === 'Approved' ? 'default'
+                                : loan.status === 'Rejected' ? 'destructive'
+                                : 'secondary'
+                              }
+                              className={loan.status === 'Approved' ? 'bg-green-500' : ''}
+                          >
                             {loan.status}
                           </Badge>
                         </TableCell>
