@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
+import { UserRoleUpdater } from '@/components/admin/UserRoleUpdater'
 
 async function getUsers() {
   const users = await prisma.user.findMany({
@@ -70,7 +71,7 @@ export default async function UsersPage() {
                 <TableCell>{user._count.loanApplications}</TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  {/* Action buttons (e.g., View, Make Admin) go here */}
+                  <UserRoleUpdater userId={user.id} isAdmin={user.isAdmin} />
                 </TableCell>
               </TableRow>
             ))}
