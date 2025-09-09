@@ -24,37 +24,39 @@ export async function middleware(request: NextRequest) {
   ];
   
   const isPublicPath = publicPaths.some(path => pathname === path) || pathname.startsWith('/api/auth/google/callback');
-  
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/sign-in";
-  
+  const isAdminPath = pathname.startsWith('/admin');
+
   // If user is logged in
   if (session) {
-    // Redirect from auth pages to dashboard
+    const isAdmin = session.user?.isAdmin;
+
+    // Redirect from auth pages
     if (isAuthPage) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/dashboard", request.url));
     }
-    // Redirect from landing page to dashboard
-    if(pathname === '/') {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+
+    // Redirect from landing page
+    if (pathname === '/') {
+        return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/dashboard", request.url));
     }
 
     // Handle admin route protection
-    if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-      if (!session.user?.isAdmin) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      }
+    if (isAdminPath && !isAdmin) {
+      // If a non-admin tries to access an admin path, redirect to user dashboard
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     
     return NextResponse.next();
   }
 
   // If user is not logged in
-  if (!session && !isPublicPath) {
+  if (!isPublicPath) {
     // Allow access to notifications API for webhooks/backend processes
     if (pathname.startsWith('/api/notifications')) {
       return NextResponse.next();
     }
-    // Redirect protected routes to login
+    // Redirect all other protected routes to login
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
