@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
+import { EnquiryStatusUpdater } from '@/components/admin/EnquiryStatusUpdater'
 
 async function getEnquiries() {
   const enquiries = await prisma.enquiry.findMany({
@@ -58,13 +59,13 @@ export default async function EnquiriesPage() {
                 </TableCell>
                 <TableCell>{enquiry.subject}</TableCell>
                 <TableCell>
-                  <Badge variant={enquiry.status === 'Closed' ? 'default' : 'secondary'}>
+                   <Badge variant={enquiry.status === 'Closed' ? 'default' : enquiry.status === 'Pending' ? 'secondary': 'outline'}>
                     {enquiry.status}
                   </Badge>
                 </TableCell>
                 <TableCell>{new Date(enquiry.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  {/* Action buttons (e.g., View, Change Status) go here */}
+                  <EnquiryStatusUpdater enquiryId={enquiry.id} currentStatus={enquiry.status} />
                 </TableCell>
               </TableRow>
             ))}

@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 
@@ -6,7 +7,15 @@ export async function middleware(request: NextRequest) {
   
   const { pathname } = request.nextUrl;
 
-  // Admin routes protection
+  // Protect all /api/admin routes
+  if (pathname.startsWith('/api/admin')) {
+    if (!session?.user?.isAdmin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
+
+  // Admin dashboard protection
   if (pathname.startsWith('/admin')) {
     if (!session?.user?.isAdmin) {
       return NextResponse.redirect(new URL("/login", request.url));

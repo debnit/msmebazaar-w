@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
+import { LoanStatusUpdater } from '@/components/admin/LoanStatusUpdater'
 
 async function getLoanApplications() {
   const loans = await prisma.loanApplication.findMany({
@@ -60,7 +61,7 @@ export default async function LoanApplicationsPage() {
                 <TableCell>₹{loan.loanAmount.toLocaleString()}</TableCell>
                 <TableCell>{loan.loanPurpose}</TableCell>
                 <TableCell>
-                  <Badge 
+                  <Badge
                      variant={
                         loan.status === 'Approved' ? 'default'
                         : loan.status === 'Rejected' ? 'destructive'
@@ -73,7 +74,7 @@ export default async function LoanApplicationsPage() {
                 </TableCell>
                 <TableCell>{new Date(loan.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  {/* Action buttons (e.g., View, Change Status) go here */}
+                  <LoanStatusUpdater loanId={loan.id} currentStatus={loan.status} />
                 </TableCell>
               </TableRow>
             ))}
