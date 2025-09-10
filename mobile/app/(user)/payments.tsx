@@ -1,20 +1,35 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePaymentStore, PaymentService } from '@/store/paymentStore';
 import { paymentService } from '@/services/paymentService';
-import { CreditCard, CheckCircle, Star, BarChart, Route } from 'lucide-react-native';
+import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Loader2 } from 'lucide-react-native';
+import { useAuthStore } from '@/store/authStore';
+import { apiService } from '@/services/apiService';
 
 const serviceIcons: { [key: string]: React.ReactNode } = {
-  "Pro-Membership": <Star className="h-8 w-8 text-primary" />,
-  "Valuation Service": <BarChart className="h-8 w-8 text-primary" />,
-  "Exit Strategy (NavArambh)": <Route className="h-8 w-8 text-primary" />,
+  "Pro-Membership": <Star size={32} color="#1e2a4a" />,
+  "Valuation Service": <BarChart size={32} color="#1e2a4a" />,
+  "Exit Strategy (NavArambh)": <Route size={32} color="#1e2a4a" />,
 };
 
 export default function PaymentsScreen() {
   const { services, customAmount, setCustomAmount, resetPayment } = usePaymentStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const res = await apiService.getDashboardData();
+      if(res.success && res.data) {
+        setWalletBalance(res.data.user.walletBalance);
+      }
+    }
+    fetchBalance();
+  }, [])
+  
 
   const handlePayment = async (serviceName: string, amount: number, description?: string) => {
     setProcessingId(serviceName);
@@ -36,13 +51,38 @@ export default function PaymentsScreen() {
     }
   };
 
+  const handlePayWithWallet = async (serviceName: string, amount: number) => {
+    setProcessingId(serviceName);
+    setIsProcessing(true);
+    try {
+      const result = await paymentService.payWithWallet({ serviceName, amount });
+       if (result.success) {
+        Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
+        setWalletBalance(prev => (prev !== null ? prev - amount : null));
+      } else {
+        Alert.alert('Payment Failed', result.error || 'Could not process wallet payment.');
+      }
+    } catch (error) {
+       Alert.alert('Payment Failed', 'An unexpected error occurred');
+    } finally {
+      setIsProcessing(false);
+      setProcessingId(null);
+    }
+  }
+
   const handleCustomPayment = async () => {
     if (customAmount <= 0) {
       Alert.alert('Error', 'Please enter a valid amount');
       return;
     }
-    handlePayment('Custom Payment', customAmount, 'Custom payment amount');
+    if (walletBalance !== null && customAmount <= walletBalance) {
+      handlePayWithWallet('Custom Payment', customAmount);
+    } else {
+      handlePayment('Custom Payment', customAmount, 'Custom payment amount');
+    }
   };
+  
+  const isProcessingSomething = isProcessing && processingId;
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -51,9 +91,23 @@ export default function PaymentsScreen() {
           <Text className="text-2xl font-bold text-primary mb-2">Payment Services</Text>
           <Text className="text-muted-foreground">Choose from our premium services or make a custom payment.</Text>
         </View>
+        
+        {walletBalance !== null && (
+             <View className="bg-card p-4 rounded-lg shadow-sm mb-6 flex-row items-center space-x-3">
+                <Wallet size={24} color="#1e2a4a" />
+                <View>
+                    <Text className="text-sm text-muted-foreground">Wallet Balance</Text>
+                    <Text className="text-2xl font-bold text-primary">₹{walletBalance.toFixed(2)}</Text>
+                </View>
+            </View>
+        )}
 
         <View className="space-y-4 mb-8">
-          {services.map((service) => (
+          {services.map((service) => {
+            const canPayWithWallet = walletBalance !== null && walletBalance >= service.price;
+            const isProcessingThis = isProcessing && processingId === service.name;
+
+            return (
             <View key={service.id} className="bg-card p-6 rounded-lg border border-border">
               <View className="flex-row items-center gap-4 mb-4">
                  {serviceIcons[service.name] || <CreditCard size={32} color="#1e2a4a" />}
@@ -63,18 +117,35 @@ export default function PaymentsScreen() {
                 </View>
               </View>
               <Text className="text-3xl font-bold text-accent mb-4">₹{service.price}</Text>
-              <TouchableOpacity
-                className={`py-3 px-6 rounded-lg flex-row justify-center items-center ${isProcessing && processingId === service.name ? 'bg-muted' : 'bg-primary'}`}
-                onPress={() => handlePayment(service.name, service.price, service.description)}
-                disabled={isProcessing}
-              >
-                 {isProcessing && processingId === service.name ? <ActivityIndicator color="#1e2a4a" /> : null}
-                <Text className="text-primary-foreground text-center font-semibold ml-2">
-                  {isProcessing && processingId === service.name ? 'Processing...' : 'Pay Now'}
-                </Text>
-              </TouchableOpacity>
+
+              {canPayWithWallet ? (
+                 <TouchableOpacity
+                  className={`py-3 px-6 rounded-lg flex-row justify-center items-center ${isProcessingThis ? 'bg-muted' : 'bg-primary'}`}
+                  onPress={() => handlePayWithWallet(service.name, service.price)}
+                  disabled={isProcessing}
+                >
+                  {isProcessingThis ? <ActivityIndicator color="#1e2a4a" /> : <Wallet color="#fafafa" size={16} />}
+                  <Text className="text-primary-foreground text-center font-semibold ml-2">
+                    {isProcessingThis ? 'Processing...' : 'Pay with Wallet'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  className={`py-3 px-6 rounded-lg flex-row justify-center items-center ${isProcessingThis ? 'bg-muted' : 'bg-primary'}`}
+                  onPress={() => handlePayment(service.name, service.price, service.description)}
+                  disabled={isProcessing}
+                >
+                   {isProcessingThis ? <ActivityIndicator color="#1e2a4a" /> : null}
+                  <Text className="text-primary-foreground text-center font-semibold ml-2">
+                    {isProcessingThis ? 'Processing...' : 'Pay Now'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+               {!canPayWithWallet && walletBalance !== null && walletBalance > 0 && (
+                  <Text className="text-xs text-red-500 text-center mt-2">Insufficient wallet balance</Text>
+               )}
             </View>
-          ))}
+          )})}
         </View>
 
         <View className="bg-card p-6 rounded-lg border border-border">

@@ -1,3 +1,4 @@
+
 import RazorpayCheckout from '@react-native-razorpay/react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,16 +18,20 @@ export interface PaymentResponse {
 }
 
 export const paymentService = {
+  async getAuthHeaders() {
+    const token = await AsyncStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+  },
+  
   async createOrder(amount: number): Promise<{ orderId: string; amount: number } | null> {
     try {
-      const token = await AsyncStorage.getItem('token');
-      
+      const headers = await this.getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/payment/create-order`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: headers,
         body: JSON.stringify({ amount: amount * 100 }), // API expects amount in paise
       });
 
@@ -51,14 +56,10 @@ export const paymentService = {
     amount: number; // This is in paise
   }): Promise<boolean> {
     try {
-      const token = await AsyncStorage.getItem('token');
-      
+      const headers = await this.getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/payment/verify`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: headers,
         body: JSON.stringify(paymentData),
       });
 
@@ -66,6 +67,27 @@ export const paymentService = {
     } catch (error) {
       console.error('Error verifying payment:', error);
       return false;
+    }
+  },
+
+  async payWithWallet(paymentData: { serviceName: string; amount: number }): Promise<PaymentResponse> {
+     try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/payment/wallet-pay`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(paymentData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        return { success: true, paymentId: data.paymentId };
+      } else {
+        return { success: false, error: data.error || 'Wallet payment failed' };
+      }
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Network error' };
     }
   },
 
