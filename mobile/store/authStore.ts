@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { authService, AuthResponse } from '@/services/authService';
+import { authService, AuthResponse, RegisterData } from '@/services/authService';
 import { router } from 'expo-router';
 
 interface User {
@@ -15,7 +15,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthResponse>;
-  register: (name: string, email: string, password: string) => Promise<AuthResponse>;
+  register: (data: RegisterData) => Promise<AuthResponse>;
   logout: () => void;
   checkAuth: () => void;
 }
@@ -43,9 +43,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return result;
   },
 
-  register: async (name, email, password) => {
+  register: async (data: RegisterData) => {
     set({ isLoading: true });
-    const result = await authService.register({ name, email, password });
+    const result = await authService.register(data);
     if (result.success && result.user && result.token) {
       set({ 
         user: result.user, 

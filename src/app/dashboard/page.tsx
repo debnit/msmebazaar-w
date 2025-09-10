@@ -24,8 +24,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Loader2 } from "lucide-react";
-import { getSession } from "@/lib/auth-actions";
+import { Download, Loader2, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface Enquiry {
   id: string;
@@ -49,19 +50,36 @@ interface Payment {
   status: string;
 }
 
+interface Referral {
+    id: string;
+    name: string;
+    date: string;
+}
+
 interface DashboardData {
   user: {
     name: string;
     email: string;
+    referralCode: string;
   };
   enquiries: Enquiry[];
   loanApplications: LoanApplication[];
   paymentTransactions: Payment[];
+  referrals: Referral[];
 }
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+        title: "Copied!",
+        description: "Referral code copied to clipboard.",
+    });
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,11 +121,12 @@ export default function DashboardPage() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="enquiries">My Enquiries</TabsTrigger>
           <TabsTrigger value="loans">Loan Applications</TabsTrigger>
           <TabsTrigger value="payments">Payment History</TabsTrigger>
+          <TabsTrigger value="referrals">Referrals</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
@@ -254,6 +273,43 @@ export default function DashboardPage() {
                   )}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="referrals" className="mt-6">
+          <Card>
+            <CardHeader>
+                <CardTitle>Your Referral Code</CardTitle>
+                <CardDescription>Share this code with friends. When they sign up, you get rewarded!</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center space-x-2">
+                    <Input value={data.user.referralCode} readOnly className="font-mono text-lg" />
+                    <Button variant="outline" size="icon" onClick={() => copyToClipboard(data.user.referralCode)}>
+                        <Copy className="h-4 w-4" />
+                    </Button>
+                </div>
+
+                <h3 className="text-lg font-semibold mt-8 mb-4">Users you've referred</h3>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>User Name</TableHead>
+                            <TableHead>Date Joined</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {data.referrals.length > 0 ? data.referrals.map((referral) => (
+                            <TableRow key={referral.id}>
+                                <TableCell>{referral.name}</TableCell>
+                                <TableCell>{new Date(referral.date).toLocaleDateString()}</TableCell>
+                            </TableRow>
+                        )) : (
+                            <TableRow><TableCell colSpan={2} className="text-center">You haven't referred anyone yet.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </CardContent>
           </Card>
         </TabsContent>

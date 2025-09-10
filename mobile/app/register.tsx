@@ -13,6 +13,7 @@ const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
     confirmPassword: z.string(),
+    referralCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -26,12 +27,13 @@ export default function RegisterScreen() {
 
   const { control, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "", referralCode: "" },
   });
 
   const handleRegister = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    const result = await register(values.name, values.email, values.password);
+    const { confirmPassword, ...registerData } = values;
+    const result = await register(registerData);
     setIsLoading(false);
 
     if (!result.success) {
@@ -127,6 +129,25 @@ export default function RegisterScreen() {
                   )}
                 />
                 {errors.confirmPassword && <Text className="text-destructive text-sm mt-1">{errors.confirmPassword.message}</Text>}
+              </View>
+              
+              <View>
+                <Text className="text-sm font-medium text-foreground mb-2">Referral Code (Optional)</Text>
+                 <Controller
+                  control={control}
+                  name="referralCode"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className={`border px-3 py-3 rounded-md text-foreground ${errors.referralCode ? 'border-destructive' : 'border-input bg-background'}`}
+                      placeholder="Enter referral code"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="characters"
+                    />
+                  )}
+                />
+                {errors.referralCode && <Text className="text-destructive text-sm mt-1">{errors.referralCode.message}</Text>}
               </View>
 
               <TouchableOpacity

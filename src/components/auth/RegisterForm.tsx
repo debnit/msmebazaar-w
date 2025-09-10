@@ -33,6 +33,7 @@ const formSchema = z
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
     confirmPassword: z.string(),
+    referralCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -51,6 +52,7 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      referralCode: "",
     },
   });
 
@@ -150,6 +152,19 @@ export function RegisterForm() {
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="referralCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Referral Code (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter referral code" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

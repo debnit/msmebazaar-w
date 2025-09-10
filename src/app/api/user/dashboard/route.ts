@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, email: true }
+      select: { name: true, email: true, referralCode: true }
     });
 
     if (!user) {
@@ -35,10 +35,17 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
+    const referrals = await prisma.user.findMany({
+        where: { referredById: userId },
+        select: { id: true, name: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+    });
+
     const dashboardData = {
       user: {
         name: user.name,
         email: user.email,
+        referralCode: user.referralCode,
       },
       enquiries: enquiries.map(e => ({
         id: e.id,
@@ -59,6 +66,11 @@ export async function GET(req: NextRequest) {
         date: p.createdAt.toISOString(),
         status: p.status,
       })),
+      referrals: referrals.map(r => ({
+          id: r.id,
+          name: r.name,
+          date: r.createdAt.toISOString(),
+      }))
     };
 
     return NextResponse.json(dashboardData, {status: 200});

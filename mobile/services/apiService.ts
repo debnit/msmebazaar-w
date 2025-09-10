@@ -27,6 +27,7 @@ export interface DashboardData {
   user: {
     name: string;
     email: string;
+    referralCode: string;
   };
   enquiries: Array<{
     id: string;
@@ -46,6 +47,11 @@ export interface DashboardData {
     amount: string;
     date: string;
     status: string;
+  }>;
+  referrals: Array<{
+    id: string;
+    name: string;
+    date: string;
   }>;
 }
 

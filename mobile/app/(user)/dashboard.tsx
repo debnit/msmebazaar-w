@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { apiService, DashboardData } from '@/services/apiService';
-import { User, LogOut, CreditCard, FileText, MessageSquare } from 'lucide-react-native';
+import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy } from 'lucide-react-native';
 
 const TabButton = ({ active, label, icon: Icon, onPress }: any) => (
   <TouchableOpacity
@@ -26,7 +26,7 @@ export default function DashboardScreen() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'enquiries' | 'loans' | 'payments'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'enquiries' | 'loans' | 'payments' | 'referrals'>('profile');
   const { user, logout } = useAuthStore();
 
   const fetchDashboardData = async () => {
@@ -58,6 +58,11 @@ export default function DashboardScreen() {
         { text: 'Logout', style: 'destructive', onPress: logout },
       ]
     );
+  };
+
+  const copyToClipboard = (text: string) => {
+    // In a real app, you would use a library like `expo-clipboard`
+    Alert.alert("Copied!", "Referral code copied to clipboard.");
   };
 
   if (loading && !data) {
@@ -149,6 +154,40 @@ export default function DashboardScreen() {
             ))}
           </View>
         ) : <Text className="text-muted-foreground text-center py-8">No payments found.</Text>;
+        case 'referrals':
+            return (
+                <View className="bg-card p-6 rounded-lg space-y-6">
+                    <View>
+                        <Text className="text-lg font-bold text-primary mb-2">Your Referral Code</Text>
+                        <Text className="text-muted-foreground mb-4">Share this code with friends. When they sign up, you get rewarded!</Text>
+                        <View className="flex-row items-center space-x-2">
+                            <TextInput 
+                                value={data.user.referralCode} 
+                                readOnly 
+                                className="flex-1 border border-input bg-background px-4 py-3 rounded-md text-foreground font-mono text-lg"
+                            />
+                            <TouchableOpacity onPress={() => copyToClipboard(data.user.referralCode)} className="p-3 border border-border rounded-md">
+                                <Copy size={20} color="#1e2a4a" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                     <View>
+                        <Text className="text-lg font-bold text-primary mb-2">Users You've Referred</Text>
+                        {data.referrals.length > 0 ? (
+                            <View className="space-y-3">
+                                {data.referrals.map(r => (
+                                    <View key={r.id} className="flex-row justify-between items-center bg-secondary p-3 rounded-md">
+                                        <Text className="font-semibold text-secondary-foreground">{r.name}</Text>
+                                        <Text className="text-sm text-muted-foreground">{new Date(r.date).toLocaleDateString()}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        ) : (
+                             <Text className="text-muted-foreground text-center py-4">You haven't referred anyone yet.</Text>
+                        )}
+                    </View>
+                </View>
+            )
       default: return null;
     }
   };
@@ -170,11 +209,14 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row bg-secondary rounded-lg p-1 mb-6">
-            <TabButton active={activeTab === 'profile'} label="Profile" icon={User} onPress={() => setActiveTab('profile')} />
-            <TabButton active={activeTab === 'enquiries'} label="Enquiries" icon={MessageSquare} onPress={() => setActiveTab('enquiries')} />
-            <TabButton active={activeTab === 'loans'} label="Loans" icon={FileText} onPress={() => setActiveTab('loans')} />
-            <TabButton active={activeTab === 'payments'} label="Payments" icon={CreditCard} onPress={() => setActiveTab('payments')} />
+          <View className="bg-secondary rounded-lg p-1 mb-6">
+             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <TabButton active={activeTab === 'profile'} label="Profile" icon={User} onPress={() => setActiveTab('profile')} />
+                <TabButton active={activeTab === 'enquiries'} label="Enquiries" icon={MessageSquare} onPress={() => setActiveTab('enquiries')} />
+                <TabButton active={activeTab === 'loans'} label="Loans" icon={FileText} onPress={() => setActiveTab('loans')} />
+                <TabButton active={activeTab === 'payments'} label="Payments" icon={CreditCard} onPress={() => setActiveTab('payments')} />
+                <TabButton active={activeTab === 'referrals'} label="Referrals" icon={Share2} onPress={() => setActiveTab('referrals')} />
+            </ScrollView>
           </View>
           
           {renderTabContent()}
