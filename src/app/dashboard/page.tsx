@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Loader2, Copy } from "lucide-react";
+import { Download, Loader2, Copy, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 
@@ -61,6 +61,7 @@ interface DashboardData {
     name: string;
     email: string;
     referralCode: string;
+    walletBalance: number;
   };
   enquiries: Enquiry[];
   loanApplications: LoanApplication[];
@@ -119,6 +120,18 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-headline font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Welcome back, {data.user.name}! Here's an overview of your account.</p>
       </div>
+      
+      <Card className="mb-8">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+            <div className="text-2xl font-bold">₹{data.user.walletBalance.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">Your earnings from referrals.</p>
+        </CardContent>
+      </Card>
+
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, email: true, referralCode: true }
+      select: { name: true, email: true, referralCode: true, walletBalance: true }
     });
 
     if (!user) {
@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
         name: user.name,
         email: user.email,
         referralCode: user.referralCode,
+        walletBalance: user.walletBalance,
       },
       enquiries: enquiries.map(e => ({
         id: e.id,

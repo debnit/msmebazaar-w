@@ -28,6 +28,7 @@ export interface DashboardData {
     name: string;
     email: string;
     referralCode: string;
+    walletBalance: number;
   };
   enquiries: Array<{
     id: string;

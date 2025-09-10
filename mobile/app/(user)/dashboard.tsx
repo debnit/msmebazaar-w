@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { apiService, DashboardData } from '@/services/apiService';
-import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy } from 'lucide-react-native';
+import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy, Wallet } from 'lucide-react-native';
 
 const TabButton = ({ active, label, icon: Icon, onPress }: any) => (
   <TouchableOpacity
@@ -207,6 +207,16 @@ export default function DashboardScreen() {
             <TouchableOpacity onPress={handleLogout}>
               <LogOut size={24} color="#1e2a4a" />
             </TouchableOpacity>
+          </View>
+          
+          <View className="bg-card p-4 rounded-lg shadow-sm mb-6">
+            <View className="flex-row items-center">
+                <Wallet size={24} color="#1e2a4a" />
+                <View className="ml-4">
+                    <Text className="text-sm text-muted-foreground">Wallet Balance</Text>
+                    <Text className="text-2xl font-bold text-primary">₹{data.user.walletBalance.toFixed(2)}</Text>
+                </View>
+            </View>
           </View>
 
           <View className="bg-secondary rounded-lg p-1 mb-6">

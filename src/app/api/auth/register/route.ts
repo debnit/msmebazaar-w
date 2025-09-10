@@ -58,8 +58,9 @@ export async function POST(req: NextRequest) {
         referralCode,
     };
 
+    let referringUser = null;
     if (incomingReferralCode) {
-        const referringUser = await prisma.user.findUnique({
+        referringUser = await prisma.user.findUnique({
             where: { referralCode: incomingReferralCode },
         });
 
@@ -68,15 +69,29 @@ export async function POST(req: NextRequest) {
         }
     }
 
-    const user = await prisma.user.create({
-      data: userData,
+    const newUser = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: userData,
+      });
+
+      if (referringUser) {
+        await tx.user.update({
+          where: { id: referringUser.id },
+          data: {
+            walletBalance: {
+              increment: 10,
+            },
+          },
+        });
+      }
+      return createdUser;
     });
 
     // Automatically log the user in after registration
-    await login({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin });
+    await login({ id: newUser.id, email: newUser.email, name: newUser.name, isAdmin: newUser.isAdmin });
 
     return NextResponse.json(
-      {message: 'User registered and logged in successfully', userId: user.id},
+      {message: 'User registered and logged in successfully', userId: newUser.id},
       {status: 201}
     );
   } catch (error) {
