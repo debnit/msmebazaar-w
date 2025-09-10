@@ -113,6 +113,18 @@ class ApiService {
       return { success: false, error: error.message || 'Network error' };
     }
   }
+
+  async getCreditScore(pan: string): Promise<{ success: boolean; score?: number; error?: string }> {
+    try {
+        const data = await this.fetch('/credit-score', {
+            method: 'POST',
+            body: JSON.stringify({ pan }),
+        });
+        return { success: true, score: data.score };
+    } catch (error: any) {
+        return { success: false, error: error.message || 'Network error' };
+    }
+  }
 }
 
 export const apiService = new ApiService();

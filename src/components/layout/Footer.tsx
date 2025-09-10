@@ -29,7 +29,7 @@ const Footer = () => {
             <ul className="mt-4 space-y-2 text-sm">
               <li><Link href="/loan-application" className="text-muted-foreground hover:text-primary">Business Loans</Link></li>
               <li><Link href="/payments" className="text-muted-foreground hover:text-primary">Online Payments</Link></li>
-              <li><Link href="/enquiry" className="text-muted-foreground hover:text-primary">Credit Score</Link></li>
+              <li><Link href="/credit-score" className="text-muted-foreground hover:text-primary">Credit Score</Link></li>
               <li><Link href="#" className="text-muted-foreground hover:text-primary">GST Registration</Link></li>
             </ul>
           </div>
