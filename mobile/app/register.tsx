@@ -1,47 +1,47 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Chrome } from 'lucide-react-native';
+
+const formSchema = z.object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    email: z.string().email({ message: "Invalid email address." }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
 
 export default function RegisterScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuthStore();
 
-  const handleRegister = async () => {
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
+  const { control, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+  });
 
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
-      return;
-    }
-
+  const handleRegister = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    const result = await register(name, email, password);
+    const result = await register(values.name, values.email, values.password);
     setIsLoading(false);
 
-    if (result.success) {
-      router.replace('/dashboard');
-    } else {
+    if (!result.success) {
       Alert.alert('Registration Failed', result.error || 'An unexpected error occurred');
     }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1 px-6">
+      <ScrollView contentContainerClassName="flex-grow justify-center px-6">
         <View className="py-12">
           <View className="bg-card p-6 rounded-lg shadow-sm">
             <View className="mb-6">
@@ -54,82 +54,121 @@ export default function RegisterScreen() {
             <View className="space-y-4">
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Name</Text>
-                <TextInput
-                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                  placeholder="John Doe"
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className={`border px-3 py-3 rounded-md text-foreground ${errors.name ? 'border-destructive' : 'border-input bg-background'}`}
+                      placeholder="John Doe"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="words"
+                    />
+                  )}
                 />
+                 {errors.name && <Text className="text-destructive text-sm mt-1">{errors.name.message}</Text>}
               </View>
 
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Email</Text>
-                <TextInput
-                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                       className={`border px-3 py-3 rounded-md text-foreground ${errors.email ? 'border-destructive' : 'border-input bg-background'}`}
+                      placeholder="name@example.com"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  )}
                 />
+                 {errors.email && <Text className="text-destructive text-sm mt-1">{errors.email.message}</Text>}
               </View>
 
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Password</Text>
-                <TextInput
-                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
+                 <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className={`border px-3 py-3 rounded-md text-foreground ${errors.password ? 'border-destructive' : 'border-input bg-background'}`}
+                      placeholder="••••••••"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry
+                    />
+                  )}
                 />
+                {errors.password && <Text className="text-destructive text-sm mt-1">{errors.password.message}</Text>}
               </View>
 
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Confirm Password</Text>
-                <TextInput
-                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
+                <Controller
+                  control={control}
+                  name="confirmPassword"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      className={`border px-3 py-3 rounded-md text-foreground ${errors.confirmPassword ? 'border-destructive' : 'border-input bg-background'}`}
+                      placeholder="••••••••"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry
+                    />
+                  )}
                 />
+                {errors.confirmPassword && <Text className="text-destructive text-sm mt-1">{errors.confirmPassword.message}</Text>}
               </View>
 
               <TouchableOpacity
-                className={`py-4 px-6 rounded-lg ${isLoading ? 'bg-muted' : 'bg-accent'}`}
-                onPress={handleRegister}
+                className={`py-4 px-6 rounded-lg flex-row justify-center items-center ${isLoading ? 'bg-muted' : 'bg-accent'}`}
+                onPress={handleSubmit(handleRegister)}
                 disabled={isLoading}
               >
-                <Text className="text-accent-foreground text-center font-semibold text-lg">
-                  {isLoading ? 'Creating Account...' : 'Create account'}
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text className="text-accent-foreground text-center font-semibold text-lg">
+                    Create account
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
 
-            <View className="mt-6 pt-6 border-t border-border">
-              <View className="flex-row justify-center items-center mb-4">
-                <View className="flex-1 h-px bg-border" />
-                <Text className="px-4 text-xs text-muted-foreground uppercase">Or continue with</Text>
-                <View className="flex-1 h-px bg-border" />
+            <View className="relative my-6">
+              <View className="absolute inset-0 flex items-center">
+                <View className="w-full border-t border-border" />
               </View>
-              
-              <TouchableOpacity className="border border-border py-4 px-6 rounded-lg">
-                <Text className="text-foreground text-center font-semibold">
-                  Sign up with Google
-                </Text>
-              </TouchableOpacity>
+              <View className="relative flex justify-center">
+                <Text className="bg-card px-2 text-xs text-muted-foreground uppercase">Or continue with</Text>
+              </View>
             </View>
+              
+            <TouchableOpacity className="border border-border py-4 px-6 rounded-lg flex-row justify-center items-center">
+              <Chrome size={20} color="#1e2a4a" />
+              <Text className="text-foreground text-center font-semibold ml-2">
+                Sign up with Google
+              </Text>
+            </TouchableOpacity>
 
             <View className="mt-6 pt-6 border-t border-border">
-              <Text className="text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
+              <View className="flex-row justify-center items-center">
+                <Text className="text-center text-sm text-muted-foreground">
+                  Already have an account?{' '}
+                </Text>
                 <TouchableOpacity onPress={() => router.push('/login')}>
                   <Text className="text-primary underline font-semibold">Log in</Text>
                 </TouchableOpacity>
-              </Text>
+              </View>
             </View>
           </View>
         </View>

@@ -1,8 +1,8 @@
 import RazorpayCheckout from '@react-native-razorpay/react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Update this to your backend URL
-const RAZORPAY_KEY_ID = 'rzp_test_E1nhfx3UCW0qUi'; // Replace with your actual Razorpay key
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const RAZORPAY_KEY_ID = process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID;
 
 export interface PaymentData {
   amount: number;
@@ -27,14 +27,15 @@ export const paymentService = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount: amount * 100 }), // API expects amount in paise
       });
 
       if (response.ok) {
         const data = await response.json();
         return { orderId: data.orderId, amount: data.amount };
       } else {
-        throw new Error('Failed to create order');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
       }
     } catch (error) {
       console.error('Error creating order:', error);
@@ -47,7 +48,7 @@ export const paymentService = {
     razorpay_order_id: string;
     razorpay_signature: string;
     serviceName: string;
-    amount: number;
+    amount: number; // This is in paise
   }): Promise<boolean> {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -83,19 +84,19 @@ export const paymentService = {
       // Razorpay options
       const options = {
         description: paymentData.description || `Payment for ${paymentData.serviceName}`,
-        image: 'https://your-logo-url.com/logo.png', // Add your logo URL
+        image: 'https://placehold.co/256x256/1e2a4a/fafafa.png?text=M', // Placeholder logo
         currency: 'INR',
         key: RAZORPAY_KEY_ID,
-        amount: orderData.amount,
+        amount: orderData.amount, // Already in paise from createOrder
         name: 'MSMEConnect',
         order_id: orderData.orderId,
         prefill: {
-          email: user?.email || 'user@example.com',
-          contact: '8260895728',
-          name: user?.name || 'User',
+          email: user?.email || '',
+          contact: '', // Prefill phone if available
+          name: user?.name || 'Valued Customer',
         },
         theme: {
-          color: '#ff6b35', // Your brand color
+          color: '#1e2a4a', // primary color
         },
       };
 
@@ -117,10 +118,10 @@ export const paymentService = {
         return { success: false, error: 'Payment verification failed' };
       }
     } catch (error: any) {
-      if (error.code === 'PAYMENT_CANCELLED') {
+      if (error.code === 1) { // PAYMENT_CANCELLED
         return { success: false, error: 'Payment was cancelled' };
       } else {
-        return { success: false, error: error.message || 'Payment failed' };
+        return { success: false, error: error.description || 'Payment failed' };
       }
     }
   },

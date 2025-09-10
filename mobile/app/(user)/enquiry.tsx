@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { apiService, EnquiryData } from '@/services/apiService';
@@ -37,16 +37,9 @@ export default function EnquiryScreen() {
         Alert.alert(
           'Enquiry Submitted',
           'Thank you! We will get back to you soon.',
-          [{ text: 'OK', onPress: () => router.push('/') }]
+          [{ text: 'OK', onPress: () => router.push('/(user)/dashboard') }]
         );
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: '',
-        });
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       } else {
         Alert.alert('Submission Failed', result.error || 'An unexpected error occurred');
       }
@@ -66,7 +59,7 @@ export default function EnquiryScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1 px-6">
+      <ScrollView contentContainerClassName="flex-grow justify-center px-6">
         <View className="py-6">
           <View className="bg-card p-6 rounded-lg shadow-sm">
             <View className="mb-6">
@@ -75,36 +68,31 @@ export default function EnquiryScreen() {
                 <Text className="text-2xl font-bold text-primary ml-2">Contact Us</Text>
               </View>
               <Text className="text-muted-foreground">
-                Have questions? Our simple enquiry form connects you with our experts to get the answers you need.
+                Have questions? Fill out the form and our experts will get back to you.
               </Text>
             </View>
 
             <View className="space-y-4">
-              {/* Name and Email Row */}
-              <View className="flex-row space-x-4">
-                <View className="flex-1">
-                  <Text className="text-sm font-medium text-foreground mb-2">Full Name</Text>
-                  <TextInput
-                    className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                    placeholder="John Doe"
-                    value={formData.name}
-                    onChangeText={(text) => updateFormData('name', text)}
-                  />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-medium text-foreground mb-2">Email Address</Text>
-                  <TextInput
-                    className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
-                    placeholder="name@example.com"
-                    value={formData.email}
-                    onChangeText={(text) => updateFormData('email', text)}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                </View>
+              <View>
+                <Text className="text-sm font-medium text-foreground mb-2">Full Name</Text>
+                <TextInput
+                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChangeText={(text) => updateFormData('name', text)}
+                />
               </View>
-
-              {/* Phone Number */}
+              <View>
+                <Text className="text-sm font-medium text-foreground mb-2">Email Address</Text>
+                <TextInput
+                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
+                  placeholder="name@example.com"
+                  value={formData.email}
+                  onChangeText={(text) => updateFormData('email', text)}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Phone Number</Text>
                 <TextInput
@@ -116,26 +104,18 @@ export default function EnquiryScreen() {
                 />
               </View>
 
-              {/* Subject */}
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Subject</Text>
                 <View className="border border-input bg-background rounded-md">
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-3 py-3">
+                   {/* This would be better as a proper picker, but for consistency with web, we use buttons */}
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="p-2">
                     {subjects.map((subject) => (
                       <TouchableOpacity
                         key={subject.value}
-                        className={`px-4 py-2 rounded-full mr-2 ${
-                          formData.subject === subject.value 
-                            ? 'bg-primary' 
-                            : 'bg-secondary'
-                        }`}
+                        className={`px-4 py-2 rounded-full mr-2 ${formData.subject === subject.value ? 'bg-primary' : 'bg-secondary'}`}
                         onPress={() => updateFormData('subject', subject.value)}
                       >
-                        <Text className={`text-sm ${
-                          formData.subject === subject.value
-                            ? 'text-primary-foreground'
-                            : 'text-foreground'
-                        }`}>
+                        <Text className={`text-sm ${formData.subject === subject.value ? 'text-primary-foreground' : 'text-foreground'}`}>
                           {subject.label}
                         </Text>
                       </TouchableOpacity>
@@ -144,7 +124,6 @@ export default function EnquiryScreen() {
                 </View>
               </View>
 
-              {/* Message */}
               <View>
                 <Text className="text-sm font-medium text-foreground mb-2">Your Message</Text>
                 <TextInput
@@ -153,38 +132,25 @@ export default function EnquiryScreen() {
                   value={formData.message}
                   onChangeText={(text) => updateFormData('message', text)}
                   multiline
-                  numberOfLines={6}
+                  numberOfLines={4}
                   textAlignVertical="top"
                   style={{ minHeight: 120 }}
                 />
-                <Text className="text-xs text-muted-foreground mt-1">
-                  {formData.message.length}/10 minimum characters
+                <Text className="text-xs text-muted-foreground mt-1 text-right">
+                  {formData.message.length} / 10 minimum characters
                 </Text>
               </View>
 
-              {/* Submit Button */}
               <TouchableOpacity
-                className={`flex-row items-center justify-center py-4 px-6 rounded-lg ${
-                  isSubmitting ? 'bg-muted' : 'bg-accent'
-                }`}
+                className={`flex-row items-center justify-center py-4 px-6 rounded-lg ${isSubmitting ? 'bg-muted' : 'bg-accent'}`}
                 onPress={handleSubmit}
                 disabled={isSubmitting}
               >
-                <Send size={20} color="#ffffff" />
+                {isSubmitting ? <ActivityIndicator color="#ffffff" /> : <Send size={20} color="#ffffff" />}
                 <Text className="text-accent-foreground font-semibold ml-2">
                   {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
                 </Text>
               </TouchableOpacity>
-            </View>
-
-            {/* Contact Info */}
-            <View className="mt-8 bg-secondary p-4 rounded-lg">
-              <Text className="font-semibold text-foreground mb-2">Need Immediate Help?</Text>
-              <Text className="text-sm text-muted-foreground mb-2">
-                For urgent queries, you can also reach us at:
-              </Text>
-              <Text className="text-sm text-foreground">📞 +91 98765 43210</Text>
-              <Text className="text-sm text-foreground">✉️ support@msmeconnect.com</Text>
             </View>
           </View>
         </View>

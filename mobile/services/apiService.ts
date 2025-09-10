@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Update this to your backend URL
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export interface LoanApplicationData {
   fullName: string;
@@ -58,60 +58,52 @@ class ApiService {
     };
   }
 
+  private async fetch(endpoint: string, options: RequestInit = {}) {
+    const headers = await this.getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: { ...headers, ...options.headers },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+    
+    return response.json();
+  }
+
+
   async submitLoanApplication(data: LoanApplicationData): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/loan-application`, {
+      await this.fetch('/loan-application', {
         method: 'POST',
-        headers: await this.getAuthHeaders(),
         body: JSON.stringify(data),
       });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.error || 'Failed to submit loan application' };
-      }
-    } catch (error) {
-      return { success: false, error: 'Network error' };
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Network error' };
     }
   }
 
   async submitEnquiry(data: EnquiryData): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/enquiry`, {
+       await this.fetch('/enquiry', {
         method: 'POST',
-        headers: await this.getAuthHeaders(),
         body: JSON.stringify(data),
       });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.error || 'Failed to submit enquiry' };
-      }
-    } catch (error) {
-      return { success: false, error: 'Network error' };
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Network error' };
     }
   }
 
   async getDashboardData(): Promise<{ success: boolean; data?: DashboardData; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/dashboard`, {
-        method: 'GET',
-        headers: await this.getAuthHeaders(),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return { success: true, data };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.error || 'Failed to fetch dashboard data' };
-      }
-    } catch (error) {
-      return { success: false, error: 'Network error' };
+      const data = await this.fetch('/user/dashboard');
+      return { success: true, data };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Network error' };
     }
   }
 }

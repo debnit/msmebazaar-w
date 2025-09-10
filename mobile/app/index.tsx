@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { HandCoins, FileText, Banknote, Rocket } from 'lucide-react-native';
 
@@ -29,8 +29,21 @@ const features = [
 ];
 
 export default function HomeScreen() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
 
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background justify-center items-center">
+        <ActivityIndicator size="large" color="#1e2a4a" />
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthenticated) {
+    const route = user?.isAdmin ? '/(admin)/dashboard' : '/(user)/dashboard';
+    return <Redirect href={route} />;
+  }
+  
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-1">
@@ -46,15 +59,15 @@ export default function HomeScreen() {
             <View className="w-full space-y-4">
               <TouchableOpacity 
                 className="bg-accent py-4 px-6 rounded-lg"
-                onPress={() => router.push('/loan')}
+                onPress={() => router.push('/login')}
               >
                 <Text className="text-accent-foreground text-center font-semibold text-lg">
-                  Apply for a Loan
+                  Login / Register
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 className="border border-primary py-4 px-6 rounded-lg"
-                onPress={() => router.push('/enquiry')}
+                onPress={() => router.push('/(user)/enquiry')}
               >
                 <Text className="text-primary text-center font-semibold text-lg">
                   Contact Sales
@@ -112,26 +125,6 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-
-        {/* Action Buttons */}
-        <View className="px-6 pb-12 space-y-4">
-          <TouchableOpacity 
-            className="bg-accent py-4 px-6 rounded-lg"
-            onPress={() => router.push('/enquiry')}
-          >
-            <Text className="text-accent-foreground text-center font-semibold text-lg">
-              Submit Enquiry
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            className="border border-primary py-4 px-6 rounded-lg"
-            onPress={() => router.push('/loan')}
-          >
-            <Text className="text-primary text-center font-semibold text-lg">
-              Apply for Loan
-            </Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
