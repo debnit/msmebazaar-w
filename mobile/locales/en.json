@@ -1,0 +1,14 @@
+
+{
+  "login": {
+    "title": "Login",
+    "subtitle": "Enter your email below to login to your account.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot password?",
+    "submit": "Login",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  }
+}

@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -6,6 +7,11 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import { getSession } from '@/lib/auth';
+import { i18n } from '../../i18n-config';
+
+export async function generateStaticParams() {
+  return i18n.locales.map(locale => ({ lang: locale }));
+}
 
 export const metadata: Metadata = {
   title: 'MSMEConnect',
@@ -14,12 +20,14 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  params
 }: Readonly<{
   children: React.ReactNode;
+  params: { lang: string };
 }>) {
   const session = await getSession();
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang={params.lang} suppressHydrationWarning={true}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

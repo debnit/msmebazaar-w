@@ -1,0 +1,17 @@
+
+{
+    "hero": {
+        "title": "Unlock Your Business Potential",
+        "subtitle": "MSMEConnect provides fast, flexible financing and seamless payment solutions to help your small business thrive.",
+        "apply_loan": "Apply for a Loan",
+        "contact_sales": "Contact Sales"
+    },
+    "header": {
+        "loans": "Loans",
+        "payments": "Payments",
+        "enquiry": "Enquiry",
+        "dashboard": "Dashboard",
+        "login": "Login",
+        "register": "Register"
+    }
+}

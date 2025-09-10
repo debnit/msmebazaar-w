@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { logout } from "@/lib/auth-actions";
 import { MobileNav } from "./MobileNav";
 import { Session } from "jose";
+import LanguageSwitcher from "../LanguageSwitcher";
+import { i18n } from "../../../i18n-config";
 
 const navLinks = [
   { href: "/loan-application", label: "Loans" },
@@ -25,9 +27,9 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
 ];
 
-const NavLink = ({ href, label, pathname }: { href: string; label: string; pathname: string }) => (
+const NavLink = ({ href, label, pathname, lang }: { href: string; label: string; pathname: string, lang: string }) => (
   <Link
-    href={href}
+    href={`/${lang}${href}`}
     className={cn(
       "text-sm font-medium transition-colors hover:text-primary",
       pathname.startsWith(href) ? "text-primary" : "text-muted-foreground"
@@ -38,10 +40,8 @@ const NavLink = ({ href, label, pathname }: { href: string; label: string; pathn
 );
 
 export default async function Header({ session }: { session: Session | null }) {
-  // We can't use usePathname() in a server component, so we will pass it down or handle differently
-  // For now, we will omit active state styling on server.
-  // A more complex solution might involve a client component wrapper.
   const pathname = ""; // Placeholder
+  const lang = i18n.defaultLocale;
 
   const handleLogout = async () => {
     "use server"
@@ -52,17 +52,18 @@ export default async function Header({ session }: { session: Session | null }) {
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href={`/${lang}`} className="mr-6 flex items-center space-x-2">
             <Logo />
           </Link>
           <nav className="hidden items-center space-x-6 md:flex">
             {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} pathname={pathname}/>
+              <NavLink key={link.href} {...link} pathname={pathname} lang={lang} />
             ))}
           </nav>
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <LanguageSwitcher />
           {session?.user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -82,20 +83,20 @@ export default async function Header({ session }: { session: Session | null }) {
                 <DropdownMenuSeparator />
                 {session.user.isAdmin && (
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">
+                    <Link href={`/${lang}/admin`}>
                       <Shield className="mr-2 h-4 w-4" />
                       <span>Admin</span>
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard">
+                  <Link href={`/${lang}/dashboard`}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/notifications">
+                  <Link href={`/${lang}/notifications`}>
                     <Bell className="mr-2 h-4 w-4" />
                     <span>Notifications</span>
                   </Link>
@@ -114,10 +115,10 @@ export default async function Header({ session }: { session: Session | null }) {
           ) : (
             <nav className="hidden items-center space-x-2 md:flex">
               <Button asChild variant="ghost">
-                <Link href="/login">Login</Link>
+                <Link href={`/${lang}/login`}>Login</Link>
               </Button>
               <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Link href="/register">Register</Link>
+                <Link href={`/${lang}/register`}>Register</Link>
               </Button>
             </nav>
           )}

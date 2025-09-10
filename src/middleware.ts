@@ -1,10 +1,52 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { i18n } from "./i18n-config";
+import { match as matchLocale } from '@formatjs/intl-localematcher'
+import Negotiator from 'negotiator'
+
+function getLocale(request: NextRequest): string | undefined {
+  const negotiatorHeaders: Record<string, string> = {}
+  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
+
+  // @ts-ignore locales are readonly
+  const locales: string[] = i18n.locales
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
+
+  const locale = matchLocale(languages, locales, i18n.defaultLocale)
+  return locale
+}
+
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  )
+
+  // Redirect if there is no locale
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request)
+
+    if (pathname.startsWith('/api/') || pathname.startsWith('/_next/')) {
+       return NextResponse.next();
+    }
+    
+    return NextResponse.redirect(
+      new URL(
+        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+        request.url
+      )
+    )
+  }
+
+
   const session = await getSession();
-  const { pathname } = request.nextUrl;
+  
+  // Removing locale from pathname
+  const pathnameWithoutLocale = pathname.startsWith(`/${i18n.defaultLocale}`) 
+      ? pathname.slice(`/${i18n.defaultLocale}`.length) 
+      : pathname.slice(pathname.indexOf('/', 1));
 
   const publicPaths = [
     "/",
@@ -13,19 +55,16 @@ export async function middleware(request: NextRequest) {
     "/forgot-password",
     "/sign-in",
     "/enquiry",
-    "/api/auth/login",
-    "/api/auth/register",
-    "/api/enquiry",
-    "/api/auth/google",
-    "/api/payment/create-order",
-    "/api/payment/verify",
     "/payments/success",
-    "/payments/failure"
+    "/payments/failure",
+    "/credit-score",
+    "/loan-application",
+    "/payments",
   ];
   
-  const isPublicPath = publicPaths.some(path => pathname === path) || pathname.startsWith('/api/auth/google/callback');
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/sign-in";
-  const isAdminPath = pathname.startsWith('/admin');
+  const isPublicPath = publicPaths.some(path => pathnameWithoutLocale === path || (pathnameWithoutLocale === '' && path === '/'));
+  const isAuthPage = pathnameWithoutLocale === "/login" || pathnameWithoutLocale === "/register" || pathnameWithoutLocale === "/forgot-password" || pathnameWithoutLocale === "/sign-in";
+  const isAdminPath = pathnameWithoutLocale.startsWith('/admin');
 
   // If user is logged in
   if (session) {
@@ -37,7 +76,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Redirect from landing page
-    if (pathname === '/') {
+    if (pathnameWithoutLocale === '' || pathnameWithoutLocale === '/') {
         return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/dashboard", request.url));
     }
 
@@ -50,13 +89,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If user is not logged in
+  // If user is not logged in and path is not public, redirect to login
   if (!isPublicPath) {
-    // Allow access to notifications API for webhooks/backend processes
-    if (pathname.startsWith('/api/notifications')) {
-      return NextResponse.next();
-    }
-    // Redirect all other protected routes to login
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -65,12 +99,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
