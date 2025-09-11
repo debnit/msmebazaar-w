@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { logout } from "@/lib/auth-actions";
 import { MobileNav } from "./MobileNav";
-import { Session } from "jose";
+import type { Session } from "@/types/auth";
 import { headers } from "next/headers";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -72,7 +72,7 @@ export default async function Header({ session }: { session: Session | null }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={session.user.profilePictureUrl} alt={session.user.name} />
+                    <AvatarImage src={session.user.profilePictureUrl || undefined} alt={session.user.name || "User"} />
                     <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </Button>

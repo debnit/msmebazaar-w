@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Session } from "jose";
+import type { Session } from "@/types/auth";
 
 interface NavLink {
     href: string;
