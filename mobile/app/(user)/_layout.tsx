@@ -1,7 +1,7 @@
 
 import { Redirect, Tabs } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutDashboard, HandCoins, MessageSquare, CreditCard, User, Gauge, Gift } from 'lucide-react-native';
+import { LayoutDashboard, HandCoins, MessageSquare, CreditCard, User, Gauge, Gift, Briefcase } from 'lucide-react-native';
 import { View } from 'react-native';
 
 export default function UserLayout() {
@@ -64,6 +64,13 @@ export default function UserLayout() {
         options={{
           title: 'Redeem',
           tabBarIcon: ({ color }) => <Gift color={color} size={24} />,
+        }}
+      />
+        <Tabs.Screen
+        name="agents"
+        options={{
+          title: 'For Agents',
+          tabBarIcon: ({ color }) => <Briefcase color={color} size={24} />,
         }}
       />
       <Tabs.Screen

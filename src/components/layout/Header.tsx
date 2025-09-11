@@ -22,6 +22,7 @@ import { headers } from "next/headers";
 const navLinks = [
   { href: "/loan-application", label: "Loans" },
   { href: "/payments", label: "Payments" },
+  { href: "/agents", label: "Become an Agent" },
   { href: "/enquiry", label: "Enquiry" },
 ];
 
