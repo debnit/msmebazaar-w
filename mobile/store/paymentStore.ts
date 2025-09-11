@@ -55,6 +55,17 @@ export const usePaymentStore = create<PaymentState>((set) => ({
             "Get a call from our expert team in 5 mins",
             "Comprehensive exit strategy report"
         ]
+    },
+    {
+      id: '4',
+      name: "Plant and Machinery",
+      description: "Buy, sell, or lease equipment with our help.",
+      price: 99,
+      features: [
+        "Turnkey Project Setup",
+        "Buy/Lease/Sell Plant & Machinery",
+        "Free Consultation",
+      ]
     }
   ],
   selectedService: null,

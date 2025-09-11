@@ -77,6 +77,7 @@ export default function UserLayout() {
       <Tabs.Screen name="pro-onboarding" options={{ href: null, title: 'Pro Onboarding' }} />
       <Tabs.Screen name="valuation-onboarding" options={{ href: null, title: 'Valuation Details' }} />
       <Tabs.Screen name="navarambh-onboarding" options={{ href: null, title: 'NavArambh Details' }} />
+      <Tabs.Screen name="plant-machinery-onboarding" options={{ href: null, title: 'Plant & Machinery' }} />
     </Tabs>
   );
 }

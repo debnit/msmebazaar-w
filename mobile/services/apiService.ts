@@ -57,6 +57,14 @@ export interface NavArambhOnboardingData {
   contactDetails: string;
 }
 
+export interface PlantAndMachineryOnboardingData {
+  requestType: 'buy' | 'sell' | 'lease';
+  machineryDetails: string;
+  name: string;
+  phone: string;
+  details: string;
+}
+
 
 // API Response Structures
 export interface DashboardData {
@@ -167,6 +175,20 @@ export interface NavArambhRequest {
         name: string;
         email: string;
     }
+}
+
+export interface PlantAndMachineryRequest {
+    id: string;
+    requestType: string;
+    machineryDetails: string;
+    name: string;
+    phone: string;
+    details: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
 }
 
 
@@ -288,6 +310,15 @@ class ApiService {
         return { success: false, error: error.message };
     }
   }
+  
+  async submitPlantAndMachineryRequest(data: PlantAndMachineryOnboardingData): Promise<{ success: boolean; error?: string }> {
+    try {
+        await this.fetch('/user/plant-machinery-request', { method: 'POST', body: JSON.stringify(data) });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
 
   // Admin APIs
   async getAdminDashboardData(): Promise<{ success: boolean; data?: AdminDashboardData; error?: string }> {
@@ -374,6 +405,15 @@ class ApiService {
   async getNavArambhRequests(query: string = ''): Promise<{ success: boolean; data?: NavArambhRequest[]; error?: string }> {
     try {
         const data = await this.fetch(`/admin/navarambh?query=${query}`);
+        return { success: true, data };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+  
+  async getPlantAndMachineryRequests(query: string = ''): Promise<{ success: boolean; data?: PlantAndMachineryRequest[]; error?: string }> {
+    try {
+        const data = await this.fetch(`/admin/plant-machinery?query=${query}`);
         return { success: true, data };
     } catch (error: any) {
         return { success: false, error: error.message };

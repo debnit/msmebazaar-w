@@ -81,6 +81,21 @@ export interface NavArambhRequest {
     };
 }
 
+export interface PlantAndMachineryRequest {
+    id: string;
+    requestType: string;
+    machineryDetails: string;
+    name: string;
+    phone: string;
+    details: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
+
 export interface AdminDashboardData {
     totalRevenue: number;
     totalUsers: number;
@@ -133,3 +148,4 @@ export const getUsers = (query: string = ""): Promise<UserWithCounts[] | null> =
 export const getRedemptionRequests = (query: string = ""): Promise<RedemptionRequest[] | null> => fetcher(`/api/admin/redemptions?query=${query}`);
 export const getValuationRequests = (query: string = ""): Promise<ValuationRequest[] | null> => fetcher(`/api/admin/valuations?query=${query}`);
 export const getNavArambhRequests = (query: string = ""): Promise<NavArambhRequest[] | null> => fetcher(`/api/admin/navarambh?query=${query}`);
+export const getPlantAndMachineryRequests = (query: string = ""): Promise<PlantAndMachineryRequest[] | null> => fetcher(`/api/admin/plant-machinery?query=${query}`);

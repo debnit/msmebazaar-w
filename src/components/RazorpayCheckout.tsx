@@ -102,6 +102,8 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                             router.push(`/payments/valuation-onboarding?paymentId=${verificationData.paymentId}`);
                         } else if (serviceName === "Exit Strategy (NavArambh)") {
                             router.push(`/payments/navarambh-onboarding?paymentId=${verificationData.paymentId}`);
+                        } else if (serviceName === "Plant and Machinery") {
+                             router.push(`/payments/plant-machinery-onboarding?paymentId=${verificationData.paymentId}`);
                         } else {
                             router.push(`/payments/success`);
                         }

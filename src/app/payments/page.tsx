@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check } from "lucide-react";
+import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench } from "lucide-react";
 import RazorpayCheckout from "@/components/RazorpayCheckout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,7 @@ const serviceIcons: { [key: string]: React.ReactNode } = {
   "Pro-Membership": <Star className="h-8 w-8 text-primary" />,
   "Valuation Service": <BarChart className="h-8 w-8 text-primary" />,
   "Exit Strategy (NavArambh)": <Route className="h-8 w-8 text-primary" />,
+  "Plant and Machinery": <Wrench className="h-8 w-8 text-primary" />,
 };
 
 type Service = {
@@ -74,10 +75,10 @@ export default function PaymentsPage() {
             description: "Get a comprehensive, professional valuation for your business.", 
             price: 199,
             features: [
-              "Upload Balance Sheet (optional)",
-              "Upload Annual GST Returns (optional)",
-              "Fill in asset and liability details",
-              "Our team provides a detailed report"
+                "Upload Balance Sheet (optional)",
+                "Upload Annual GST Returns (optional)",
+                "Fill in asset and liability details",
+                "Our team provides a detailed report"
             ]
           },
           { 
@@ -92,6 +93,17 @@ export default function PaymentsPage() {
                 "Comprehensive exit strategy report"
             ]
           },
+          {
+            id: '4',
+            name: "Plant and Machinery",
+            description: "Buy, sell, or lease plant and machinery with expert help.",
+            price: 99,
+            features: [
+              "Turnkey Project Setup",
+              "Buy/Lease/Sell Plant and Machinery",
+              "Free Consultation",
+            ]
+          }
         ]);
         
         // Fetch wallet balance
@@ -134,6 +146,8 @@ export default function PaymentsPage() {
           router.push(`/payments/valuation-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Exit Strategy (NavArambh)") {
           router.push(`/payments/navarambh-onboarding?paymentId=${data.paymentId}`);
+        } else if (serviceName === "Plant and Machinery") {
+          router.push(`/payments/plant-machinery-onboarding?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }

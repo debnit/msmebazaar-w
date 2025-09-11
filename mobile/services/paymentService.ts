@@ -89,6 +89,8 @@ export const paymentService = {
             router.push('/(user)/valuation-onboarding');
         } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
             router.push('/(user)/navarambh-onboarding');
+        } else if (paymentData.serviceName === "Plant and Machinery") {
+            router.push('/(user)/plant-machinery-onboarding');
         }
         return { success: true, paymentId: data.paymentId };
       } else {
@@ -153,6 +155,8 @@ export const paymentService = {
             router.push('/(user)/valuation-onboarding');
         } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
             router.push('/(user)/navarambh-onboarding');
+        } else if (paymentData.serviceName === "Plant and Machinery") {
+            router.push('/(user)/plant-machinery-onboarding');
         }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {

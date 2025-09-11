@@ -1,7 +1,7 @@
 
 import { Redirect, Tabs } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutDashboard, FileText, Briefcase, IndianRupee, Users, Gift, BarChart, Route } from 'lucide-react-native';
+import { LayoutDashboard, FileText, Briefcase, IndianRupee, Users, Gift, BarChart, Route, Wrench } from 'lucide-react-native';
 
 export default function AdminLayout() {
   const { isAuthenticated, isLoading, user } = useAuthStore();
@@ -62,6 +62,13 @@ export default function AdminLayout() {
         options={{
           title: 'NavArambh',
           tabBarIcon: ({ color }) => <Route color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="plant-machinery"
+        options={{
+          title: 'Plant & Machinery',
+          tabBarIcon: ({ color }) => <Wrench color={color} size={24} />,
         }}
       />
       <Tabs.Screen
