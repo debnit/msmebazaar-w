@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { apiService, DashboardData } from '@/services/apiService';
-import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy, Wallet, Send } from 'lucide-react-native';
+import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy, Wallet, Send, Pencil } from 'lucide-react-native';
 
 const TabButton = ({ active, label, icon: Icon, onPress }: any) => (
   <TouchableOpacity
@@ -40,10 +40,14 @@ export default function DashboardScreen() {
     }
     setLoading(false);
   };
+  
+  // Use useFocusEffect to refetch data when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDashboardData();
+    }, [])
+  );
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -97,6 +101,10 @@ export default function DashboardScreen() {
             <View className="space-y-4">
               <View className="flex-row justify-between items-center"><Text className="font-semibold text-foreground">Name:</Text><Text className="text-muted-foreground">{data.user.name}</Text></View>
               <View className="flex-row justify-between items-center"><Text className="font-semibold text-foreground">Email:</Text><Text className="text-muted-foreground">{data.user.email}</Text></View>
+               <TouchableOpacity className="bg-secondary py-3 px-4 rounded-lg flex-row justify-center items-center" onPress={() => router.push('/(user)/profile-edit')}>
+                <Pencil size={16} color="#1e2a4a" />
+                <Text className="text-secondary-foreground font-semibold ml-2">Edit Profile</Text>
+               </TouchableOpacity>
             </View>
           </View>
         );
@@ -200,10 +208,16 @@ export default function DashboardScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#1e2a4a"]}/>}
       >
         <View className="px-6 py-6">
-          <View className="flex-row justify-between items-center mb-6">
-            <View>
-              <Text className="text-3xl font-bold text-primary">Dashboard</Text>
-              <Text className="text-muted-foreground">Welcome back, {data.user.name}!</Text>
+          <View className="flex-row justify-between items-start mb-6">
+            <View className="flex-row items-center space-x-4">
+               <Image 
+                source={{ uri: data.user.profilePictureUrl || 'https://i.pravatar.cc/150?u=' + user?.id }}
+                className="h-16 w-16 rounded-full"
+               />
+               <View>
+                <Text className="text-3xl font-bold text-primary">{data.user.name}</Text>
+                <Text className="text-muted-foreground">Welcome back!</Text>
+               </View>
             </View>
             <TouchableOpacity onPress={handleLogout}>
               <LogOut size={24} color="#1e2a4a" />

@@ -1,7 +1,7 @@
 
 import { Redirect, Tabs } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutDashboard, HandCoins, MessageSquare, CreditCard, User, Gauge, Gift, Briefcase, Bell } from 'lucide-react-native';
+import { LayoutDashboard, HandCoins, MessageSquare, CreditCard, User, Gauge, Gift, Briefcase, Bell, FileText } from 'lucide-react-native';
 import { View } from 'react-native';
 
 export default function UserLayout() {
@@ -43,6 +43,13 @@ export default function UserLayout() {
         options={{
           title: 'Apply for Loan',
           tabBarIcon: ({ color }) => <HandCoins color={color} size={24} />,
+        }}
+      />
+       <Tabs.Screen
+        name="business-plan"
+        options={{
+          title: 'AI Business Plan',
+          tabBarIcon: ({ color }) => <FileText color={color} size={24} />,
         }}
       />
       <Tabs.Screen
@@ -92,6 +99,7 @@ export default function UserLayout() {
       <Tabs.Screen name="valuation-onboarding" options={{ href: null, title: 'Valuation Details' }} />
       <Tabs.Screen name="navarambh-onboarding" options={{ href: null, title: 'NavArambh Details' }} />
       <Tabs.Screen name="plant-machinery-onboarding" options={{ href: null, title: 'Plant & Machinery' }} />
+      <Tabs.Screen name="profile-edit" options={{ href: null, title: 'Edit Profile' }} />
     </Tabs>
   );
 }

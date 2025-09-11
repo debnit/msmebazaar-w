@@ -1,18 +1,41 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, Briefcase, FileText, IndianRupee, Users } from 'lucide-react-native';
+import { LogOut, Briefcase, FileText, IndianRupee, Users, BarChart2 } from 'lucide-react-native';
 import { AdminDashboardData, apiService } from '@/services/apiService';
 import { router } from 'expo-router';
 
-const StatCard = ({ title, value, icon, onPress }: { title: string; value: string; icon: React.ReactNode, onPress: () => void }) => (
-    <TouchableOpacity onPress={onPress} className="bg-card rounded-lg p-4 flex-1 items-center justify-center space-y-2 shadow">
+const StatCard = ({ title, value, icon, onPress }: { title: string; value: string; icon: React.ReactNode, onPress?: () => void }) => (
+    <TouchableOpacity onPress={onPress} disabled={!onPress} className="bg-card rounded-lg p-4 flex-1 items-center justify-center space-y-2 shadow">
         {icon}
         <Text className="text-muted-foreground text-sm">{title}</Text>
         <Text className="text-2xl font-bold text-primary">{value}</Text>
     </TouchableOpacity>
 );
+
+const SimpleBarChart = ({ data, title }: { data: { label: string; value: number }[], title: string }) => {
+  const maxValue = Math.max(...data.map(d => d.value));
+  return (
+    <View className="bg-card rounded-lg p-4 mt-6 shadow">
+      <Text className="text-lg font-semibold text-primary mb-4">{title}</Text>
+      {data.length > 0 ? (
+        <View className="space-y-4">
+          {data.map((item, index) => (
+            <View key={index}>
+              <Text className="text-sm text-muted-foreground">{item.label}</Text>
+              <View className="flex-row items-center mt-1">
+                <View style={{ width: `${(item.value / maxValue) * 100}%` }} className="bg-accent h-4 rounded-l-md" />
+                <Text className="text-xs font-semibold text-primary ml-2">{item.value}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : <Text className="text-muted-foreground">No data available.</Text>}
+    </View>
+  );
+};
 
 export default function AdminDashboardScreen() {
     const { user, logout } = useAuthStore();
@@ -73,6 +96,10 @@ export default function AdminDashboardScreen() {
                         <StatCard title="Enquiries" value={String(data.totalEnquiries)} icon={<FileText size={24} color="#1e2a4a" />} onPress={() => router.push('/(admin)/enquiries')} />
                     </View>
                 </View>
+
+                {/* Charts */}
+                <SimpleBarChart data={data.monthlyRevenue} title="Monthly Revenue (Last 6 Months)" />
+                <SimpleBarChart data={data.userSignups} title="User Signups (Last 6 Months)" />
 
                 {/* Recent Loans */}
                 <View className="bg-card rounded-lg p-4 mt-6 shadow">

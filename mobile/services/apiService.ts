@@ -65,6 +65,17 @@ export interface PlantAndMachineryOnboardingData {
   details: string;
 }
 
+export interface UserProfileUpdateData {
+    name: string;
+    profilePictureUrl?: string;
+}
+
+export interface BusinessPlanData {
+    businessName: string;
+    industry: string;
+    targetAudience: string;
+}
+
 
 // API Response Structures
 export interface DashboardData {
@@ -73,6 +84,7 @@ export interface DashboardData {
     email: string;
     referralCode: string;
     walletBalance: number;
+    profilePictureUrl?: string;
   };
   enquiries: Array<{
     id: string;
@@ -199,6 +211,8 @@ export interface AdminDashboardData {
     totalEnquiries: number;
     recentLoans: Loan[];
     recentUsers: User[];
+    monthlyRevenue: { label: string; value: number }[];
+    userSignups: { label: string; value: number }[];
 }
 
 export interface AdminUser extends User {
@@ -329,6 +343,25 @@ class ApiService {
         return { success: false, error: error.message };
     }
   }
+
+  async updateUserProfile(data: UserProfileUpdateData): Promise<{ success: boolean; error?: string }> {
+    try {
+        await this.fetch('/user/profile', { method: 'PATCH', body: JSON.stringify(data) });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+
+  async generateBusinessPlan(data: BusinessPlanData): Promise<{ success: boolean; plan?: string; error?: string }> {
+    try {
+        const response = await this.fetch('/ai/business-plan', { method: 'POST', body: JSON.stringify(data) });
+        return { success: true, plan: response.plan };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+
 
   // Notification APIs
   async getNotifications(): Promise<{ success: boolean; data?: Notification[]; error?: string }> {

@@ -2,7 +2,7 @@
 "use server"
 
 import Link from "next/link";
-import { UserCircle, LogOut, LayoutDashboard, Bell, Shield } from "lucide-react";
+import { UserCircle, LogOut, LayoutDashboard, Bell, Shield, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "./Logo";
 import {
@@ -18,10 +18,12 @@ import { logout } from "@/lib/auth-actions";
 import { MobileNav } from "./MobileNav";
 import { Session } from "jose";
 import { headers } from "next/headers";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const navLinks = [
   { href: "/loan-application", label: "Loans" },
   { href: "/payments", label: "Payments" },
+  { href: "/business-plan", label: "AI Business Plan" },
   { href: "/agents", label: "Become an Agent" },
   { href: "/enquiry", label: "Enquiry" },
 ];
@@ -68,7 +70,10 @@ export default async function Header({ session }: { session: Session | null }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <UserCircle className="h-8 w-8" />
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={session.user.profilePictureUrl} alt={session.user.name} />
+                    <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
