@@ -22,8 +22,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Skip middleware for API routes and static assets
-  const publicPaths = ['/api/', '/_next/static/', '/_next/image/', '.ico', '.png', '.svg', '.jpg', '.jpeg', '.webp'];
-  if (publicPaths.some(p => pathname.includes(p))) {
+  const publicPaths = ['/api/', '/_next/static/', '/_next/image', '/favicon.ico', '/sw.js', '/manifest.json'];
+  if (publicPaths.some(p => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
