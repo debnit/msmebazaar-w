@@ -81,6 +81,7 @@ export default function UsersPage() {
                     <SelectItem value="all">All Roles</SelectItem>
                     <SelectItem value="admin">Admins</SelectItem>
                     <SelectItem value="agent">Agents</SelectItem>
+                    <SelectItem value="pro">Pro Users</SelectItem>
                     <SelectItem value="user">Regular Users</SelectItem>
                 </SelectContent>
             </Select>
@@ -122,7 +123,8 @@ export default function UsersPage() {
                   <div className='flex flex-col gap-2'>
                     {user.isAdmin && <Badge variant={'destructive'}>Admin</Badge>}
                     {user.isAgent && <Badge variant={'outline'}>Agent</Badge>}
-                    {!user.isAdmin && !user.isAgent && <Badge variant={'secondary'}>User</Badge>}
+                    {user.isPro && <Badge variant="secondary" className='bg-yellow-500 text-white'>Pro</Badge>}
+                    {!user.isAdmin && !user.isAgent && !user.isPro && <Badge variant={'secondary'}>User</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>{user._count.enquiries}</TableCell>

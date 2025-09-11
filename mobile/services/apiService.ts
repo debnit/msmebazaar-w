@@ -203,6 +203,7 @@ export interface AdminDashboardData {
 
 export interface AdminUser extends User {
     isAgent: boolean;
+    isPro: boolean;
     _count: {
         loanApplications: number;
         enquiries: number;
@@ -436,7 +437,7 @@ class ApiService {
     }
   }
 
-  async getUsers(query: string = '', role: 'all' | 'admin' | 'agent' | 'user' = 'all'): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
+  async getUsers(query: string = '', role: 'all' | 'admin' | 'agent' | 'pro' | 'user' = 'all'): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
       try {
           const data = await this.fetch(`/admin/users?query=${query}&role=${role}`);
           return { success: true, data };

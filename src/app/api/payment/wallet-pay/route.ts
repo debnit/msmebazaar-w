@@ -28,14 +28,20 @@ export async function POST(req: NextRequest) {
 
     // Use a transaction to ensure atomicity
     const payment = await prisma.$transaction(async (tx) => {
-      // 1. Deduct from wallet
-      await tx.user.update({
-        where: { id: session.user.id },
-        data: {
+      // 1. Deduct from wallet & potentially update user status
+      const updateData: any = {
           walletBalance: {
             decrement: amount,
           },
-        },
+      };
+
+      if(serviceName === "Pro-Membership") {
+          updateData.isPro = true;
+      }
+      
+      await tx.user.update({
+        where: { id: session.user.id },
+        data: updateData,
       });
 
       // 2. Create payment transaction record

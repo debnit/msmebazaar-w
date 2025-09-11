@@ -24,9 +24,12 @@ export async function GET(req: NextRequest) {
       where.isAdmin = true;
     } else if (role === 'agent') {
       where.isAgent = true;
+    } else if (role === 'pro') {
+      where.isPro = true;
     } else if (role === 'user') {
       where.isAdmin = false;
       where.isAgent = false;
+      where.isPro = false;
     }
 
     const users = await prisma.user.findMany({

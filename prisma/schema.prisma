@@ -11,32 +11,34 @@ datasource db {
 }
 
 model User {
-  id                    String                @id @default(uuid())
-  name                  String
-  email                 String                @unique
-  password              String
-  isAdmin               Boolean               @default(false)
-  isAgent               Boolean               @default(false)
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  referralCode          String                @unique @default(cuid())
-  walletBalance         Float                 @default(0)
-  referredById          String?
-  referredBy            User?                 @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals             User[]                @relation("UserReferrals")
-  enquiries             Enquiry[]
-  loanApplications      LoanApplication[]
-  paymentTransactions   PaymentTransaction[]
-  notifications         Notification[]
-  proMemberProfile      ProMemberProfile?
-  valuationRequests     ValuationRequest[]
-  navArambhRequests     NavArambhRequest[]
+  id                  String                @id @default(cuid())
+  name                String
+  email               String                @unique
+  password            String
+  isAdmin             Boolean               @default(false)
+  isAgent             Boolean               @default(false)
+  isPro               Boolean               @default(false)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  referralCode        String                @unique
+  referredById        String?
+  walletBalance       Float                 @default(0)
+  referredBy          User?                 @relation("UserReferrals", fields: [referredById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  referrals           User[]                @relation("UserReferrals")
+  enquiries           Enquiry[]
+  loanApplications    LoanApplication[]
+  paymentTransactions PaymentTransaction[]
+  notifications       Notification[]
+  proMemberProfile    ProMemberProfile?
+  valuationRequests   ValuationRequest[]
+  navArambhRequests    NavArambhRequest[]
   plantAndMachineryRequests PlantAndMachineryRequest[]
-  redemptionRequests    RedemptionRequest[]
+  redemptionRequests  RedemptionRequest[]
 }
 
 model Enquiry {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
+  userId    String?
   name      String
   email     String
   phone     String
@@ -44,118 +46,122 @@ model Enquiry {
   message   String
   status    String   @default("Pending") // Pending, In Progress, Closed
   createdAt DateTime @default(now())
-  userId    String?
+  updatedAt DateTime @updatedAt
   user      User?    @relation(fields: [userId], references: [id])
 }
 
 model LoanApplication {
-  id              String   @id @default(uuid())
-  fullName        String
-  email           String
-  phone           String
-  pan             String
-  businessName    String
-  businessType    String
+  id             String   @id @default(cuid())
+  userId         String
+  fullName       String
+  email          String
+  phone          String
+  pan            String
+  businessName   String
+  businessType   String
   yearsInBusiness Int
-  annualTurnover  Float
-  loanAmount      Float
-  loanPurpose     String
-  status          String   @default("Pending") // Pending, Approved, Rejected
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
+  annualTurnover Float
+  loanAmount     Float
+  loanPurpose    String
+  status         String   @default("Pending") // Pending, Approved, Rejected
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model PaymentTransaction {
-  id                  String    @id @default(uuid())
+  id                  String   @id @default(cuid())
+  userId              String
   serviceName         String
   amount              Float
-  status              String // Success, Failed
+  status              String
   razorpayOrderId     String?
   razorpayPaymentId   String?
   razorpaySignature   String?
-  createdAt           DateTime  @default(now())
-  userId              String
-  user                User      @relation(fields: [userId], references: [id])
-  valuationRequest    ValuationRequest?
-  navArambhRequest    NavArambhRequest?
-  plantAndMachineryRequest PlantAndMachineryRequest?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id])
+  ValuationRequest    ValuationRequest?
+  NavArambhRequest    NavArambhRequest?
+  PlantAndMachineryRequest PlantAndMachineryRequest?
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
+  userId    String
   title     String
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-  userId    String
   user      User     @relation(fields: [userId], references: [id])
 }
 
 model ProMemberProfile {
-  id                  String   @id @default(uuid())
-  businessName        String
-  businessNature      String
-  helpNeeded          String
-  consultationNotes   String
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id])
+    id                  String   @id @default(cuid())
+    userId              String   @unique
+    businessName        String
+    businessNature      String
+    helpNeeded          String
+    consultationNotes   String
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    user                User     @relation(fields: [userId], references: [id])
 }
 
 model ValuationRequest {
-  id                   String   @id @default(uuid())
-  turnover             Float
-  assets               String
-  liabilities          String
-  phone                String
-  balanceSheetUrl      String?
-  gstReturnsUrl        String?
-  createdAt            DateTime @default(now())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id])
-  paymentTransactionId String?  @unique
-  paymentTransaction   PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
+    id                  String   @id @default(cuid())
+    userId              String
+    paymentTransactionId String  @unique
+    turnover            Float
+    assets              String
+    liabilities         String
+    phone               String
+    balanceSheetUrl     String?
+    gstReturnsUrl       String?
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    user                User     @relation(fields: [userId], references: [id])
+    paymentTransaction  PaymentTransaction @relation(fields: [paymentTransactionId], references: [id])
 }
 
 model NavArambhRequest {
-  id                   String   @id @default(uuid())
-  assetDetails         String
-  turnoverDetails      String
-  loanDetails          String
-  problemDetails       String
-  contactDetails       String
-  createdAt            DateTime @default(now())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id])
-  paymentTransactionId String?  @unique
-  paymentTransaction   PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
+    id                  String   @id @default(cuid())
+    userId              String
+    paymentTransactionId String? @unique
+    assetDetails        String
+    turnoverDetails     String
+    loanDetails         String
+    problemDetails      String
+    contactDetails      String
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    user                User     @relation(fields: [userId], references: [id])
+    paymentTransaction  PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
 }
 
 model PlantAndMachineryRequest {
-  id                   String   @id @default(uuid())
-  requestType          String // buy, sell, lease
-  machineryDetails     String
-  name                 String
-  phone                String
-  details              String
-  createdAt            DateTime @default(now())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id])
-  paymentTransactionId String?  @unique
-  paymentTransaction   PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
+    id                  String   @id @default(cuid())
+    userId              String
+    paymentTransactionId String? @unique
+    requestType         String // buy, sell, lease
+    machineryDetails    String
+    name                String
+    phone               String
+    details             String
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    user                User     @relation(fields: [userId], references: [id])
+    paymentTransaction  PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id])
 }
 
 model RedemptionRequest {
-  id          String   @id @default(uuid())
-  amount      Float
-  method      String // UPI, AccountNumber, Mobile
-  details     String
-  status      String   @default("Pending") // Pending, Completed, Failed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
+    id          String   @id @default(cuid())
+    userId      String
+    amount      Float
+    method      String
+    details     String
+    status      String   @default("Pending") // Pending, Completed, Failed
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    user        User     @relation(fields: [userId], references: [id])
 }

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     if (generated_signature === razorpay_signature) {
       // Payment is successful, save to DB
-      await prisma.paymentTransaction.create({
+      const payment = await prisma.paymentTransaction.create({
         data: {
           userId: session.user.id,
           serviceName,
@@ -39,8 +39,16 @@ export async function POST(req: NextRequest) {
           status: 'Success',
         }
       });
+      
+      if(serviceName === "Pro-Membership") {
+          await prisma.user.update({
+              where: { id: session.user.id },
+              data: { isPro: true }
+          });
+      }
+      
       return NextResponse.json(
-        {status: 'success', message: 'Payment verified successfully'},
+        {status: 'success', message: 'Payment verified successfully', paymentId: payment.id},
         {status: 200}
       );
     } else {
