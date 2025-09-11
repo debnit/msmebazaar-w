@@ -36,13 +36,13 @@ export default function CreditScoreScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="flex-grow justify-center px-6">
+      <ScrollView contentContainerClassName="flex-grow justify-center p-6">
         <View className="bg-card p-6 rounded-lg shadow-sm">
           <View className="mb-6 items-center">
             <Gauge size={32} color="#1e2a4a" />
-            <Text className="text-2xl font-bold text-primary mt-2">Check Your CIBIL Score</Text>
+            <Text className="text-2xl font-bold text-primary mt-2">Instant CIBIL Score Check</Text>
             <Text className="text-muted-foreground text-center mt-1">
-              Enter your PAN to get an instant credit score check.
+              Enter your PAN to get a real-time, comprehensive credit score analysis.
             </Text>
           </View>
 
@@ -66,7 +66,7 @@ export default function CreditScoreScreen() {
               >
                 {loading ? <ActivityIndicator color="#ffffff" /> : <TrendingUp size={20} color="#ffffff" />}
                 <Text className="text-accent-foreground font-semibold ml-2">
-                  {loading ? 'Checking...' : 'Get My Score'}
+                  {loading ? 'Analyzing...' : 'Get My Score'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -76,6 +76,9 @@ export default function CreditScoreScreen() {
               <Text className={`text-7xl font-bold ${getScoreColor(score)}`}>{score}</Text>
               <Text className={`text-xl font-semibold ${getScoreColor(score)}`}>
                  {score > 750 ? "Excellent" : score > 650 ? "Good" : "Needs Improvement"}
+              </Text>
+              <Text className="text-muted-foreground text-center mt-2 px-4">
+                This score is an estimate and may vary from the official CIBIL report.
               </Text>
               <TouchableOpacity
                 className="bg-secondary py-3 px-8 rounded-lg mt-4"
@@ -94,5 +97,3 @@ export default function CreditScoreScreen() {
     </SafeAreaView>
   );
 }
-
-

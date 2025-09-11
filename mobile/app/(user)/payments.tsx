@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { usePaymentStore, PaymentService } from '@/store/paymentStore';
+import { usePaymentStore } from '@/store/paymentStore';
 import { paymentService } from '@/services/paymentService';
-import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Loader2 } from 'lucide-react-native';
-import { useAuthStore } from '@/store/authStore';
+import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet } from 'lucide-react-native';
 import { apiService } from '@/services/apiService';
 
 const serviceIcons: { [key: string]: React.ReactNode } = {
@@ -82,14 +81,12 @@ export default function PaymentsScreen() {
     }
   };
   
-  const isProcessingSomething = isProcessing && processingId;
-
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView contentContainerClassName="p-6">
         <View className="mb-6">
-          <Text className="text-2xl font-bold text-primary mb-2">Payment Services</Text>
-          <Text className="text-muted-foreground">Choose from our premium services or make a custom payment.</Text>
+          <Text className="text-2xl font-bold text-primary mb-2">Our Premium Services</Text>
+          <Text className="text-muted-foreground">Choose a service or make a custom payment to suit your needs.</Text>
         </View>
         
         {walletBalance !== null && (
@@ -151,7 +148,7 @@ export default function PaymentsScreen() {
         <View className="bg-card p-6 rounded-lg border border-border">
           <View className="mb-4">
             <Text className="text-xl font-semibold text-primary">Custom Payment</Text>
-            <Text className="text-muted-foreground">Enter an amount for any other service.</Text>
+            <Text className="text-muted-foreground">Paying for a different service? Enter the amount below.</Text>
           </View>
           <Text className="text-sm font-medium text-foreground mb-2">Amount (₹)</Text>
           <TextInput

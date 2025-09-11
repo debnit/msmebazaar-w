@@ -55,9 +55,9 @@ export default function PaymentsPage() {
         // Fetch services
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
-          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and support.", price: 99 },
-          { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 199 },
-          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 },
+          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and premium support.", price: 99 },
+          { id: '2', name: "Valuation Service", description: "Get a comprehensive, professional valuation for your business.", price: 199 },
+          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with our flagship expert guidance service.", price: 299 },
         ]);
         
         // Fetch wallet balance
@@ -132,10 +132,10 @@ export default function PaymentsPage() {
     <div className="container py-12 md:py-24">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-headline font-bold tracking-tight text-primary sm:text-4xl">
-          Secure Payments
+          Our Premium Services
         </h1>
         <p className="mt-2 text-lg leading-8 text-muted-foreground">
-          Pay for our services or make a custom payment.
+          Choose a service or make a custom payment to suit your business needs.
         </p>
       </div>
 

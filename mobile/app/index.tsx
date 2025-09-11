@@ -4,28 +4,28 @@ import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { HandCoins, FileText, Banknote, Rocket, Route } from 'lucide-react-native';
+import { HandCoins, FileText, Banknote, Rocket, Route, Award } from 'lucide-react-native';
 
 const features = [
   {
-    icon: <Route size={40} color="#1e2a4a" />,
+    icon: <Route size={32} color="#1e2a4a" />,
     title: "NavArambh Exit Strategy",
-    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit.",
+    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
   },
   {
-    icon: <HandCoins size={40} color="#1e2a4a" />,
+    icon: <HandCoins size={32} color="#1e2a4a" />,
     title: "Quick Business Loans",
-    description: "Access capital quickly with our streamlined loan application process. Get funds in as little as 24 hours.",
+    description: "Access working capital, expand your operations, or purchase new equipment with our streamlined loan application process designed for the speed of business.",
   },
   {
-    icon: <Banknote size={40} color="#1e2a4a" />,
-    title: "Seamless Payments",
-    description: "Integrate our secure payment gateway to accept payments from customers effortlessly. Powered by Razorpay.",
+    icon: <Award size={32} color="#1e2a4a" />,
+    title: "Referral Program",
+    description: "Refer other MSMEs to our platform and earn rewards in your wallet. It's our way of saying thank you for helping our community grow.",
   },
   {
-    icon: <FileText size={40} color="#1e2a4a" />,
+    icon: <FileText size={32} color="#1e2a4a" />,
     title: "Easy Enquiry & Support",
-    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers you need.",
+    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers and support you need to grow.",
   },
 ];
 
@@ -49,29 +49,48 @@ export default function HomeScreen() {
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-1">
         {/* Hero Section */}
-        <View className="bg-card px-6 py-12">
-          <View className="items-center space-y-6">
-            <Text className="text-4xl font-bold text-primary text-center">
-              Exit Strategies & Quick Loans for MSMEs
-            </Text>
-            <Text className="text-lg text-muted-foreground text-center px-4">
-              From expert valuation with NavArambh to fast, accessible business loans, we provide the financial tools you need to succeed.
-            </Text>
-            <View className="w-full space-y-4">
+        <View className="px-6 py-12">
+          <View className="space-y-8">
+            {/* NavArambh Card */}
+            <View className="bg-card p-6 rounded-lg shadow-md">
+              <Image 
+                source={{ uri: 'https://picsum.photos/seed/exit-strategy/600/400' }}
+                className="w-full h-40 rounded-lg mb-4"
+              />
+              <Text className="text-3xl font-bold text-primary text-left">
+                Plan Your Perfect Exit with NavArambh
+              </Text>
+              <Text className="text-lg text-muted-foreground text-left mt-2">
+                Expert valuation and strategic guidance for a profitable exit.
+              </Text>
               <TouchableOpacity 
-                className="bg-accent py-4 px-6 rounded-lg"
-                onPress={() => router.push('/(user)/loan')}
+                className="bg-primary py-3 px-6 rounded-lg mt-6"
+                onPress={() => router.push('/payments')}
               >
-                <Text className="text-accent-foreground text-center font-semibold text-lg">
-                  Apply for a Loan
+                <Text className="text-primary-foreground text-center font-semibold text-base">
+                  Explore Exit Strategies
                 </Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Quick Loans Card */}
+            <View className="bg-card p-6 rounded-lg shadow-md">
+                <Image 
+                  source={{ uri: 'https://picsum.photos/seed/business-loan/600/400' }}
+                  className="w-full h-40 rounded-lg mb-4"
+                />
+              <Text className="text-3xl font-bold text-primary text-left">
+                Fuel Your Growth with Quick Loans
+              </Text>
+              <Text className="text-lg text-muted-foreground text-left mt-2">
+                Fast, accessible business loans to help you scale your MSME.
+              </Text>
               <TouchableOpacity 
-                className="border border-primary py-4 px-6 rounded-lg"
-                onPress={() => router.push('/login')}
+                className="bg-accent py-3 px-6 rounded-lg mt-6"
+                onPress={() => router.push('/(user)/loan')}
               >
-                <Text className="text-primary text-center font-semibold text-lg">
-                  Explore Services
+                <Text className="text-accent-foreground text-center font-semibold text-base">
+                  Apply for a Loan
                 </Text>
               </TouchableOpacity>
             </View>
@@ -82,27 +101,27 @@ export default function HomeScreen() {
         <View className="px-6 py-12">
           <View className="mb-8">
             <Text className="text-3xl font-bold text-primary text-center mb-4">
-              Solutions Tailored for Your Business
+              A Complete Financial Toolkit
             </Text>
             <Text className="text-lg text-muted-foreground text-center">
-              From strategic exits to daily operations, we offer a comprehensive suite of services designed for MSMEs.
+              From strategic exits to daily operations, we offer a comprehensive suite of services.
             </Text>
           </View>
           
           <View className="space-y-6">
             {features.map((feature, index) => (
-              <View key={index} className="bg-card p-6 rounded-lg shadow-sm">
-                <View className="items-center mb-4">
-                  <View className="bg-secondary p-4 rounded-full mb-4">
+              <View key={index} className="bg-card p-6 rounded-lg shadow-sm flex-row items-center space-x-4">
+                  <View className="bg-secondary p-3 rounded-full">
                     {feature.icon}
                   </View>
-                  <Text className="text-xl font-semibold text-center mb-2">
-                    {feature.title}
-                  </Text>
-                  <Text className="text-muted-foreground text-center text-sm">
-                    {feature.description}
-                  </Text>
-                </View>
+                  <View className="flex-1">
+                    <Text className="text-xl font-semibold mb-1">
+                      {feature.title}
+                    </Text>
+                    <Text className="text-muted-foreground text-sm">
+                      {feature.description}
+                    </Text>
+                  </View>
               </View>
             ))}
           </View>
@@ -112,10 +131,10 @@ export default function HomeScreen() {
         <View className="px-6 py-12">
           <View className="bg-primary p-8 rounded-lg">
             <Text className="text-3xl font-bold text-primary-foreground text-center mb-4">
-              Ready to Grow Your Business?
+              Ready to Get Started?
             </Text>
             <Text className="text-lg text-primary-foreground/80 text-center mb-8">
-              Join thousands of MSMEs who trust us to power their growth. Get started today with a simple registration.
+              Join thousands of MSMEs who trust us to power their growth. Create your account in minutes.
             </Text>
             <TouchableOpacity 
               className="bg-accent py-4 px-6 rounded-lg"

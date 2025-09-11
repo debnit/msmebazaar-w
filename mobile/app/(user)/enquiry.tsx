@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,7 +37,7 @@ export default function EnquiryScreen() {
       if (result.success) {
         Alert.alert(
           'Enquiry Submitted',
-          'Thank you! We will get back to you soon.',
+          'Thank you for reaching out! Our team will review your message and get back to you shortly.',
           [{ text: 'OK', onPress: () => router.push('/(user)/dashboard') }]
         );
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
@@ -59,16 +60,16 @@ export default function EnquiryScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="flex-grow justify-center px-6">
+      <ScrollView contentContainerClassName="flex-grow justify-center p-6">
         <View className="py-6">
           <View className="bg-card p-6 rounded-lg shadow-sm">
             <View className="mb-6">
               <View className="flex-row items-center mb-2">
                 <MessageSquare size={24} color="#1e2a4a" />
-                <Text className="text-2xl font-bold text-primary ml-2">Contact Us</Text>
+                <Text className="text-2xl font-bold text-primary ml-2">Contact Our Experts</Text>
               </View>
               <Text className="text-muted-foreground">
-                Have questions? Fill out the form and our experts will get back to you.
+                Have a question or need assistance? Fill out the form and we will get back to you shortly.
               </Text>
             </View>
 

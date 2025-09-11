@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -14,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -37,8 +38,8 @@ const personalInfoSchema = z.object({
 const businessInfoSchema = z.object({
   businessName: z.string().min(2, "Business name is required"),
   businessType: z.string().min(1, "Please select a business type"),
-  yearsInBusiness: z.coerce.number().min(0, "Years must be positive"),
-  annualTurnover: z.coerce.number().min(0, "Turnover must be positive"),
+  yearsInBusiness: z.coerce.number().min(0, "Years in business must be a positive number"),
+  annualTurnover: z.coerce.number().min(1, "Annual turnover must be greater than zero"),
 });
 
 const loanDetailsSchema = z.object({
@@ -51,9 +52,9 @@ const formSchema = personalInfoSchema.merge(businessInfoSchema).merge(loanDetail
 type FormData = z.infer<typeof formSchema>;
 
 const steps = [
-  { id: 1, title: "Personal Information", fields: Object.keys(personalInfoSchema.shape) as (keyof FormData)[] },
-  { id: 2, title: "Business Information", fields: Object.keys(businessInfoSchema.shape) as (keyof FormData)[] },
-  { id: 3, title: "Loan Details", fields: Object.keys(loanDetailsSchema.shape) as (keyof FormData)[] },
+  { id: 1, title: "Personal Information", description: "Let's start with the basics. Please provide your personal details.", fields: Object.keys(personalInfoSchema.shape) as (keyof FormData)[] },
+  { id: 2, title: "Business Information", description: "Tell us about your business. This helps us understand your venture.", fields: Object.keys(businessInfoSchema.shape) as (keyof FormData)[] },
+  { id: 3, title: "Loan Details", description: "Specify your funding needs. What are your goals?", fields: Object.keys(loanDetailsSchema.shape) as (keyof FormData)[] },
 ];
 
 export function LoanApplicationForm() {
@@ -64,6 +65,7 @@ export function LoanApplicationForm() {
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    mode: "onTouched",
     defaultValues: {
       fullName: "", email: "", phone: "", pan: "",
       businessName: "", businessType: "", yearsInBusiness: 0, annualTurnover: 0,
@@ -127,12 +129,17 @@ export function LoanApplicationForm() {
   }
 
   const progress = (currentStep / steps.length) * 100;
+  const currentStepInfo = steps[currentStep-1];
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl font-headline">{steps[currentStep-1].title}</CardTitle>
+        <div className="mb-4">
+          <CardTitle className="text-xl font-headline">{currentStepInfo.title}</CardTitle>
+          <CardDescription>{currentStepInfo.description}</CardDescription>
+        </div>
         <Progress value={progress} className="mt-2" />
+        <p className="text-sm text-muted-foreground text-right mt-2">Step {currentStepInfo.id} of {steps.length}</p>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -156,7 +163,7 @@ export function LoanApplicationForm() {
             {currentStep === 3 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField control={form.control} name="loanAmount" render={({ field }) => ( <FormItem><FormLabel>Loan Amount Required (in ₹)</FormLabel><FormControl><Input type="number" placeholder="e.g., 200000" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                <FormField control={form.control} name="loanPurpose" render={({ field }) => ( <FormItem><FormLabel>Purpose of Loan</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select loan purpose" /></SelectTrigger></FormControl><SelectContent><SelectItem value="working-capital">Working Capital</SelectItem><SelectItem value="expansion">Business Expansion</SelectItem><SelectItem value="equipment">Equipment Purchase</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select><FormMessage /></FormItem> )} />
+                <FormField control={form.control} name="loanPurpose" render={({ field }) => ( <FormItem><FormLabel>Purpose of Loan</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select loan purpose" /></SelectTrigger></FormControl><SelectContent><SelectItem value="working-capital">Working Capital</SelectItem><SelectItem value="business-expansion">Business Expansion</SelectItem><SelectItem value="equipment-purchase">Equipment Purchase</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select><FormMessage /></FormItem> )} />
               </div>
             )}
             <CardFooter className="flex justify-between p-0 pt-6">
@@ -166,7 +173,7 @@ export function LoanApplicationForm() {
                 </Button>
               ) : <div></div>}
               {currentStep < steps.length ? (
-                <Button type="button" onClick={handleNext} className="bg-primary hover:bg-primary/90">Next</Button>
+                <Button type="button" onClick={handleNext} className="bg-primary hover:bg-primary/90">Next Step</Button>
               ) : (
                 <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}

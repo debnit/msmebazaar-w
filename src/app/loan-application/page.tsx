@@ -7,10 +7,10 @@ export default function LoanApplicationPage() {
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-headline font-bold tracking-tight text-primary sm:text-4xl">
-            Business Loan Application
+            Streamlined Business Loan Application
           </h1>
           <p className="mt-2 text-lg leading-8 text-muted-foreground">
-            Complete the following steps to apply for a business loan. It only takes a few minutes.
+            Our simplified 3-step process makes getting the funding you need faster than ever. Complete the form to get started.
           </p>
         </div>
         <LoanApplicationForm />

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,9 +8,9 @@ import { ArrowLeft, ArrowRight, Send } from 'lucide-react-native';
 import { useAuthStore } from '@/store/authStore';
 
 const steps = [
-  { id: 1, title: "Personal Information" },
-  { id: 2, title: "Business Information" },
-  { id: 3, title: "Loan Details" },
+  { id: 1, title: "Personal Information", description: "Let's start with the basics. Please provide your personal details." },
+  { id: 2, title: "Business Information", description: "Tell us about your business. This helps us understand your venture." },
+  { id: 3, title: "Loan Details", description: "Specify your funding needs. What are your goals?" },
 ];
 
 export default function LoanScreen() {
@@ -47,7 +48,7 @@ export default function LoanScreen() {
 
   const handleNext = () => {
     if (validateStep(currentStep)) setCurrentStep(currentStep + 1);
-    else Alert.alert('Validation Error', 'Please fill in all fields correctly.');
+    else Alert.alert('Validation Error', 'Please fill in all fields correctly to continue.');
   };
 
   const handlePrev = () => setCurrentStep(currentStep - 1);
@@ -60,7 +61,7 @@ export default function LoanScreen() {
     setIsSubmitting(true);
     const result = await apiService.submitLoanApplication(formData);
     if (result.success) {
-      Alert.alert('Application Submitted!', 'We have received your loan application.',
+      Alert.alert('Application Submitted!', 'We have received your loan application and will be in touch soon.',
         [{ text: 'OK', onPress: () => router.push('/(user)/dashboard') }]
       );
     } else {
@@ -70,6 +71,7 @@ export default function LoanScreen() {
   };
 
   const progress = (currentStep / steps.length) * 100;
+  const currentStepInfo = steps[currentStep-1];
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -146,15 +148,16 @@ export default function LoanScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="flex-grow justify-center px-6">
+      <ScrollView contentContainerClassName="flex-grow justify-center p-6">
         <View className="py-6">
           <View className="bg-card p-6 rounded-lg shadow-sm">
             <View className="mb-6">
-              <Text className="text-xl font-bold text-primary mb-2">{steps[currentStep - 1].title}</Text>
+              <Text className="text-xl font-bold text-primary mb-1">{currentStepInfo.title}</Text>
+              <Text className="text-muted-foreground text-sm mb-4">{currentStepInfo.description}</Text>
               <View className="w-full bg-secondary rounded-full h-2 mb-2">
                 <View className="bg-primary h-2 rounded-full" style={{ width: `${progress}%` }} />
               </View>
-              <Text className="text-sm text-muted-foreground">Step {currentStep} of {steps.length}</Text>
+              <Text className="text-sm text-muted-foreground self-end">Step {currentStep} of {steps.length}</Text>
             </View>
 
             {renderStepContent()}
@@ -169,13 +172,13 @@ export default function LoanScreen() {
 
               {currentStep < steps.length ? (
                 <TouchableOpacity className="flex-row items-center bg-primary py-3 px-6 rounded-lg" onPress={handleNext}>
-                  <Text className="text-primary-foreground font-semibold mr-2">Next</Text>
+                  <Text className="text-primary-foreground font-semibold mr-2">Next Step</Text>
                   <ArrowRight size={16} color="#ffffff" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity className={`flex-row items-center py-3 px-6 rounded-lg ${isSubmitting ? 'bg-muted' : 'bg-accent'}`} onPress={handleSubmit} disabled={isSubmitting}>
                   {isSubmitting ? <ActivityIndicator color="#ffffff"/> : <Send size={16} color="#ffffff" />}
-                  <Text className="text-accent-foreground font-semibold ml-2">{isSubmitting ? 'Submitting...' : 'Submit'}</Text>
+                  <Text className="text-accent-foreground font-semibold ml-2">{isSubmitting ? 'Submitting...' : 'Submit Application'}</Text>
                 </TouchableOpacity>
               )}
             </View>

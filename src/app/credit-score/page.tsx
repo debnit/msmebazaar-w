@@ -74,16 +74,23 @@ export default function CreditScorePage() {
     }
   }
 
+  const getScoreColor = (s: number) => {
+    if (s > 750) return 'text-green-600';
+    if (s > 650) return 'text-orange-500';
+    return 'text-red-600';
+  }
+
+
   return (
     <div className="container py-12 md:py-24">
       <div className="mx-auto max-w-xl">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-headline">
-              Check Your CIBIL Score
+              Instant CIBIL Score Check
             </CardTitle>
             <CardDescription>
-              Get your real-time credit score in just a few seconds.
+              Enter your PAN to get a real-time, comprehensive credit score analysis.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -103,7 +110,7 @@ export default function CreditScorePage() {
                           <Input
                             placeholder="ABCDE1234F"
                             {...field}
-                            className="text-center text-lg"
+                            className="text-center text-lg tracking-widest"
                           />
                         </FormControl>
                         <FormMessage />
@@ -114,21 +121,22 @@ export default function CreditScorePage() {
                     {loading ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : null}
-                    {loading ? "Checking..." : "Get Score"}
+                    {loading ? "Analyzing..." : "Get My Score"}
                   </Button>
                 </form>
               </Form>
             ) : (
               <div className="text-center">
-                <p className="text-muted-foreground">Your CIBIL Score is</p>
-                <p className="text-7xl font-bold text-primary my-4">{score}</p>
+                <p className="text-muted-foreground">Your Estimated CIBIL Score</p>
+                <p className={`text-7xl font-bold my-4 ${getScoreColor(score)}`}>{score}</p>
                 <div
-                  className={`text-lg font-semibold ${
-                    score > 750 ? "text-green-600" : "text-amber-600"
-                  }`}
+                  className={`text-lg font-semibold ${getScoreColor(score)}`}
                 >
-                  {score > 750 ? "Excellent" : "Good"}
+                  {score > 750 ? "Excellent" : score > 650 ? "Good" : "Needs Improvement"}
                 </div>
+                 <p className="text-muted-foreground text-sm mt-2">
+                    This score is an estimate and may vary from the official CIBIL report.
+                  </p>
                  <Button onClick={() => setScore(null)} className="mt-8">
                     Check Again
                 </Button>
