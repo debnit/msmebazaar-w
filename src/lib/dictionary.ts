@@ -1,4 +1,3 @@
-
 import 'server-only'
 import type { Locale } from '@/i18n-config'
 
@@ -8,6 +7,6 @@ const dictionaries = {
 }
 
 export const getDictionary = async (locale: Locale) => {
-    const dictionaryLoader = dictionaries[locale] || dictionaries.en;
+    const dictionaryLoader = dictionaries[locale] ?? dictionaries.en;
     return dictionaryLoader();
 }
