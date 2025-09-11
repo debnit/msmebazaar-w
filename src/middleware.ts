@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { i18n } from "@/i18n-config";
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
+import { getSession } from "./lib/auth";
 
 function getLocale(request: NextRequest): string | undefined {
   const negotiatorHeaders: Record<string, string> = {}
@@ -12,13 +13,16 @@ function getLocale(request: NextRequest): string | undefined {
   const locales: string[] = i18n.locales
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
 
-  const locale = matchLocale(languages, locales, i18n.defaultLocale)
-  return locale
+  try {
+    return matchLocale(languages, locales, i18n.defaultLocale)
+  } catch (e) {
+    return i18n.defaultLocale
+  }
 }
-
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const session = await getSession();
 
   // Skip middleware for API routes, static assets, and images
   const publicPaths = ['/api/', '/_next/static/', '/_next/image', '/favicon.ico', '/sw.js', '/manifest.json'];
@@ -33,14 +37,15 @@ export async function middleware(request: NextRequest) {
   // Redirect if there is no locale
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
-    
-    // If the request already has a callbackUrl, we don't want to lose it
-    if (request.nextUrl.search.includes("callbackUrl")) {
-        return NextResponse.rewrite(new URL(`/${locale}${pathname}${request.nextUrl.search}`, request.url));
-    }
-    return NextResponse.rewrite(new URL(`/${locale}${pathname}`, request.url));
+    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
   }
   
+  // Redirect authenticated users from auth pages to dashboard
+  const currentLocale = pathname.split('/')[1];
+  if (session && (pathname.endsWith('/login') || pathname.endsWith('/register'))) {
+      return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, request.url));
+  }
+
   return NextResponse.next();
 }
 

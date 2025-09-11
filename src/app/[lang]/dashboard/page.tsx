@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -26,6 +27,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Loader2, Copy, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getSession } from "@/lib/auth-actions";
+import { Session } from "jose";
+import { useRouter } from "next/navigation";
 
 
 interface Enquiry {
@@ -72,7 +76,10 @@ interface DashboardData {
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
+
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -83,24 +90,35 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('/api/user/dashboard');
-        if (response.ok) {
-          const result = await response.json();
-          setData(result);
-        } else {
-          console.error("Failed to fetch dashboard data");
+    const checkSessionAndFetchData = async () => {
+        const currentSession = await getSession();
+        if (!currentSession) {
+            router.push("/login");
+            return;
         }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
+        setSession(currentSession);
+
+        try {
+            const response = await fetch('/api/user/dashboard');
+            if (response.ok) {
+            const result = await response.json();
+            setData(result);
+            } else {
+            console.error("Failed to fetch dashboard data");
+            toast({
+                title: 'Error',
+                description: 'Failed to load dashboard data.',
+                variant: 'destructive'
+            })
+            }
+        } catch (error) {
+            console.error("Error fetching dashboard data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
-    fetchData();
-  }, []);
+    checkSessionAndFetchData();
+  }, [router, toast]);
 
   if (loading) {
     return (

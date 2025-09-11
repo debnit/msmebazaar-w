@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from "react";
 import useScript from "@/hooks/use-script";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Locale } from "@/i18n-config";
 
 declare global {
     interface Window {
@@ -20,6 +21,8 @@ interface RazorpayCheckoutProps {
 
 const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
     const router = useRouter();
+    const params = useParams();
+    const lang = params.lang as Locale;
     const { toast } = useToast();
     const [loading, setLoading] = useState(true);
 
@@ -34,14 +37,14 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                 description: "Razorpay SDK could not be loaded. Please try again later.",
                 variant: "destructive",
             });
-            router.push("/payments/failure");
+            router.push(`/${lang}/payments/failure`);
             return;
         }
 
         if (isScriptLoaded) {
             initiatePayment();
         }
-    }, [isScriptLoaded, isScriptLoadError]);
+    }, [isScriptLoaded, isScriptLoadError, lang, router, toast]);
 
     const initiatePayment = async () => {
         setLoading(true);
@@ -61,7 +64,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                         description: "Please log in to make a payment.",
                         variant: "destructive",
                     });
-                    router.push("/login");
+                    router.push(`/${lang}/login`);
                 } else {
                     throw new Error(errorData.error || "Failed to create payment order.");
                 }
@@ -93,9 +96,9 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                     });
 
                     if (verificationRes.ok) {
-                        router.push("/payments/success");
+                        router.push(`/${lang}/payments/success`);
                     } else {
-                        router.push("/payments/failure");
+                        router.push(`/${lang}/payments/failure`);
                     }
                 },
                 prefill: {
@@ -112,7 +115,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                 modal: {
                     ondismiss: function() {
                         // Redirect to failure if user closes the modal
-                        router.replace('/payments/failure');
+                        router.replace(`/${lang}/payments/failure`);
                     }
                 }
             };
@@ -128,7 +131,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                 description: errorMessage,
                 variant: "destructive",
             });
-            router.push("/payments/failure");
+            router.push(`/${lang}/payments/failure`);
         } finally {
             setLoading(false);
         }

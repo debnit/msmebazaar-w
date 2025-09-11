@@ -24,9 +24,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Chrome } from "lucide-react";
 import React from "react";
+import { Locale } from "@/i18n-config";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -36,6 +37,8 @@ const formSchema = z.object({
 export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const params = useParams();
+  const lang = params.lang as Locale;
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,7 +67,7 @@ export function LoginForm() {
           title: "Login Successful",
           description: "Welcome back!",
         });
-        router.push("/dashboard");
+        router.push(`/${lang}/dashboard`);
         router.refresh(); 
       } else {
         toast({
@@ -116,7 +119,7 @@ export function LoginForm() {
                   <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
                     <Link
-                      href="/forgot-password"
+                      href={`/${lang}/forgot-password`}
                       className="ml-auto inline-block text-sm underline"
                     >
                       Forgot your password?
@@ -154,7 +157,7 @@ export function LoginForm() {
       <CardFooter>
         <div className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link href="/register" className="underline text-primary">
+          <Link href={`/${lang}/register`} className="underline text-primary">
             Sign up
           </Link>
         </div>
