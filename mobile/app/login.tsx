@@ -7,9 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Chrome, Globe } from 'lucide-react-native';
-import i18n from '@/i18n';
-
+import { Chrome } from 'lucide-react-native';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -18,7 +16,6 @@ const formSchema = z.object({
 
 export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
-  const [locale, setLocale] = useState(i18n.locale);
   const { login } = useAuthStore();
 
   const { control, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
@@ -36,40 +33,28 @@ export default function LoginScreen() {
     }
   };
 
-  const handleLanguageChange = () => {
-    const newLocale = locale === 'en' ? 'hi' : 'en';
-    i18n.locale = newLocale;
-    setLocale(newLocale);
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView contentContainerClassName="flex-grow justify-center px-6">
         <View className="py-12">
           <View className="bg-card p-6 rounded-lg shadow-sm">
-            <View className="flex-row justify-between items-center mb-6">
-              <View>
-                <Text className="text-2xl font-bold text-primary mb-2">{i18n.t('login.title')}</Text>
-                <Text className="text-muted-foreground">
-                  {i18n.t('login.subtitle')}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={handleLanguageChange} className="flex-row items-center space-x-1 border border-border p-2 rounded-md">
-                  <Globe size={16} color="#1e2a4a" />
-                  <Text className="font-semibold text-primary">{locale.toUpperCase()}</Text>
-              </TouchableOpacity>
+            <View className="mb-6">
+              <Text className="text-2xl font-bold text-primary mb-2">Login</Text>
+              <Text className="text-muted-foreground">
+                Enter your email below to login to your account.
+              </Text>
             </View>
 
             <View className="space-y-4">
               <View>
-                <Text className="text-sm font-medium text-foreground mb-2">{i18n.t('login.emailLabel')}</Text>
+                <Text className="text-sm font-medium text-foreground mb-2">Email</Text>
                 <Controller
                   control={control}
                   name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       className={`border px-3 py-3 rounded-md text-foreground ${errors.email ? 'border-destructive' : 'border-input bg-background'}`}
-                      placeholder={i18n.t('login.emailPlaceholder')}
+                      placeholder="name@example.com"
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -84,9 +69,9 @@ export default function LoginScreen() {
 
               <View>
                 <View className="flex-row justify-between items-center mb-2">
-                  <Text className="text-sm font-medium text-foreground">{i18n.t('login.passwordLabel')}</Text>
+                  <Text className="text-sm font-medium text-foreground">Password</Text>
                   <TouchableOpacity>
-                    <Text className="text-sm text-primary underline">{i18n.t('login.forgotPassword')}</Text>
+                    <Text className="text-sm text-primary underline">Forgot password?</Text>
                   </TouchableOpacity>
                 </View>
                 <Controller
@@ -115,7 +100,7 @@ export default function LoginScreen() {
                   <ActivityIndicator color="#ffffff" />
                 ) : (
                   <Text className="text-primary-foreground text-center font-semibold text-lg">
-                    {i18n.t('login.submit')}
+                    Login
                   </Text>
                 )}
               </TouchableOpacity>
@@ -140,10 +125,10 @@ export default function LoginScreen() {
             <View className="mt-6 pt-6 border-t border-border">
               <View className="flex-row justify-center items-center">
                 <Text className="text-sm text-muted-foreground">
-                  {i18n.t('login.noAccount')}{' '}
+                  Don't have an account?{' '}
                 </Text>
                 <TouchableOpacity onPress={() => router.push('/register')}>
-                  <Text className="text-primary underline font-semibold">{i18n.t('login.signUp')}</Text>
+                  <Text className="text-primary underline font-semibold">Sign up</Text>
                 </TouchableOpacity>
               </View>
             </View>
