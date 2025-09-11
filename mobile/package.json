@@ -29,7 +29,8 @@
     "react-native-svg": "14.1.0",
     "react-native-web": "^0.19.13",
     "zod": "^3.22.4",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "expo-constants": "~15.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
