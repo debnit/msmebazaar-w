@@ -1,8 +1,8 @@
+
 import { Button } from "@/components/ui/button";
-import { Locale } from "@/i18n-config";
 import Link from "next/link";
 
-const CTA = ({ lang }: { lang: Locale }) => {
+const CTA = () => {
   return (
     <section className="py-12 md:py-24 bg-background">
       <div className="container">
@@ -15,7 +15,7 @@ const CTA = ({ lang }: { lang: Locale }) => {
           </p>
           <div className="mt-8">
             <Button asChild size="lg" variant="secondary" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href={`/${lang}/register`}>Register Now</Link>
+              <Link href="/register">Register Now</Link>
             </Button>
           </div>
         </div>

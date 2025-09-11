@@ -26,8 +26,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
-import { useParams } from "next/navigation";
-import { Locale } from "@/i18n-config";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -36,8 +34,6 @@ const formSchema = z.object({
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const params = useParams();
-  const lang = params.lang as Locale;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,7 +88,7 @@ export default function ForgotPasswordPage() {
       </CardContent>
       <CardFooter>
         <Button variant="link" asChild className="w-full text-muted-foreground">
-            <Link href={`/${lang}/login`}>
+            <Link href="/login">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to login
             </Link>

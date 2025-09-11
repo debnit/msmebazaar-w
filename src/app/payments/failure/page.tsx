@@ -1,10 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Locale } from "@/i18n-config";
 import { XCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function PaymentFailurePage({ params: { lang } }: { params: { lang: Locale } }) {
+export default function PaymentFailurePage() {
   return (
     <div className="container flex min-h-[60vh] items-center justify-center py-12">
       <Card className="w-full max-w-md text-center">
@@ -20,10 +20,10 @@ export default function PaymentFailurePage({ params: { lang } }: { params: { lan
             Please check your payment details and try again. If the problem persists, please contact our support team.
           </p>
           <Button asChild className="mt-8 w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-            <Link href={`/${lang}/payments`}>Try Again</Link>
+            <Link href="/payments">Try Again</Link>
           </Button>
           <Button asChild variant="ghost" className="mt-2 w-full">
-            <Link href={`/${lang}/dashboard`}>Go to Dashboard</Link>
+            <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
         </CardContent>
       </Card>

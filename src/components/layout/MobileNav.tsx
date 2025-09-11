@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Session } from "jose";
-import { Locale } from "@/i18n-config";
-
 
 interface NavLink {
     href: string;
@@ -19,19 +17,18 @@ interface NavLink {
 interface MobileNavProps {
     session: Session | null;
     navLinks: NavLink[];
-    lang: Locale;
 }
 
-export function MobileNav({ session, navLinks, lang }: MobileNavProps) {
+export function MobileNav({ session, navLinks }: MobileNavProps) {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const pathname = usePathname();
 
     const NavLinkItem = ({ href, label }: { href: string; label: string }) => (
         <Link
-          href={`/${lang}${href}`}
+          href={href}
           className={cn(
             "text-sm font-medium transition-colors hover:text-primary",
-            pathname.startsWith(`/${lang}${href}`) ? "text-primary" : "text-muted-foreground"
+            pathname === href ? "text-primary" : "text-muted-foreground"
           )}
           onClick={() => setIsMenuOpen(false)}
         >
@@ -55,13 +52,16 @@ export function MobileNav({ session, navLinks, lang }: MobileNavProps) {
                             {navLinks.map((link) => (
                                 <NavLinkItem key={link.href} {...link} />
                             ))}
+                            {session?.user && (
+                                <NavLinkItem href="/dashboard" label="Dashboard" />
+                            )}
                             {!session?.user && (
                                 <div className="flex flex-col space-y-2 pt-4 border-t">
                                     <Button asChild variant="outline">
-                                        <Link href={`/${lang}/login`} onClick={() => setIsMenuOpen(false)}>Login</Link>
+                                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
                                     </Button>
                                     <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                                        <Link href={`/${lang}/register`} onClick={() => setIsMenuOpen(false)}>Register</Link>
+                                        <Link href="/register" onClick={() => setIsMenuOpen(false)}>Register</Link>
                                     </Button>
                                 </div>
                             )}

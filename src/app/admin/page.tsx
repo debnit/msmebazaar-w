@@ -29,8 +29,6 @@ import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react';
 import { getAdminDashboardData, AdminDashboardData } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'next/navigation';
-import { Locale } from '@/i18n-config';
 
 const StatCard = ({ title, value, icon, loading }: { title: string, value: string, icon: React.ReactNode, loading: boolean }) => (
     <Card>
@@ -47,8 +45,6 @@ const StatCard = ({ title, value, icon, loading }: { title: string, value: strin
 export default function AdminDashboard() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const params = useParams();
-  const lang = params.lang as Locale;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +79,7 @@ export default function AdminDashboard() {
               </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href={`/${lang}/admin/loans`}>
+              <Link href="/admin/loans">
                 View All
                 <ArrowUpRight className="h-4 w-4" />
               </Link>

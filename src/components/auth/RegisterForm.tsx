@@ -24,10 +24,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Chrome } from "lucide-react";
 import React from "react";
-import { Locale } from "@/i18n-config";
 
 const formSchema = z
   .object({
@@ -45,8 +44,6 @@ const formSchema = z
 export function RegisterForm() {
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
-  const lang = params.lang as Locale;
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -78,7 +75,7 @@ export function RegisterForm() {
           title: "Registration Successful",
           description: "Welcome! You are now logged in.",
         });
-        router.push(`/${lang}/dashboard`);
+        router.push("/dashboard");
         router.refresh();
       } else {
         toast({
@@ -199,7 +196,7 @@ export function RegisterForm() {
       <CardFooter>
         <div className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href={`/${lang}/login`} className="underline text-primary">
+          <Link href="/login" className="underline text-primary">
             Log in
           </Link>
         </div>

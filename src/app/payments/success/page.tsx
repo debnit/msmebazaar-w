@@ -1,10 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Locale } from "@/i18n-config";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function PaymentSuccessPage({ params: { lang } }: { params: { lang: Locale } }) {
+export default function PaymentSuccessPage() {
   return (
     <div className="container flex min-h-[60vh] items-center justify-center py-12">
       <Card className="w-full max-w-md text-center">
@@ -20,7 +20,7 @@ export default function PaymentSuccessPage({ params: { lang } }: { params: { lan
             Your transaction has been completed successfully. A confirmation email and receipt have been sent to your registered email address.
           </p>
           <Button asChild className="mt-8 w-full">
-            <Link href={`/${lang}/dashboard`}>Go to Dashboard</Link>
+            <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
         </CardContent>
       </Card>
