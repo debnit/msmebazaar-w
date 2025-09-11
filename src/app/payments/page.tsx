@@ -100,8 +100,9 @@ export default function PaymentsPage() {
             price: 99,
             features: [
               "Turnkey Project Setup",
-              "Buy/Lease/Sell Plant and Machinery",
+              "Buy/Lease/Sell Plant & Machinery",
               "Free Consultation",
+              "Expert Help",
             ]
           }
         ]);

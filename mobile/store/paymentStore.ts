@@ -65,6 +65,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         "Turnkey Project Setup",
         "Buy/Lease/Sell Plant & Machinery",
         "Free Consultation",
+        "Expert Help",
       ]
     }
   ],
