@@ -25,6 +25,7 @@ const Hero = () => {
                   src="https://picsum.photos/seed/exit-strategy/800/400"
                   alt="Exit strategy planning"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                   data-ai-hint="exit strategy"
                 />
@@ -51,6 +52,7 @@ const Hero = () => {
                   src="https://picsum.photos/seed/business-loan/800/400"
                   alt="Business loan for growth"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                   data-ai-hint="business loan"
                 />

@@ -1,6 +1,4 @@
 
-"use server"
-
 import Link from "next/link";
 import { UserCircle, LogOut, LayoutDashboard, Bell, Shield, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,10 +42,6 @@ export default async function Header({ session }: { session: Session | null }) {
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || "";
 
-  const handleLogout = async () => {
-    "use server"
-    await logout();
-  };
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
@@ -108,7 +102,7 @@ export default async function Header({ session }: { session: Session | null }) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <form action={handleLogout}>
+                <form action={logout}>
                     <button type="submit" className="w-full">
                         <DropdownMenuItem>
                           <LogOut className="mr-2 h-4 w-4" />
