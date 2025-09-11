@@ -28,6 +28,7 @@ export async function login(formData: any) {
 
   const cookieStore = await cookies();
   cookieStore.set("session", session, { expires, httpOnly: true });
+  return { token: session };
 }
 
 export async function logout() {

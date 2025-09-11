@@ -30,10 +30,10 @@ export async function POST(req: NextRequest) {
     }
 
     // The user object must be passed inside a 'user' key.
-    await login({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin });
+    const { token } = await login({ id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin });
 
     return NextResponse.json(
-      {message: 'Login successful'},
+      {message: 'Login successful', user, token},
       {status: 200}
     );
   } catch (error) {
