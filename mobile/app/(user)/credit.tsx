@@ -54,7 +54,7 @@ export default function CreditScoreScreen() {
                   className="border border-input bg-background px-4 py-3 rounded-lg text-foreground text-center text-lg tracking-widest"
                   placeholder="ABCDE1234F"
                   value={pan}
-                  onChangeText={(text) => setPan(text.toUpperCase())}
+                  onChangeText={(text: string) => setPan(text.toUpperCase())}
                   autoCapitalize="characters"
                   maxLength={10}
                 />
@@ -94,4 +94,5 @@ export default function CreditScoreScreen() {
     </SafeAreaView>
   );
 }
+
 
