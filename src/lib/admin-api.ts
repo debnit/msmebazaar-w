@@ -1,4 +1,3 @@
-
 "use client";
 
 import { toast } from "@/hooks/use-toast";
@@ -86,7 +85,7 @@ export interface UserWithCounts {
 
 // API functions
 export const getAdminDashboardData = (): Promise<AdminDashboardData | null> => fetcher("/api/admin/dashboard-data");
-export const getEnquiries = (): Promise<Enquiry[] | null> => fetcher("/api/admin/enquiries");
-export const getLoanApplications = (): Promise<LoanApplication[] | null> => fetcher("/api/admin/loans");
-export const getPayments = (): Promise<PaymentTransaction[] | null> => fetcher("/api/admin/payments");
-export const getUsers = (): Promise<UserWithCounts[] | null> => fetcher("/api/admin/users");
+export const getEnquiries = (query: string = ""): Promise<Enquiry[] | null> => fetcher(`/api/admin/enquiries?query=${query}`);
+export const getLoanApplications = (query: string = ""): Promise<LoanApplication[] | null> => fetcher(`/api/admin/loans?query=${query}`);
+export const getPayments = (query: string = ""): Promise<PaymentTransaction[] | null> => fetcher(`/api/admin/payments?query=${query}`);
+export const getUsers = (query: string = ""): Promise<UserWithCounts[] | null> => fetcher(`/api/admin/users?query=${query}`);

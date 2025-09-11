@@ -188,9 +188,9 @@ class ApiService {
       }
   }
 
-  async getEnquiries(): Promise<{ success: boolean; data?: Enquiry[]; error?: string }> {
+  async getEnquiries(query: string = ''): Promise<{ success: boolean; data?: Enquiry[]; error?: string }> {
     try {
-        const data = await this.fetch('/admin/enquiries');
+        const data = await this.fetch(`/admin/enquiries?query=${query}`);
         return { success: true, data };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -206,9 +206,9 @@ class ApiService {
       }
   }
 
-  async getLoans(): Promise<{ success: boolean; data?: Loan[]; error?: string }> {
+  async getLoans(query: string = ''): Promise<{ success: boolean; data?: Loan[]; error?: string }> {
       try {
-          const data = await this.fetch('/admin/loans');
+          const data = await this.fetch(`/admin/loans?query=${query}`);
           return { success: true, data };
       } catch (error: any) {
           return { success: false, error: error.message };
@@ -224,18 +224,18 @@ class ApiService {
       }
   }
 
-  async getPayments(): Promise<{ success: boolean; data?: Payment[]; error?: string }> {
+  async getPayments(query: string = ''): Promise<{ success: boolean; data?: Payment[]; error?: string }> {
       try {
-          const data = await this.fetch('/admin/payments');
+          const data = await this.fetch(`/admin/payments?query=${query}`);
           return { success: true, data };
       } catch (error: any) {
           return { success: false, error: error.message };
       }
   }
 
-  async getUsers(): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
+  async getUsers(query: string = ''): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
       try {
-          const data = await this.fetch('/admin/users');
+          const data = await this.fetch(`/admin/users?query=${query}`);
           return { success: true, data };
       } catch (error: any) {
           return { success: false, error: error.message };

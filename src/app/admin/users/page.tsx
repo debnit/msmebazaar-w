@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -18,27 +17,43 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { UserRoleUpdater } from '@/components/admin/UserRoleUpdater'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getUsers, UserWithCounts } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
+// Custom hook for debouncing
+function useDebounce(value: string, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
 export default function UsersPage() {
   const [users, setUsers] = useState<UserWithCounts[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
-    const result = await getUsers();
+    const result = await getUsers(debouncedSearchQuery);
     if(result) {
         setUsers(result);
     }
     setLoading(false);
-  }
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   return (
     <Card>
@@ -47,6 +62,14 @@ export default function UsersPage() {
         <CardDescription>
           A list of all registered users.
         </CardDescription>
+         <div className="pt-4">
+            <Input 
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+            />
+        </div>
       </CardHeader>
       <CardContent>
         <Table>

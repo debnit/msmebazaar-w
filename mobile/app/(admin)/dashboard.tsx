@@ -4,13 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/store/authStore';
 import { LogOut, Briefcase, FileText, IndianRupee, Users } from 'lucide-react-native';
 import { AdminDashboardData, apiService } from '@/services/apiService';
+import { router } from 'expo-router';
 
-const StatCard = ({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) => (
-    <View className="bg-card rounded-lg p-4 flex-1 items-center justify-center space-y-2 shadow">
+const StatCard = ({ title, value, icon, onPress }: { title: string; value: string; icon: React.ReactNode, onPress: () => void }) => (
+    <TouchableOpacity onPress={onPress} className="bg-card rounded-lg p-4 flex-1 items-center justify-center space-y-2 shadow">
         {icon}
         <Text className="text-muted-foreground text-sm">{title}</Text>
         <Text className="text-2xl font-bold text-primary">{value}</Text>
-    </View>
+    </TouchableOpacity>
 );
 
 export default function AdminDashboardScreen() {
@@ -64,12 +65,12 @@ export default function AdminDashboardScreen() {
                 {/* Stats */}
                 <View className="space-y-4">
                     <View className="flex-row space-x-4">
-                        <StatCard title="Total Revenue" value={`₹${(data.totalRevenue/1000).toFixed(0)}k`} icon={<IndianRupee size={24} color="#1e2a4a" />} />
-                        <StatCard title="Total Users" value={String(data.totalUsers)} icon={<Users size={24} color="#1e2a4a" />} />
+                        <StatCard title="Total Revenue" value={`₹${(data.totalRevenue/1000).toFixed(0)}k`} icon={<IndianRupee size={24} color="#1e2a4a" />} onPress={() => router.push('/(admin)/payments')} />
+                        <StatCard title="Total Users" value={String(data.totalUsers)} icon={<Users size={24} color="#1e2a4a" />} onPress={() => router.push('/(admin)/users')} />
                     </View>
                      <View className="flex-row space-x-4">
-                        <StatCard title="Loan Apps" value={String(data.totalLoans)} icon={<Briefcase size={24} color="#1e2a4a" />} />
-                        <StatCard title="Enquiries" value={String(data.totalEnquiries)} icon={<FileText size={24} color="#1e2a4a" />} />
+                        <StatCard title="Loan Apps" value={String(data.totalLoans)} icon={<Briefcase size={24} color="#1e2a4a" />} onPress={() => router.push('/(admin)/loans')} />
+                        <StatCard title="Enquiries" value={String(data.totalEnquiries)} icon={<FileText size={24} color="#1e2a4a" />} onPress={() => router.push('/(admin)/enquiries')} />
                     </View>
                 </View>
 

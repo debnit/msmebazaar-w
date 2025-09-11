@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -18,26 +17,44 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EnquiryStatusUpdater } from '@/components/admin/EnquiryStatusUpdater'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getEnquiries, Enquiry } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+
+// Custom hook for debouncing
+function useDebounce(value: string, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
+
 
 export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchEnquiries = async () => {
+  const fetchEnquiries = useCallback(async () => {
     setLoading(true);
-    const result = await getEnquiries();
+    const result = await getEnquiries(debouncedSearchQuery);
     if (result) {
         setEnquiries(result);
     }
     setLoading(false);
-  }
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
     fetchEnquiries();
-  }, []);
+  }, [fetchEnquiries]);
 
   return (
     <Card>
@@ -46,6 +63,14 @@ export default function EnquiriesPage() {
         <CardDescription>
           A list of all enquiries submitted by users.
         </CardDescription>
+        <div className="pt-4">
+            <Input 
+                placeholder="Search by name, email, or subject..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+            />
+        </div>
       </CardHeader>
       <CardContent>
         <Table>

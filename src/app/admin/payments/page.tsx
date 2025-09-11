@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -17,25 +16,43 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getPayments, PaymentTransaction } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+
+// Custom hook for debouncing
+function useDebounce(value: string, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  const fetchPayments = useCallback(async () => {
+    setLoading(true);
+    const result = await getPayments(debouncedSearchQuery);
+    if(result) {
+      setPayments(result);
+    }
+    setLoading(false);
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
-    const fetchPayments = async () => {
-      setLoading(true);
-      const result = await getPayments();
-      if(result) {
-        setPayments(result);
-      }
-      setLoading(false);
-    };
     fetchPayments();
-  }, []);
+  }, [fetchPayments]);
 
   return (
     <Card>
@@ -44,6 +61,14 @@ export default function PaymentsPage() {
         <CardDescription>
           A list of all payment transactions.
         </CardDescription>
+        <div className="pt-4">
+            <Input 
+                placeholder="Search by name, email, service, or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+            />
+        </div>
       </CardHeader>
       <CardContent>
         <Table>

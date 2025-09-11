@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -19,25 +18,42 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { LoanStatusUpdater } from '@/components/admin/LoanStatusUpdater'
 import { getLoanApplications, LoanApplication } from '@/lib/admin-api'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+
+// Custom hook for debouncing
+function useDebounce(value: string, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
 export default function LoanApplicationsPage() {
   const [loans, setLoans] = useState<LoanApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     setLoading(true);
-    const result = await getLoanApplications();
+    const result = await getLoanApplications(debouncedSearchQuery);
     if(result) {
       setLoans(result);
     }
     setLoading(false);
-  };
+  }, [debouncedSearchQuery]);
 
   useEffect(() => {
     fetchLoans();
-  }, []);
+  }, [fetchLoans]);
 
   return (
     <Card>
@@ -46,6 +62,14 @@ export default function LoanApplicationsPage() {
         <CardDescription>
           A list of all loan applications submitted by users.
         </CardDescription>
+        <div className="pt-4">
+            <Input 
+                placeholder="Search by name, email, or purpose..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+            />
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
