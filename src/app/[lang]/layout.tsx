@@ -27,13 +27,13 @@ export default async function LocaleLayout({
 }>) {
   const session = await getSession();
   return (
-    <div lang={params.lang} suppressHydrationWarning={true}>
+      <html lang={params.lang} suppressHydrationWarning={true}>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
         </head>
-        <div
+        <body
           className={cn(
             'min-h-screen bg-background font-body antialiased'
           )}
@@ -45,7 +45,7 @@ export default async function LocaleLayout({
           </div>
           <WhatsAppButton />
           <Toaster />
-        </div>
-    </div>
+        </body>
+      </html>
   );
 }

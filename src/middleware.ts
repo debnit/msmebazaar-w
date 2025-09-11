@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { i18n } from "./i18n-config";
+import { i18n } from "@/i18n-config";
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 
@@ -22,7 +22,13 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Skip middleware for API routes and static assets
-  if (pathname.startsWith('/api/') || pathname.startsWith('/_next/static/') || pathname.startsWith('/_next/image/') || pathname.endsWith('.ico')) {
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/static/') ||
+    pathname.startsWith('/_next/image/') ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.png')
+    ) {
     return NextResponse.next();
   }
 
@@ -42,27 +48,12 @@ export async function middleware(request: NextRequest) {
     );
   }
   
+  // Locale is present in the path, so we can proceed with auth checks
   const locale = pathname.split('/')[1];
-
   const session = await getSession();
   
   const pathnameWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
   
-  const publicPaths = [
-    "/",
-    "/login",
-    "/register",
-    "/forgot-password",
-    "/sign-in",
-    "/enquiry",
-    "/payments",
-    "/payments/success",
-    "/payments/failure",
-    "/credit-score",
-    "/loan-application",
-  ];
-  
-  const isPublicPath = publicPaths.includes(pathnameWithoutLocale);
   const isAuthPage = pathnameWithoutLocale === "/login" || pathnameWithoutLocale === "/register" || pathnameWithoutLocale === "/forgot-password" || pathnameWithoutLocale === "/sign-in";
   const isAdminPath = pathnameWithoutLocale.startsWith('/admin');
 
@@ -76,23 +67,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(url, request.url));
     }
 
-    // Redirect from landing page
-    if (pathnameWithoutLocale === '/') {
-       const url = isAdmin ? `/${locale}/admin` : `/${locale}/dashboard`;
-       return NextResponse.redirect(new URL(url, request.url));
-    }
-
-    // Handle admin route protection
+    // Redirect non-admins from admin paths
     if (isAdminPath && !isAdmin) {
-      // If a non-admin tries to access an admin path, redirect to user dashboard
       return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
     }
     
     return NextResponse.next();
   }
 
-  // If user is not logged in and path is not public, redirect to login
-  if (!isPublicPath) {
+  // If user is not logged in and path is protected, redirect to login
+  const protectedPaths = ['/dashboard', '/loan-application', '/notifications'];
+  if (protectedPaths.some(p => pathnameWithoutLocale.startsWith(p)) || isAdminPath) {
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
   }
 
