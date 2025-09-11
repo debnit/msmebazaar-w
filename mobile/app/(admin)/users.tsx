@@ -63,6 +63,17 @@ export default function AdminUsersScreen() {
             ]
         );
     };
+    
+    const handleAgentChange = (user: AdminUser) => {
+        Alert.alert(
+            'Change Agent Status',
+            `Are you sure you want to ${user.isAgent ? 'remove agent status for' : 'make'} this user ${user.isAgent ? '' : 'an agent'}?`,
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Confirm', onPress: () => updateUserAgentStatus(user) },
+            ]
+        );
+    };
 
     const updateUserRole = async (user: AdminUser) => {
         setUpdatingId(user.id);
@@ -72,6 +83,18 @@ export default function AdminUsersScreen() {
             Alert.alert('Success', "User role updated successfully.");
         } else {
             Alert.alert('Error', result.error || "Failed to update user role.");
+        }
+        setUpdatingId(null);
+    }
+    
+    const updateUserAgentStatus = async (user: AdminUser) => {
+        setUpdatingId(user.id);
+        const result = await apiService.updateUserAgentStatus(user.id, !user.isAgent);
+        if (result.success) {
+            onRefresh();
+            Alert.alert('Success', "User agent status updated successfully.");
+        } else {
+            Alert.alert('Error', result.error || "Failed to update user agent status.");
         }
         setUpdatingId(null);
     }
@@ -105,28 +128,48 @@ export default function AdminUsersScreen() {
                         <View className="space-y-4">
                             {users.map(user => (
                                 <View key={user.id} className="bg-card p-4 rounded-lg shadow">
-                                    <View className="flex-row justify-between items-start">
+                                    <View className="flex-row justify-between items-start mb-4">
                                         <View>
                                             <Text className="font-bold text-foreground">{user.name}</Text>
                                             <Text className="text-sm text-muted-foreground">{user.email}</Text>
                                         </View>
-                                        {user.isAdmin && (
-                                            <Text className="font-semibold px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Admin</Text>
-                                        )}
+                                        <View className="flex-col items-end gap-y-2">
+                                          {user.isAdmin && (
+                                              <Text className="font-semibold px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Admin</Text>
+                                          )}
+                                          {user.isAgent && (
+                                              <Text className="font-semibold px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Agent</Text>
+                                          )}
+                                        </View>
                                     </View>
-                                    <TouchableOpacity 
-                                        className={`bg-secondary p-2 rounded-md self-start mt-4 ${user.id === currentUser?.id ? 'opacity-50' : ''}`}
-                                        onPress={() => handleRoleChange(user)}
-                                        disabled={updatingId === user.id || user.id === currentUser?.id}
-                                    >
-                                        {updatingId === user.id ? (
-                                            <ActivityIndicator color="#1e2a4a" />
-                                        ) : (
-                                            <Text className="text-secondary-foreground text-sm font-semibold">
-                                                {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
-                                            </Text>
-                                        )}
-                                    </TouchableOpacity>
+                                    <View className="flex-row space-x-2">
+                                      <TouchableOpacity 
+                                          className={`bg-secondary p-2 rounded-md self-start ${user.id === currentUser?.id ? 'opacity-50' : ''}`}
+                                          onPress={() => handleRoleChange(user)}
+                                          disabled={updatingId === user.id || user.id === currentUser?.id}
+                                      >
+                                          {updatingId === user.id ? (
+                                              <ActivityIndicator color="#1e2a4a" />
+                                          ) : (
+                                              <Text className="text-secondary-foreground text-sm font-semibold">
+                                                  {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
+                                              </Text>
+                                          )}
+                                      </TouchableOpacity>
+                                       <TouchableOpacity 
+                                          className={`bg-secondary p-2 rounded-md self-start`}
+                                          onPress={() => handleAgentChange(user)}
+                                          disabled={updatingId === user.id}
+                                      >
+                                          {updatingId === user.id ? (
+                                              <ActivityIndicator color="#1e2a4a" />
+                                          ) : (
+                                              <Text className="text-secondary-foreground text-sm font-semibold">
+                                                  {user.isAgent ? 'Remove Agent' : 'Make Agent'}
+                                              </Text>
+                                          )}
+                                      </TouchableOpacity>
+                                    </View>
                                 </View>
                             ))}
                         </View>

@@ -202,6 +202,7 @@ export interface AdminDashboardData {
 }
 
 export interface AdminUser extends User {
+    isAgent: boolean;
     _count: {
         loanApplications: number;
         enquiries: number;
@@ -437,7 +438,15 @@ class ApiService {
           return { success: false, error: error.message };
       }
   }
-
+  
+  async updateUserAgentStatus(id: string, isAgent: boolean): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch(`/admin/users/${id}/agent`, { method: 'PATCH', body: JSON.stringify({ isAgent }) });
+          return { success: true };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
 }
 
 export const apiService = new ApiService();
