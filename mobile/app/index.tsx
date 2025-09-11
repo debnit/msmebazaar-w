@@ -4,28 +4,32 @@ import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { HandCoins, FileText, Banknote, Rocket, Route, Award } from 'lucide-react-native';
+import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit } from 'lucide-react-native';
 
 const features = [
   {
     icon: <Route size={32} color="#1e2a4a" />,
     title: "NavArambh Exit Strategy",
     description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
+    onPress: () => router.push('/payments')
+  },
+  {
+    icon: <BrainCircuit size={32} color="#1e2a4a" />,
+    title: "AI Business Plan",
+    description: "Generate a foundational business plan in minutes. Our AI helps structure your ideas and create a professional plan to guide your venture.",
+    onPress: () => router.push('/(user)/business-plan')
   },
   {
     icon: <HandCoins size={32} color="#1e2a4a" />,
     title: "Quick Business Loans",
     description: "Access working capital, expand your operations, or purchase new equipment with our streamlined loan application process designed for the speed of business.",
+    onPress: () => router.push('/(user)/loan')
   },
   {
     icon: <Award size={32} color="#1e2a4a" />,
     title: "Referral Program",
     description: "Refer other MSMEs to our platform and earn rewards in your wallet. It's our way of saying thank you for helping our community grow.",
-  },
-  {
-    icon: <FileText size={32} color="#1e2a4a" />,
-    title: "Easy Enquiry & Support",
-    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers and support you need to grow.",
+    onPress: () => router.push('/register')
   },
 ];
 
@@ -110,19 +114,21 @@ export default function HomeScreen() {
           
           <View className="space-y-6">
             {features.map((feature, index) => (
-              <View key={index} className="bg-card p-6 rounded-lg shadow-sm flex-row items-center space-x-4">
-                  <View className="bg-secondary p-3 rounded-full">
-                    {feature.icon}
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-xl font-semibold mb-1">
-                      {feature.title}
-                    </Text>
-                    <Text className="text-muted-foreground text-sm">
-                      {feature.description}
-                    </Text>
-                  </View>
-              </View>
+              <TouchableOpacity key={index} onPress={feature.onPress}>
+                <View className="bg-card p-6 rounded-lg shadow-sm flex-row items-center space-x-4">
+                    <View className="bg-secondary p-3 rounded-full">
+                      {feature.icon}
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-xl font-semibold mb-1">
+                        {feature.title}
+                      </Text>
+                      <Text className="text-muted-foreground text-sm">
+                        {feature.description}
+                      </Text>
+                    </View>
+                </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>

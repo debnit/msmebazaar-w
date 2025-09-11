@@ -1,27 +1,32 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HandCoins, FileText, Banknote, Rocket, Route, Award } from "lucide-react";
+import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit } from "lucide-react";
+import Link from "next/link";
 
 const features = [
   {
     icon: <Route className="h-10 w-10 text-primary" />,
     title: "NavArambh Exit Strategy",
     description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
+    href: "/payments"
+  },
+  {
+    icon: <BrainCircuit className="h-10 w-10 text-primary" />,
+    title: "AI Business Plan Generator",
+    description: "Generate a foundational business plan in minutes. Our AI helps you structure your ideas, analyze your market, and create a professional plan to guide your venture.",
+    href: "/business-plan"
   },
   {
     icon: <HandCoins className="h-10 w-10 text-primary" />,
     title: "Quick Business Loans",
     description: "Access working capital, expand your operations, or purchase new equipment with our streamlined loan application process designed for the speed of business.",
+    href: "/loan-application"
   },
   {
     icon: <Award className="h-10 w-10 text-primary" />,
     title: "Referral Program",
     description: "Refer other MSMEs to our platform and earn rewards in your wallet. It's our way of saying thank you for helping our community grow.",
-  },
-  {
-    icon: <FileText className="h-10 w-10 text-primary" />,
-    title: "Easy Enquiry & Support",
-    description: "Our simple enquiry form connects you with our experts to get the answers and support you need to grow your business.",
+    href: "/register"
   },
 ];
 
@@ -39,17 +44,19 @@ const Features = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="text-center group hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="items-center">
-                <div className="p-4 bg-secondary rounded-full group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <h3 className="font-headline text-xl font-semibold">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm">{feature.description}</p>
-              </CardContent>
-            </Card>
+             <Link href={feature.href} key={index} className="flex">
+                <Card className="text-center group hover:shadow-xl transition-shadow duration-300 flex flex-col w-full">
+                  <CardHeader className="items-center">
+                    <div className="p-4 bg-secondary rounded-full group-hover:scale-110 transition-transform duration-300">
+                      {feature.icon}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2 flex-grow">
+                    <h3 className="font-headline text-xl font-semibold">{feature.title}</h3>
+                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  </CardContent>
+                </Card>
+            </Link>
           ))}
         </div>
       </div>
