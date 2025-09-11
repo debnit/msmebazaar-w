@@ -1,3 +1,4 @@
+
 "use client";
 
 import { toast } from "@/hooks/use-toast";
@@ -32,6 +33,19 @@ export interface LoanApplication {
     id: string;
     loanAmount: number;
     loanPurpose: string;
+    status: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
+export interface RedemptionRequest {
+    id: string;
+    amount: number;
+    method: string;
+    details: string;
     status: string;
     createdAt: string;
     user: {
@@ -89,3 +103,4 @@ export const getEnquiries = (query: string = ""): Promise<Enquiry[] | null> => f
 export const getLoanApplications = (query: string = ""): Promise<LoanApplication[] | null> => fetcher(`/api/admin/loans?query=${query}`);
 export const getPayments = (query: string = ""): Promise<PaymentTransaction[] | null> => fetcher(`/api/admin/payments?query=${query}`);
 export const getUsers = (query: string = ""): Promise<UserWithCounts[] | null> => fetcher(`/api/admin/users?query=${query}`);
+export const getRedemptionRequests = (query: string = ""): Promise<RedemptionRequest[] | null> => fetcher(`/api/admin/redemptions?query=${query}`);

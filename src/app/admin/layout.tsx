@@ -5,6 +5,7 @@ import {
     FileText,
     Banknote,
     Users,
+    Gift,
 } from 'lucide-react'
 import Link from 'next/link'
 import AdminHeader from '@/components/admin/AdminHeader'
@@ -53,6 +54,13 @@ export default function AdminLayout({
                             >
                                 <Banknote className="h-4 w-4" />
                                 Payments
+                            </Link>
+                             <Link
+                                href="/admin/redemptions"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                            >
+                                <Gift className="h-4 w-4" />
+                                Redemptions
                             </Link>
                             <Link
                                 href="/admin/users"

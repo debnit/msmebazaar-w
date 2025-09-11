@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { apiService, DashboardData } from '@/services/apiService';
-import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy, Wallet } from 'lucide-react-native';
+import { User, LogOut, CreditCard, FileText, MessageSquare, Share2, Copy, Wallet, Send } from 'lucide-react-native';
 
 const TabButton = ({ active, label, icon: Icon, onPress }: any) => (
   <TouchableOpacity
@@ -210,12 +211,21 @@ export default function DashboardScreen() {
           </View>
           
           <View className="bg-card p-4 rounded-lg shadow-sm mb-6">
-            <View className="flex-row items-center">
-                <Wallet size={24} color="#1e2a4a" />
-                <View className="ml-4">
-                    <Text className="text-sm text-muted-foreground">Wallet Balance</Text>
-                    <Text className="text-2xl font-bold text-primary">₹{data.user.walletBalance.toFixed(2)}</Text>
+            <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center space-x-3">
+                    <Wallet size={24} color="#1e2a4a" />
+                    <View>
+                        <Text className="text-sm text-muted-foreground">Wallet Balance</Text>
+                        <Text className="text-2xl font-bold text-primary">₹{data.user.walletBalance.toFixed(2)}</Text>
+                    </View>
                 </View>
+                <TouchableOpacity 
+                    className="bg-accent py-2 px-4 rounded-lg"
+                    onPress={() => router.push('/(user)/redeem')}
+                    disabled={data.user.walletBalance <= 0}
+                >
+                    <Text className="text-accent-foreground font-semibold">Redeem</Text>
+                </TouchableOpacity>
             </View>
           </View>
 

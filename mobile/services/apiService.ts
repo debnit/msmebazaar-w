@@ -1,3 +1,4 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from './authService';
 
@@ -25,6 +26,13 @@ export interface EnquiryData {
   subject: string;
   message: string;
 }
+
+export interface RedemptionData {
+    amount: number;
+    method: string;
+    details: string;
+}
+
 
 // API Response Structures
 export interface DashboardData {
@@ -176,6 +184,15 @@ class ApiService {
     } catch (error: any) {
         return { success: false, error: error.message };
     }
+  }
+  
+  async submitRedemptionRequest(data: RedemptionData): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch('/user/redeem', { method: 'POST', body: JSON.stringify(data) });
+          return { success: true };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
   }
 
   // Admin APIs

@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getSession } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { RedemptionDialog } from "@/components/RedemptionDialog";
 
 
 interface Enquiry {
@@ -88,6 +89,27 @@ export default function DashboardPage() {
     });
   }
 
+  const fetchDashboardData = async () => {
+    try {
+        const response = await fetch('/api/user/dashboard');
+        if (response.ok) {
+            const result = await response.json();
+            setData(result);
+        } else {
+            console.error("Failed to fetch dashboard data");
+            toast({
+                title: 'Error',
+                description: 'Failed to load dashboard data.',
+                variant: 'destructive'
+            })
+        }
+    } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const checkSessionAndFetchData = async () => {
         const currentSession = await getSession();
@@ -95,25 +117,7 @@ export default function DashboardPage() {
             router.push("/login");
             return;
         }
-
-        try {
-            const response = await fetch('/api/user/dashboard');
-            if (response.ok) {
-                const result = await response.json();
-                setData(result);
-            } else {
-                console.error("Failed to fetch dashboard data");
-                toast({
-                    title: 'Error',
-                    description: 'Failed to load dashboard data.',
-                    variant: 'destructive'
-                })
-            }
-        } catch (error) {
-            console.error("Error fetching dashboard data:", error);
-        } finally {
-            setLoading(false);
-        }
+        fetchDashboardData();
     };
     checkSessionAndFetchData();
   }, [router, toast]);
@@ -138,13 +142,18 @@ export default function DashboardPage() {
       </div>
       
       <Card className="mb-8">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader>
             <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
-        <CardContent>
-            <div className="text-2xl font-bold">₹{data.user.walletBalance.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Your earnings from referrals.</p>
+        <CardContent className="flex items-center justify-between">
+            <div>
+                <div className="text-2xl font-bold">₹{data.user.walletBalance.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground">Your earnings from referrals.</p>
+            </div>
+            <RedemptionDialog 
+                balance={data.user.walletBalance} 
+                onSuccess={fetchDashboardData}
+            />
         </CardContent>
       </Card>
 
