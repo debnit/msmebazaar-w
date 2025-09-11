@@ -1,20 +1,21 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { HandCoins, FileText, Banknote, Rocket } from 'lucide-react-native';
+import { HandCoins, FileText, Banknote, Rocket, Route } from 'lucide-react-native';
 
 const features = [
+  {
+    icon: <Route size={40} color="#1e2a4a" />,
+    title: "NavArambh Exit Strategy",
+    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit.",
+  },
   {
     icon: <HandCoins size={40} color="#1e2a4a" />,
     title: "Quick Business Loans",
     description: "Access capital quickly with our streamlined loan application process. Get funds in as little as 24 hours.",
-  },
-  {
-    icon: <FileText size={40} color="#1e2a4a" />,
-    title: "Easy Enquiry",
-    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers you need.",
   },
   {
     icon: <Banknote size={40} color="#1e2a4a" />,
@@ -22,9 +23,9 @@ const features = [
     description: "Integrate our secure payment gateway to accept payments from customers effortlessly. Powered by Razorpay.",
   },
   {
-    icon: <Rocket size={40} color="#1e2a4a" />,
-    title: "Grow Your Business",
-    description: "From registration to scaling, we provide the tools and financial support to fuel your growth journey.",
+    icon: <FileText size={40} color="#1e2a4a" />,
+    title: "Easy Enquiry & Support",
+    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers you need.",
   },
 ];
 
@@ -51,10 +52,10 @@ export default function HomeScreen() {
         <View className="bg-card px-6 py-12">
           <View className="items-center space-y-6">
             <Text className="text-4xl font-bold text-primary text-center">
-              Unlock Your Business Potential
+              NavArambh: Secure Your Business's Future
             </Text>
             <Text className="text-lg text-muted-foreground text-center px-4">
-              MSMEConnect provides fast, flexible financing and seamless payment solutions to help your small business thrive.
+              Our premier service for strategic business exits. NavArambh provides expert valuation and guidance to ensure you get the best value for your hard work.
             </Text>
             <View className="w-full space-y-4">
               <TouchableOpacity 
@@ -84,7 +85,7 @@ export default function HomeScreen() {
               Solutions Tailored for Your Business
             </Text>
             <Text className="text-lg text-muted-foreground text-center">
-              We offer a comprehensive suite of services designed to meet the unique needs of micro, small, and medium enterprises.
+              From strategic exits to daily operations, we offer a comprehensive suite of services designed for MSMEs.
             </Text>
           </View>
           

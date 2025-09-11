@@ -1,16 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HandCoins, FileText, Banknote, Rocket } from "lucide-react";
+import { HandCoins, FileText, Banknote, Rocket, Route } from "lucide-react";
 
 const features = [
+  {
+    icon: <Route className="h-10 w-10 text-primary" />,
+    title: "NavArambh Exit Strategy",
+    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit.",
+  },
   {
     icon: <HandCoins className="h-10 w-10 text-primary" />,
     title: "Quick Business Loans",
     description: "Access capital quickly with our streamlined loan application process. Get funds in as little as 24 hours.",
-  },
-  {
-    icon: <FileText className="h-10 w-10 text-primary" />,
-    title: "Easy Enquiry",
-    description: "Have questions? Our simple enquiry form connects you with our experts to get the answers you need.",
   },
   {
     icon: <Banknote className="h-10 w-10 text-primary" />,
@@ -18,9 +18,9 @@ const features = [
     description: "Integrate our secure payment gateway to accept payments from customers effortlessly. Powered by Razorpay.",
   },
   {
-    icon: <Rocket className="h-10 w-10 text-primary" />,
-    title: "Grow Your Business",
-    description: "From registration to scaling, we provide the tools and financial support to fuel your growth journey.",
+    icon: <FileText className="h-10 w-10 text-primary" />,
+    title: "Easy Enquiry & Support",
+    description: "Our simple enquiry form connects you with our experts to get the answers and support you need to grow.",
   },
 ];
 
@@ -33,7 +33,7 @@ const Features = () => {
             Solutions Tailored for Your Business
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            We offer a comprehensive suite of services designed to meet the unique needs of micro, small, and medium enterprises.
+            From strategic exits to daily operations, we offer a comprehensive suite of services designed for MSMEs.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
