@@ -37,7 +37,7 @@ export default function LoanScreen() {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.fullName && formData.email && formData.phone && /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan));
+        return !!(formData.fullName && formData.email && formData.phone && /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(formData.pan));
       case 2:
         return !!(formData.businessName && formData.businessType && formData.yearsInBusiness > 0 && formData.annualTurnover > 0);
       case 3:

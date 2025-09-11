@@ -11,14 +11,14 @@ export default function CreditScoreScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(pan)) {
       Alert.alert('Invalid PAN', 'Please enter a valid PAN card number.');
       return;
     }
 
     setLoading(true);
     setScore(null);
-    const result = await apiService.getCreditScore(pan);
+    const result = await apiService.getCreditScore(pan.toUpperCase());
     setLoading(false);
 
     if (result.success && result.score) {

@@ -27,7 +27,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
+  pan: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN format"),
 });
 
 export default function CreditScorePage() {
@@ -49,7 +49,7 @@ export default function CreditScorePage() {
       const response = await fetch("/api/credit-score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ pan: values.pan.toUpperCase() }),
       });
 
       const data = await response.json();
@@ -110,6 +110,7 @@ export default function CreditScorePage() {
                           <Input
                             placeholder="ABCDE1234F"
                             {...field}
+                            onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                             className="text-center text-lg tracking-widest"
                           />
                         </FormControl>
