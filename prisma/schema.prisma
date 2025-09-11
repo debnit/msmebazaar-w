@@ -11,24 +11,22 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(cuid())
-  name            String
-  email           String   @unique
-  password        String
-  isAdmin         Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  referralCode    String   @unique
-  walletBalance   Float    @default(0)
-
-  enquiries          Enquiry[]
-  loanApplications   LoanApplication[]
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String
+  isAdmin           Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  referralCode      String   @unique
+  walletBalance     Float    @default(0)
+  referredById      String?
+  referredBy        User?    @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals         User[]   @relation("UserReferrals")
+  enquiries         Enquiry[]
+  loanApplications  LoanApplication[]
   paymentTransactions PaymentTransaction[]
-  notifications      Notification[]
-
-  referredById       String?
-  referredBy         User?     @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals          User[]    @relation("UserReferrals")
+  notifications     Notification[]
 }
 
 model Enquiry {
@@ -39,11 +37,10 @@ model Enquiry {
   subject   String
   message   String
   status    String   @default("Pending") // Pending, In Progress, Closed
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
 }
 
 model LoanApplication {
@@ -59,35 +56,32 @@ model LoanApplication {
   loanAmount      Float
   loanPurpose     String
   status          String   @default("Pending") // Pending, Approved, Rejected
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
 }
 
 model PaymentTransaction {
-  id                 String   @id @default(cuid())
-  serviceName        String
-  amount             Float
-  status             String // Success, Failed
-  razorpayOrderId    String
-  razorpayPaymentId  String
-  razorpaySignature  String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  serviceName       String
+  amount            Float
+  status            String // Success, Failed
+  razorpayOrderId   String?
+  razorpayPaymentId String
+  razorpaySignature String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Notification {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   title     String
   message   String
-  isRead    Boolean   @default(false)
-  createdAt DateTime  @default(now())
-
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

@@ -29,6 +29,7 @@ import { Download, Loader2, Copy, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getSession } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 
 interface Enquiry {
