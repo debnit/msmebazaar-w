@@ -39,12 +39,23 @@ export const usePaymentStore = create<PaymentState>((set) => ({
       price: 199,
       features: [
           "Upload Balance Sheet (optional)",
-          "Upload GST Returns (optional)",
+          "Upload Annual GST Returns (optional)",
           "Fill in asset and liability details",
-          "Our team will provide a detailed report"
+          "Our team provides a detailed report"
       ]
     },
-    { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 }
+    { 
+        id: '3', 
+        name: "Exit Strategy (NavArambh)", 
+        description: "Plan your business exit with expert guidance.", 
+        price: 299,
+        features: [
+            "Fill in Asset, Turnover & Loan Details",
+            "Describe your business challenges",
+            "Get a call from our expert team in 5 mins",
+            "Comprehensive exit strategy report"
+        ]
+    }
   ],
   selectedService: null,
   customAmount: 0,

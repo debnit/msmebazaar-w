@@ -76,6 +76,7 @@ export default function UserLayout() {
       {/* Hide screens from tabs */}
       <Tabs.Screen name="pro-onboarding" options={{ href: null, title: 'Pro Onboarding' }} />
       <Tabs.Screen name="valuation-onboarding" options={{ href: null, title: 'Valuation Details' }} />
+      <Tabs.Screen name="navarambh-onboarding" options={{ href: null, title: 'NavArambh Details' }} />
     </Tabs>
   );
 }

@@ -77,10 +77,21 @@ export default function PaymentsPage() {
               "Upload Balance Sheet (optional)",
               "Upload Annual GST Returns (optional)",
               "Fill in asset and liability details",
-              "Our team will provide a detailed report"
+              "Our team provides a detailed report"
             ]
           },
-          { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with our flagship expert guidance service.", price: 299 },
+          { 
+            id: '3', 
+            name: "Exit Strategy (NavArambh)", 
+            description: "Plan your business exit with our flagship expert guidance service.", 
+            price: 299,
+            features: [
+                "Fill in Asset, Turnover & Loan Details",
+                "Describe your business challenges",
+                "Get a call from our expert team in 5 mins",
+                "Comprehensive exit strategy report"
+            ]
+          },
         ]);
         
         // Fetch wallet balance
@@ -121,6 +132,8 @@ export default function PaymentsPage() {
           router.push('/payments/pro-onboarding');
         } else if (serviceName === "Valuation Service") {
           router.push(`/payments/valuation-onboarding?paymentId=${data.paymentId}`);
+        } else if (serviceName === "Exit Strategy (NavArambh)") {
+          router.push(`/payments/navarambh-onboarding?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }

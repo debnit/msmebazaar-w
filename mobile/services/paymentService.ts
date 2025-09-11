@@ -87,6 +87,8 @@ export const paymentService = {
             router.push('/(user)/pro-onboarding');
         } else if (paymentData.serviceName === "Valuation Service") {
             router.push('/(user)/valuation-onboarding');
+        } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
+            router.push('/(user)/navarambh-onboarding');
         }
         return { success: true, paymentId: data.paymentId };
       } else {
@@ -149,6 +151,8 @@ export const paymentService = {
             router.push('/(user)/pro-onboarding');
         } else if (paymentData.serviceName === "Valuation Service") {
             router.push('/(user)/valuation-onboarding');
+        } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
+            router.push('/(user)/navarambh-onboarding');
         }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {

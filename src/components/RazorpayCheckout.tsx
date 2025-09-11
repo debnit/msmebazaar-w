@@ -100,6 +100,8 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                             router.push(`/payments/pro-onboarding`);
                         } else if (serviceName === "Valuation Service") {
                             router.push(`/payments/valuation-onboarding?paymentId=${verificationData.paymentId}`);
+                        } else if (serviceName === "Exit Strategy (NavArambh)") {
+                            router.push(`/payments/navarambh-onboarding?paymentId=${verificationData.paymentId}`);
                         } else {
                             router.push(`/payments/success`);
                         }

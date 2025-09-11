@@ -7,6 +7,7 @@ import {
     Users,
     Gift,
     BarChart,
+    Route,
 } from 'lucide-react'
 import Link from 'next/link'
 import AdminHeader from '@/components/admin/AdminHeader'
@@ -55,6 +56,13 @@ export default function AdminLayout({
                             >
                                 <BarChart className="h-4 w-4" />
                                 Valuations
+                            </Link>
+                             <Link
+                                href="/admin/navarambh"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                            >
+                                <Route className="h-4 w-4" />
+                                NavArambh
                             </Link>
                             <Link
                                 href="/admin/payments"
