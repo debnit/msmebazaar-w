@@ -2,7 +2,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { i18n } from '../../i18n-config'
+import { i18n } from '@/i18n-config'
 import { Button } from './ui/button'
 import {
   DropdownMenu,

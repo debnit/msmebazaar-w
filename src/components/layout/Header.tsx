@@ -18,13 +18,14 @@ import { logout } from "@/lib/auth-actions";
 import { MobileNav } from "./MobileNav";
 import { Session } from "jose";
 import LanguageSwitcher from "../LanguageSwitcher";
-import { i18n } from "../../../i18n-config";
+import { i18n, Locale } from "@/i18n-config";
+import { getDictionary } from "@/lib/dictionary";
 
 const navLinks = [
-  { href: "/loan-application", label: "Loans" },
-  { href: "/payments", label: "Payments" },
-  { href: "/enquiry", label: "Enquiry" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/loan-application", label: "loans" },
+  { href: "/payments", label: "payments" },
+  { href: "/enquiry", label: "enquiry" },
+  { href: "/dashboard", label: "dashboard" },
 ];
 
 const NavLink = ({ href, label, pathname, lang }: { href: string; label: string; pathname: string, lang: string }) => (
@@ -32,16 +33,16 @@ const NavLink = ({ href, label, pathname, lang }: { href: string; label: string;
     href={`/${lang}${href}`}
     className={cn(
       "text-sm font-medium transition-colors hover:text-primary",
-      pathname.startsWith(href) ? "text-primary" : "text-muted-foreground"
+      pathname.startsWith(`/${lang}${href}`) ? "text-primary" : "text-muted-foreground"
     )}
   >
     {label}
   </Link>
 );
 
-export default async function Header({ session }: { session: Session | null }) {
-  const pathname = ""; // Placeholder
-  const lang = i18n.defaultLocale;
+export default async function Header({ session, lang }: { session: Session | null, lang: Locale }) {
+  const pathname = ""; // Placeholder for current path
+  const dict = await getDictionary(lang);
 
   const handleLogout = async () => {
     "use server"
@@ -57,7 +58,7 @@ export default async function Header({ session }: { session: Session | null }) {
           </Link>
           <nav className="hidden items-center space-x-6 md:flex">
             {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} pathname={pathname} lang={lang} />
+              <NavLink key={link.href} href={link.href} label={dict.header[link.label as keyof typeof dict.header]} pathname={pathname} lang={lang} />
             ))}
           </nav>
         </div>
@@ -115,14 +116,14 @@ export default async function Header({ session }: { session: Session | null }) {
           ) : (
             <nav className="hidden items-center space-x-2 md:flex">
               <Button asChild variant="ghost">
-                <Link href={`/${lang}/login`}>Login</Link>
+                <Link href={`/${lang}/login`}>{dict.header.login}</Link>
               </Button>
               <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Link href={`/${lang}/register`}>Register</Link>
+                <Link href={`/${lang}/register`}>{dict.header.register}</Link>
               </Button>
             </nav>
           )}
-          <MobileNav session={session} navLinks={navLinks} />
+          <MobileNav session={session} navLinks={navLinks.map(link => ({...link, label: dict.header[link.label as keyof typeof dict.header]}))} lang={lang} />
         </div>
       </div>
     </header>
