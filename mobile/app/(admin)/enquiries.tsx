@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiService, Enquiry } from '@/services/apiService';
 import { useFocusEffect } from 'expo-router';
 import { Search } from 'lucide-react-native';
+
+type DateFilter = 'all' | 'today' | '7d' | '30d';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -26,11 +29,12 @@ export default function AdminEnquiriesScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [dateFilter, setDateFilter] = useState<DateFilter>('all');
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-    const fetchEnquiries = useCallback(async (query: string) => {
+    const fetchEnquiries = useCallback(async (query: string, filter: DateFilter) => {
         setLoading(true);
-        const result = await apiService.getEnquiries(query);
+        const result = await apiService.getEnquiries(query, filter);
         if (result.success && result.data) {
             setEnquiries(result.data);
         } else {
@@ -40,13 +44,13 @@ export default function AdminEnquiriesScreen() {
     }, []);
 
     useEffect(() => {
-        fetchEnquiries(debouncedSearchQuery);
-    }, [debouncedSearchQuery, fetchEnquiries]);
+        fetchEnquiries(debouncedSearchQuery, dateFilter);
+    }, [debouncedSearchQuery, dateFilter, fetchEnquiries]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchEnquiries(debouncedSearchQuery).then(() => setRefreshing(false));
-    }, [debouncedSearchQuery, fetchEnquiries]);
+        fetchEnquiries(debouncedSearchQuery, dateFilter).then(() => setRefreshing(false));
+    }, [debouncedSearchQuery, dateFilter, fetchEnquiries]);
 
     const handleStatusChange = (enquiry: Enquiry, newStatus: string) => {
         if (enquiry.status === newStatus) return;
@@ -94,6 +98,20 @@ export default function AdminEnquiriesScreen() {
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                     />
+                </View>
+                <View className="flex-row justify-around mb-4">
+                    <TouchableOpacity onPress={() => setDateFilter('all')} className={`px-4 py-2 rounded-full ${dateFilter === 'all' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={dateFilter === 'all' ? 'text-primary-foreground' : 'text-secondary-foreground'}>All</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setDateFilter('today')} className={`px-4 py-2 rounded-full ${dateFilter === 'today' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={dateFilter === 'today' ? 'text-primary-foreground' : 'text-secondary-foreground'}>Today</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setDateFilter('7d')} className={`px-4 py-2 rounded-full ${dateFilter === '7d' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={dateFilter === '7d' ? 'text-primary-foreground' : 'text-secondary-foreground'}>7 Days</Text>
+                    </TouchableOpacity>
+                     <TouchableOpacity onPress={() => setDateFilter('30d')} className={`px-4 py-2 rounded-full ${dateFilter === '30d' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={dateFilter === '30d' ? 'text-primary-foreground' : 'text-secondary-foreground'}>30 Days</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
             {loading ? (

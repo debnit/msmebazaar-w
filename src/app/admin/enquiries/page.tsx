@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -21,6 +22,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { getEnquiries, Enquiry } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { DateRangePicker } from '@/components/admin/DateRangePicker';
+import { DateRange } from 'react-day-picker';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -42,15 +45,16 @@ export default function EnquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const fetchEnquiries = useCallback(async () => {
     setLoading(true);
-    const result = await getEnquiries(debouncedSearchQuery);
+    const result = await getEnquiries(debouncedSearchQuery, dateRange);
     if (result) {
         setEnquiries(result);
     }
     setLoading(false);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, dateRange]);
 
   useEffect(() => {
     fetchEnquiries();
@@ -63,13 +67,14 @@ export default function EnquiriesPage() {
         <CardDescription>
           A list of all enquiries submitted by users.
         </CardDescription>
-        <div className="pt-4">
+        <div className="pt-4 flex gap-4">
             <Input 
                 placeholder="Search by name, email, or subject..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-sm"
             />
+            <DateRangePicker onUpdate={(range) => setDateRange(range)} />
         </div>
       </CardHeader>
       <CardContent>

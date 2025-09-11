@@ -331,9 +331,24 @@ class ApiService {
       }
   }
 
-  async getEnquiries(query: string = ''): Promise<{ success: boolean; data?: Enquiry[]; error?: string }> {
+  async getEnquiries(query: string = '', dateFilter: 'all' | 'today' | '7d' | '30d' = 'all'): Promise<{ success: boolean; data?: Enquiry[]; error?: string }> {
     try {
-        const data = await this.fetch(`/admin/enquiries?query=${query}`);
+        const params = new URLSearchParams({ query });
+        if (dateFilter !== 'all') {
+            const today = new Date();
+            let fromDate: Date;
+            if (dateFilter === 'today') {
+                fromDate = new Date(today.setHours(0,0,0,0));
+            } else if (dateFilter === '7d') {
+                fromDate = new Date(today.setDate(today.getDate() - 7));
+            } else { // 30d
+                fromDate = new Date(today.setDate(today.getDate() - 30));
+            }
+            params.set('from', fromDate.toISOString());
+            params.set('to', new Date().toISOString());
+        }
+
+        const data = await this.fetch(`/admin/enquiries?${params.toString()}`);
         return { success: true, data };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -421,9 +436,9 @@ class ApiService {
     }
   }
 
-  async getUsers(query: string = ''): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
+  async getUsers(query: string = '', role: 'all' | 'admin' | 'agent' | 'user' = 'all'): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
       try {
-          const data = await this.fetch(`/admin/users?query=${query}`);
+          const data = await this.fetch(`/admin/users?query=${query}&role=${role}`);
           return { success: true, data };
       } catch (error: any) {
           return { success: false, error: error.message };

@@ -11,15 +11,26 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('query') || '';
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
 
-    const enquiries = await prisma.enquiry.findMany({
-      where: {
+    const where: any = {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { email: { contains: query, mode: 'insensitive' } },
           { subject: { contains: query, mode: 'insensitive' } },
         ],
-      },
+    };
+
+    if(from && to) {
+        where.createdAt = {
+            gte: new Date(from),
+            lte: new Date(to),
+        };
+    }
+
+    const enquiries = await prisma.enquiry.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { name: true, email: true } } },
     });

@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiService, AdminUser } from '@/services/apiService';
 import { useAuthStore } from '@/store/authStore';
 import { Search } from 'lucide-react-native';
+
+type RoleFilter = 'all' | 'admin' | 'agent' | 'user';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -26,11 +29,12 @@ export default function AdminUsersScreen() {
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const { user: currentUser } = useAuthStore();
     const [searchQuery, setSearchQuery] = useState('');
+    const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-    const fetchUsers = useCallback(async (query: string) => {
+    const fetchUsers = useCallback(async (query: string, filter: RoleFilter) => {
         setLoading(true);
-        const result = await apiService.getUsers(query);
+        const result = await apiService.getUsers(query, filter);
         if (result.success && result.data) {
             setUsers(result.data);
         } else {
@@ -40,13 +44,13 @@ export default function AdminUsersScreen() {
     }, []);
 
     useEffect(() => {
-        fetchUsers(debouncedSearchQuery);
-    }, [debouncedSearchQuery, fetchUsers]);
+        fetchUsers(debouncedSearchQuery, roleFilter);
+    }, [debouncedSearchQuery, roleFilter, fetchUsers]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchUsers(debouncedSearchQuery).then(() => setRefreshing(false));
-    }, [debouncedSearchQuery, fetchUsers]);
+        fetchUsers(debouncedSearchQuery, roleFilter).then(() => setRefreshing(false));
+    }, [debouncedSearchQuery, roleFilter, fetchUsers]);
 
     const handleRoleChange = (user: AdminUser) => {
         if (user.id === currentUser?.id) {
@@ -111,6 +115,20 @@ export default function AdminUsersScreen() {
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                     />
+                </View>
+                <View className="flex-row justify-around mb-4">
+                    <TouchableOpacity onPress={() => setRoleFilter('all')} className={`px-4 py-2 rounded-full ${roleFilter === 'all' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={roleFilter === 'all' ? 'text-primary-foreground' : 'text-secondary-foreground'}>All</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setRoleFilter('admin')} className={`px-4 py-2 rounded-full ${roleFilter === 'admin' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={roleFilter === 'admin' ? 'text-primary-foreground' : 'text-secondary-foreground'}>Admins</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setRoleFilter('agent')} className={`px-4 py-2 rounded-full ${roleFilter === 'agent' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={roleFilter === 'agent' ? 'text-primary-foreground' : 'text-secondary-foreground'}>Agents</Text>
+                    </TouchableOpacity>
+                     <TouchableOpacity onPress={() => setRoleFilter('user')} className={`px-4 py-2 rounded-full ${roleFilter === 'user' ? 'bg-primary' : 'bg-secondary'}`}>
+                        <Text className={roleFilter === 'user' ? 'text-primary-foreground' : 'text-secondary-foreground'}>Users</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
             {loading ? (

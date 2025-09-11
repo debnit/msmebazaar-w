@@ -1,6 +1,8 @@
+
 "use client";
 
 import { toast } from "@/hooks/use-toast";
+import { DateRange } from "react-day-picker";
 
 async function fetcher(url: string, options?: RequestInit) {
     try {
@@ -141,10 +143,15 @@ export interface UserWithCounts {
 
 // API functions
 export const getAdminDashboardData = (): Promise<AdminDashboardData | null> => fetcher("/api/admin/dashboard-data");
-export const getEnquiries = (query: string = ""): Promise<Enquiry[] | null> => fetcher(`/api/admin/enquiries?query=${query}`);
+export const getEnquiries = (query: string = "", dateRange?: DateRange): Promise<Enquiry[] | null> => {
+    const params = new URLSearchParams({ query });
+    if(dateRange?.from) params.set('from', dateRange.from.toISOString());
+    if(dateRange?.to) params.set('to', dateRange.to.toISOString());
+    return fetcher(`/api/admin/enquiries?${params.toString()}`);
+};
 export const getLoanApplications = (query: string = ""): Promise<LoanApplication[] | null> => fetcher(`/api/admin/loans?query=${query}`);
 export const getPayments = (query: string = ""): Promise<PaymentTransaction[] | null> => fetcher(`/api/admin/payments?query=${query}`);
-export const getUsers = (query: string = ""): Promise<UserWithCounts[] | null> => fetcher(`/api/admin/users?query=${query}`);
+export const getUsers = (query: string = "", role: string = "all"): Promise<UserWithCounts[] | null> => fetcher(`/api/admin/users?query=${query}&role=${role}`);
 export const getRedemptionRequests = (query: string = ""): Promise<RedemptionRequest[] | null> => fetcher(`/api/admin/redemptions?query=${query}`);
 export const getValuationRequests = (query: string = ""): Promise<ValuationRequest[] | null> => fetcher(`/api/admin/valuations?query=${query}`);
 export const getNavArambhRequests = (query: string = ""): Promise<NavArambhRequest[] | null> => fetcher(`/api/admin/navarambh?query=${query}`);

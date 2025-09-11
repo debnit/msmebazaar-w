@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -22,6 +23,7 @@ import { getUsers, UserWithCounts } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { UserAgentUpdater } from '@/components/admin/UserAgentUpdater';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -41,16 +43,17 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserWithCounts[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
-    const result = await getUsers(debouncedSearchQuery);
+    const result = await getUsers(debouncedSearchQuery, roleFilter);
     if(result) {
         setUsers(result);
     }
     setLoading(false);
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, roleFilter]);
 
   useEffect(() => {
     fetchUsers();
@@ -63,13 +66,24 @@ export default function UsersPage() {
         <CardDescription>
           A list of all registered users.
         </CardDescription>
-         <div className="pt-4">
+         <div className="pt-4 flex gap-4">
             <Input 
                 placeholder="Search by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-sm"
             />
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by role" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem value="admin">Admins</SelectItem>
+                    <SelectItem value="agent">Agents</SelectItem>
+                    <SelectItem value="user">Regular Users</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
       </CardHeader>
       <CardContent>

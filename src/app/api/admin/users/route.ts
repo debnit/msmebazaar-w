@@ -11,14 +11,26 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('query') || '';
+    const role = searchParams.get('role') || 'all';
+    
+    const where: any = {
+      OR: [
+        { name: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } },
+      ],
+    };
+
+    if (role === 'admin') {
+      where.isAdmin = true;
+    } else if (role === 'agent') {
+      where.isAgent = true;
+    } else if (role === 'user') {
+      where.isAdmin = false;
+      where.isAgent = false;
+    }
 
     const users = await prisma.user.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
-        ],
-      },
+      where,
       orderBy: { createdAt: 'desc' },
       include: {
           _count: {
