@@ -1,9 +1,13 @@
+
 import { Stack, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import WhatsAppButton from '@/components/WhatsAppButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 const queryClient = new QueryClient();
 
@@ -30,23 +34,26 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#1e2a4a',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <Stack.Screen name="index" options={{ title: 'Welcome to MSMEConnect', headerShown: false }} />
-          <Stack.Screen name="login" options={{ title: 'Login' }} />
-          <Stack.Screen name="register" options={{ title: 'Register' }} />
-          <Stack.Screen name="(user)" options={{ headerShown: false }} />
-          <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-        </Stack>
+        <View style={{ flex: 1 }}>
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: '#1e2a4a',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <Stack.Screen name="index" options={{ title: 'Welcome to MSMEConnect', headerShown: false }} />
+            <Stack.Screen name="login" options={{ title: 'Login' }} />
+            <Stack.Screen name="register" options={{ title: 'Register' }} />
+            <Stack.Screen name="(user)" options={{ headerShown: false }} />
+            <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+          </Stack>
+          <WhatsAppButton />
+        </View>
         <StatusBar style="light" />
       </QueryClientProvider>
     </GestureHandlerRootView>
