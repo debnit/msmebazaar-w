@@ -52,26 +52,26 @@ export default function HomeScreen() {
         <View className="bg-card px-6 py-12">
           <View className="items-center space-y-6">
             <Text className="text-4xl font-bold text-primary text-center">
-              NavArambh: Secure Your Business's Future
+              Exit Strategies & Quick Loans for MSMEs
             </Text>
             <Text className="text-lg text-muted-foreground text-center px-4">
-              Our premier service for strategic business exits. NavArambh provides expert valuation and guidance to ensure you get the best value for your hard work.
+              From expert valuation with NavArambh to fast, accessible business loans, we provide the financial tools you need to succeed.
             </Text>
             <View className="w-full space-y-4">
               <TouchableOpacity 
                 className="bg-accent py-4 px-6 rounded-lg"
-                onPress={() => router.push('/login')}
+                onPress={() => router.push('/(user)/loan')}
               >
                 <Text className="text-accent-foreground text-center font-semibold text-lg">
-                  Login / Register
+                  Apply for a Loan
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 className="border border-primary py-4 px-6 rounded-lg"
-                onPress={() => router.push('/(user)/enquiry')}
+                onPress={() => router.push('/login')}
               >
                 <Text className="text-primary text-center font-semibold text-lg">
-                  Contact Sales
+                  Explore Services
                 </Text>
               </TouchableOpacity>
             </View>

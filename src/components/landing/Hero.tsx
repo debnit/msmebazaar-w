@@ -9,17 +9,17 @@ const Hero = () => {
       <div className="container grid md:grid-cols-2 gap-8 items-center py-12 md:py-24">
         <div className="space-y-6">
           <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-primary">
-            NavArambh: Secure Your Business's Future
+            Exit Strategies & Quick Loans for MSMEs
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Introducing our premier service for strategic business exits. NavArambh provides expert valuation and guidance to ensure you get the best value for your hard work.
+            From expert valuation with NavArambh to fast, accessible business loans, we provide the financial tools you need to succeed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="/payments">Explore NavArambh</Link>
+              <Link href="/loan-application">Apply for a Loan</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/enquiry">Contact Sales</Link>
+              <Link href="/payments">Explore NavArambh</Link>
             </Button>
           </div>
         </div>
