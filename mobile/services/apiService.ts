@@ -211,6 +211,14 @@ export interface AdminUser extends User {
     createdAt: string;
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 // API Service Class
 class ApiService {
   private async getAuthHeaders() {
@@ -319,6 +327,25 @@ class ApiService {
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
+    }
+  }
+
+  // Notification APIs
+  async getNotifications(): Promise<{ success: boolean; data?: Notification[]; error?: string }> {
+    try {
+      const data = await this.fetch('/notifications');
+      return { success: true, data };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async markNotificationsAsRead(): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.fetch('/notifications', { method: 'PATCH' });
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
     }
   }
 
