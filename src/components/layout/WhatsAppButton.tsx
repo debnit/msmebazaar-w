@@ -19,7 +19,7 @@ const WhatsAppIcon = () => (
 );
 
 const WhatsAppButton = () => {
-    const phoneNumber = "911234567890"; // Replace with your WhatsApp number
+    const phoneNumber = "8260895728"; // Replace with your WhatsApp number
     const message = "Hello! I'm interested in your services."; // Pre-filled message
   
     const handleClick = () => {
