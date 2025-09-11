@@ -17,8 +17,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Protect user dashboard, notifications and other user-specific pages
-  const protectedUserRoutes = ['/dashboard', '/notifications', '/loan-application', '/credit-score', '/payments'];
+  // Protect user-specific pages that are NOT public
+  const protectedUserRoutes = ['/dashboard', '/notifications'];
   if (protectedUserRoutes.some(route => pathname.startsWith(route)) && !session?.user) {
      const url = request.nextUrl.clone()
      url.pathname = '/login'
