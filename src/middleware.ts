@@ -55,14 +55,14 @@ export async function middleware(request: NextRequest) {
     "/forgot-password",
     "/sign-in",
     "/enquiry",
+    "/payments",
     "/payments/success",
     "/payments/failure",
     "/credit-score",
     "/loan-application",
-    "/payments",
   ];
   
-  const isPublicPath = publicPaths.some(path => pathnameWithoutLocale === path);
+  const isPublicPath = publicPaths.includes(pathnameWithoutLocale);
   const isAuthPage = pathnameWithoutLocale === "/login" || pathnameWithoutLocale === "/register" || pathnameWithoutLocale === "/forgot-password" || pathnameWithoutLocale === "/sign-in";
   const isAdminPath = pathnameWithoutLocale.startsWith('/admin');
 
@@ -92,7 +92,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user is not logged in and path is not public, redirect to login
-  if (!isPublicPath && !isAdminPath) { // Also prevent redirect loop for admin login
+  if (!isPublicPath) {
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
   }
 

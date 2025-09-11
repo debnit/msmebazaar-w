@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: 'Financial services for Micro, Small, and Medium Enterprises',
 };
 
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
   params
 }: Readonly<{
@@ -27,25 +27,25 @@ export default async function RootLayout({
 }>) {
   const session = await getSession();
   return (
-    <html lang={params.lang} suppressHydrationWarning={true}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
-      <body
-        className={cn(
-          'min-h-screen bg-background font-body antialiased'
-        )}
-      >
-        <div className="relative flex min-h-screen flex-col">
-          <Header session={session} lang={params.lang} />
-          <main className="flex-1">{children}</main>
-          <Footer />
+    <div lang={params.lang} suppressHydrationWarning={true}>
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+        </head>
+        <div
+          className={cn(
+            'min-h-screen bg-background font-body antialiased'
+          )}
+        >
+          <div className="relative flex min-h-screen flex-col">
+            <Header session={session} lang={params.lang} />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <WhatsAppButton />
+          <Toaster />
         </div>
-        <WhatsAppButton />
-        <Toaster />
-      </body>
-    </html>
+    </div>
   );
 }
