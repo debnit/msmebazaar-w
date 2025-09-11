@@ -19,35 +19,35 @@ function getLocale(request: NextRequest): string | undefined {
 
 
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
+  const pathname = request.nextUrl.pathname;
+
+  // Skip middleware for API routes and static assets
+  if (pathname.startsWith('/api/') || pathname.startsWith('/_next/static/') || pathname.startsWith('/_next/image/') || pathname.endsWith('.ico')) {
+    return NextResponse.next();
+  }
+
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  )
+  );
 
   // Redirect if there is no locale
   if (pathnameIsMissingLocale) {
-    const locale = getLocale(request)
-
-    if (pathname.startsWith('/api/') || pathname.startsWith('/_next/')) {
-       return NextResponse.next();
-    }
+    const locale = getLocale(request);
     
     return NextResponse.redirect(
       new URL(
         `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
         request.url
       )
-    )
+    );
   }
-
+  
+  const locale = pathname.split('/')[1];
 
   const session = await getSession();
   
-  // Removing locale from pathname
-  const pathnameWithoutLocale = pathname.startsWith(`/${i18n.defaultLocale}`) 
-      ? pathname.slice(`/${i18n.defaultLocale}`.length) 
-      : pathname.slice(pathname.indexOf('/', 1));
-
+  const pathnameWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
+  
   const publicPaths = [
     "/",
     "/login",
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
     "/payments",
   ];
   
-  const isPublicPath = publicPaths.some(path => pathnameWithoutLocale === path || (pathnameWithoutLocale === '' && path === '/'));
+  const isPublicPath = publicPaths.some(path => pathnameWithoutLocale === path);
   const isAuthPage = pathnameWithoutLocale === "/login" || pathnameWithoutLocale === "/register" || pathnameWithoutLocale === "/forgot-password" || pathnameWithoutLocale === "/sign-in";
   const isAdminPath = pathnameWithoutLocale.startsWith('/admin');
 
@@ -72,26 +72,28 @@ export async function middleware(request: NextRequest) {
 
     // Redirect from auth pages
     if (isAuthPage) {
-      return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/dashboard", request.url));
+      const url = isAdmin ? `/${locale}/admin` : `/${locale}/dashboard`;
+      return NextResponse.redirect(new URL(url, request.url));
     }
 
     // Redirect from landing page
-    if (pathnameWithoutLocale === '' || pathnameWithoutLocale === '/') {
-        return NextResponse.redirect(new URL(isAdmin ? "/admin" : "/dashboard", request.url));
+    if (pathnameWithoutLocale === '/') {
+       const url = isAdmin ? `/${locale}/admin` : `/${locale}/dashboard`;
+       return NextResponse.redirect(new URL(url, request.url));
     }
 
     // Handle admin route protection
     if (isAdminPath && !isAdmin) {
       // If a non-admin tries to access an admin path, redirect to user dashboard
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
     }
     
     return NextResponse.next();
   }
 
   // If user is not logged in and path is not public, redirect to login
-  if (!isPublicPath) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (!isPublicPath && !isAdminPath) { // Also prevent redirect loop for admin login
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
   }
 
   return NextResponse.next();
@@ -99,6 +101,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sw.js).*)',
   ],
 }
