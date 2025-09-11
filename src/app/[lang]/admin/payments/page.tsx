@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Table,
   TableBody,
@@ -14,19 +16,26 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
+import { useEffect, useState } from 'react';
+import { getPayments, PaymentTransaction } from '@/lib/admin-api';
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getPayments() {
-  const payments = await prisma.paymentTransaction.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { user: true },
-  })
-  return payments
-}
+export default function PaymentsPage() {
+  const [payments, setPayments] = useState<PaymentTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function PaymentsPage() {
-  const payments = await getPayments()
+  useEffect(() => {
+    const fetchPayments = async () => {
+      setLoading(true);
+      const result = await getPayments();
+      if(result) {
+        setPayments(result);
+      }
+      setLoading(false);
+    };
+    fetchPayments();
+  }, []);
 
   return (
     <Card>
@@ -49,7 +58,18 @@ export default async function PaymentsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {payments.map((payment) => (
+             {loading ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-5 w-32" /></TableCell>
+                    </TableRow>
+                ))
+            ) : payments.map((payment) => (
               <TableRow key={payment.id}>
                 <TableCell>
                   <div className="font-medium">{payment.user.name}</div>

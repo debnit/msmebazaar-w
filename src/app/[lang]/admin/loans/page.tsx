@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Table,
   TableBody,
@@ -14,20 +16,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
 import { LoanStatusUpdater } from '@/components/admin/LoanStatusUpdater'
+import { getLoanApplications, LoanApplication } from '@/lib/admin-api'
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getLoanApplications() {
-  const loans = await prisma.loanApplication.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { user: true },
-  })
-  return loans
-}
+export default function LoanApplicationsPage() {
+  const [loans, setLoans] = useState<LoanApplication[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function LoanApplicationsPage() {
-  const loans = await getLoanApplications()
+  const fetchLoans = async () => {
+    setLoading(true);
+    const result = await getLoanApplications();
+    if(result) {
+      setLoans(result);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchLoans();
+  }, []);
 
   return (
     <Card>
@@ -50,7 +60,18 @@ export default async function LoanApplicationsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loans.map((loan) => (
+            {loading ? (
+              Array.from({ length: 10 }).map((_, i) => (
+                <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
+                </TableRow>
+              ))
+            ) : loans.map((loan) => (
               <TableRow key={loan.id}>
                 <TableCell>
                   <div className="font-medium">{loan.user.name}</div>
@@ -74,7 +95,7 @@ export default async function LoanApplicationsPage() {
                 </TableCell>
                 <TableCell>{new Date(loan.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  <LoanStatusUpdater loanId={loan.id} currentStatus={loan.status} />
+                  <LoanStatusUpdater loanId={loan.id} currentStatus={loan.status} onUpdate={fetchLoans} />
                 </TableCell>
               </TableRow>
             ))}

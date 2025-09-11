@@ -1,6 +1,7 @@
 
+"use client";
+
 import {
-  Activity,
   ArrowUpRight,
   Banknote,
   Briefcase,
@@ -8,9 +9,6 @@ import {
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
-
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -26,89 +24,54 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { prisma } from '@/lib/prisma'
-import { Locale } from '@/i18n-config'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react';
+import { getAdminDashboardData, AdminDashboardData } from '@/lib/admin-api';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useParams } from 'next/navigation';
+import { Locale } from '@/i18n-config';
 
-async function getDashboardData() {
-    const totalUsers = await prisma.user.count();
-    const totalEnquiries = await prisma.enquiry.count();
-    const totalLoans = await prisma.loanApplication.count();
-    const totalRevenueResult = await prisma.paymentTransaction.aggregate({
-        _sum: {
-            amount: true,
-        },
-        where: {
-            status: 'Success',
-        }
-    });
-    const totalRevenue = totalRevenueResult._sum.amount ?? 0;
+const StatCard = ({ title, value, icon, loading }: { title: string, value: string, icon: React.ReactNode, loading: boolean }) => (
+    <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            {icon}
+        </CardHeader>
+        <CardContent>
+            {loading ? <Skeleton className="h-8 w-1/2" /> : <div className="text-2xl font-bold">{value}</div>}
+        </CardContent>
+    </Card>
+);
 
+export default function AdminDashboard() {
+  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const lang = params.lang as Locale;
 
-    const recentLoans = await prisma.loanApplication.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: { user: true },
-    });
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const result = await getAdminDashboardData();
+      if (result) {
+        setData(result);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
-    const recentUsers = await prisma.user.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-    });
-
-    return {
-        totalUsers,
-        totalEnquiries,
-        totalLoans,
-        totalRevenue,
-        recentLoans,
-        recentUsers
-    }
-}
-
-export default async function AdminDashboard({ params: { lang } }: { params: { lang: Locale }}) {
-    const data = await getDashboardData();
   return (
     <>
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <Banknote className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{data.totalRevenue.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.totalUsers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Loan Applications</CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+{data.totalLoans}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Enquiries</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+{data.totalEnquiries}</div>
-          </CardContent>
-        </Card>
+        <StatCard title="Total Revenue" value={`₹${data?.totalRevenue?.toLocaleString() ?? '0'}`} icon={<Banknote className="h-4 w-4 text-muted-foreground" />} loading={loading} />
+        <StatCard title="Total Users" value={data?.totalUsers?.toString() ?? '0'} icon={<Users className="h-4 w-4 text-muted-foreground" />} loading={loading} />
+        <StatCard title="Loan Applications" value={`+${data?.totalLoans?.toString() ?? '0'}`} icon={<Briefcase className="h-4 w-4 text-muted-foreground" />} loading={loading} />
+        <StatCard title="Enquiries" value={`+${data?.totalEnquiries?.toString() ?? '0'}`} icon={<FileText className="h-4 w-4 text-muted-foreground" />} loading={loading} />
       </div>
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
@@ -137,7 +100,16 @@ export default async function AdminDashboard({ params: { lang } }: { params: { l
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.recentLoans.map(loan => (
+                 {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell className="text-right"><Skeleton className="h-5 w-20" /></TableCell>
+                        </TableRow>
+                    ))
+                ) : data?.recentLoans?.map(loan => (
                     <TableRow key={loan.id}>
                         <TableCell>
                             <div className="font-medium">{loan.user.name}</div>
@@ -170,7 +142,17 @@ export default async function AdminDashboard({ params: { lang } }: { params: { l
             <CardTitle>Recent Sign Ups</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {data.recentUsers.map(user => (
+             {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                        <div className="grid gap-1 flex-1">
+                            <Skeleton className="h-5 w-3/4" />
+                            <Skeleton className="h-4 w-full" />
+                        </div>
+                        <Skeleton className="h-5 w-1/4" />
+                    </div>
+                ))
+            ) : data?.recentUsers?.map(user => (
                 <div key={user.id} className="flex items-center gap-4">
                     <div className="grid gap-1">
                     <p className="text-sm font-medium leading-none">

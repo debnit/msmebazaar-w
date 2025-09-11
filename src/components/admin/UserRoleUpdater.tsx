@@ -4,17 +4,16 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 import { Shield, ShieldOff } from 'lucide-react';
 
 interface UserRoleUpdaterProps {
   userId: string;
   isAdmin: boolean;
+  onUpdate: () => void;
 }
 
-export function UserRoleUpdater({ userId, isAdmin }: UserRoleUpdaterProps) {
+export function UserRoleUpdater({ userId, isAdmin, onUpdate }: UserRoleUpdaterProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRoleChange = async () => {
@@ -32,7 +31,7 @@ export function UserRoleUpdater({ userId, isAdmin }: UserRoleUpdaterProps) {
           title: 'Success',
           description: `User role updated successfully.`,
         });
-        router.refresh();
+        onUpdate();
       } else {
         const errorData = await response.json();
         toast({

@@ -13,16 +13,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 interface EnquiryStatusUpdaterProps {
   enquiryId: string;
   currentStatus: string;
+  onUpdate: () => void;
 }
 
-export function EnquiryStatusUpdater({ enquiryId, currentStatus }: EnquiryStatusUpdaterProps) {
+export function EnquiryStatusUpdater({ enquiryId, currentStatus, onUpdate }: EnquiryStatusUpdaterProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
@@ -41,7 +40,7 @@ export function EnquiryStatusUpdater({ enquiryId, currentStatus }: EnquiryStatus
           title: 'Success',
           description: `Enquiry status updated to ${newStatus}.`,
         });
-        router.refresh();
+        onUpdate();
       } else {
         const errorData = await response.json();
         toast({

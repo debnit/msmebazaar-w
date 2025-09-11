@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Table,
   TableBody,
@@ -14,20 +16,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
 import { EnquiryStatusUpdater } from '@/components/admin/EnquiryStatusUpdater'
+import { useEffect, useState } from 'react';
+import { getEnquiries, Enquiry } from '@/lib/admin-api';
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getEnquiries() {
-  const enquiries = await prisma.enquiry.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { user: true },
-  })
-  return enquiries
-}
+export default function EnquiriesPage() {
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function EnquiriesPage() {
-  const enquiries = await getEnquiries()
+  const fetchEnquiries = async () => {
+    setLoading(true);
+    const result = await getEnquiries();
+    if (result) {
+        setEnquiries(result);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchEnquiries();
+  }, []);
 
   return (
     <Card>
@@ -49,7 +59,17 @@ export default async function EnquiriesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {enquiries.map((enquiry) => (
+            {loading ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
+                    </TableRow>
+                ))
+            ) : enquiries.map((enquiry) => (
               <TableRow key={enquiry.id}>
                 <TableCell>
                   <div className="font-medium">{enquiry.name}</div>
@@ -65,7 +85,7 @@ export default async function EnquiriesPage() {
                 </TableCell>
                 <TableCell>{new Date(enquiry.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  <EnquiryStatusUpdater enquiryId={enquiry.id} currentStatus={enquiry.status} />
+                  <EnquiryStatusUpdater enquiryId={enquiry.id} currentStatus={enquiry.status} onUpdate={fetchEnquiries}/>
                 </TableCell>
               </TableRow>
             ))}

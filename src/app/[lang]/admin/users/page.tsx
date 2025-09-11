@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Table,
   TableBody,
@@ -14,24 +16,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { prisma } from '@/lib/prisma'
 import { Badge } from '@/components/ui/badge'
 import { UserRoleUpdater } from '@/components/admin/UserRoleUpdater'
+import { useEffect, useState } from 'react';
+import { getUsers, UserWithCounts } from '@/lib/admin-api';
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getUsers() {
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-        _count: {
-            select: { loanApplications: true, enquiries: true }
-        }
+
+export default function UsersPage() {
+  const [users, setUsers] = useState<UserWithCounts[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    const result = await getUsers();
+    if(result) {
+        setUsers(result);
     }
-  })
-  return users
-}
+    setLoading(false);
+  }
 
-export default async function UsersPage() {
-  const users = await getUsers()
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <Card>
@@ -54,7 +61,18 @@ export default async function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+             {loading ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={i}>
+                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-9 w-28" /></TableCell>
+                    </TableRow>
+                ))
+            ) : users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                   <div className="font-medium">{user.name}</div>
@@ -71,7 +89,7 @@ export default async function UsersPage() {
                 <TableCell>{user._count.loanApplications}</TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  <UserRoleUpdater userId={user.id} isAdmin={user.isAdmin} />
+                  <UserRoleUpdater userId={user.id} isAdmin={user.isAdmin} onUpdate={fetchUsers} />
                 </TableCell>
               </TableRow>
             ))}

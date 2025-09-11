@@ -13,16 +13,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 interface LoanStatusUpdaterProps {
   loanId: string;
   currentStatus: string;
+  onUpdate: () => void;
 }
 
-export function LoanStatusUpdater({ loanId, currentStatus }: LoanStatusUpdaterProps) {
+export function LoanStatusUpdater({ loanId, currentStatus, onUpdate }: LoanStatusUpdaterProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
@@ -42,18 +41,20 @@ export function LoanStatusUpdater({ loanId, currentStatus }: LoanStatusUpdaterPr
           description: `Loan status updated to ${newStatus}.`,
         });
 
+        const updatedLoan = await response.json();
+
         // Also trigger a notification for the user
         await fetch('/api/notifications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: response.headers.get('X-User-Id'), // We'll need to return this from the PATCH response
+              userId: updatedLoan.userId,
               title: 'Loan Application Update',
               message: `Your loan application status has been updated to: ${newStatus}`,
             }),
           });
           
-        router.refresh();
+        onUpdate();
       } else {
         const errorData = await response.json();
         toast({
