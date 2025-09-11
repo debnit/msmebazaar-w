@@ -92,10 +92,14 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                             amount: orderData.amount,
                         }),
                     });
+                    
+                    const verificationData = await verificationRes.json();
 
                     if (verificationRes.ok) {
                         if(serviceName === "Pro-Membership") {
                             router.push(`/payments/pro-onboarding`);
+                        } else if (serviceName === "Valuation Service") {
+                            router.push(`/payments/valuation-onboarding?paymentId=${verificationData.paymentId}`);
                         } else {
                             router.push(`/payments/success`);
                         }

@@ -73,8 +73,9 @@ export default function UserLayout() {
           tabBarIcon: ({ color }) => <MessageSquare color={color} size={24} />,
         }}
       />
-      {/* Hide pro-onboarding from tabs */}
+      {/* Hide screens from tabs */}
       <Tabs.Screen name="pro-onboarding" options={{ href: null, title: 'Pro Onboarding' }} />
+      <Tabs.Screen name="valuation-onboarding" options={{ href: null, title: 'Valuation Details' }} />
     </Tabs>
   );
 }

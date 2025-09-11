@@ -85,6 +85,8 @@ export const paymentService = {
       if (response.ok) {
         if(paymentData.serviceName === "Pro-Membership") {
             router.push('/(user)/pro-onboarding');
+        } else if (paymentData.serviceName === "Valuation Service") {
+            router.push('/(user)/valuation-onboarding');
         }
         return { success: true, paymentId: data.paymentId };
       } else {
@@ -145,6 +147,8 @@ export const paymentService = {
       if (isVerified) {
         if(paymentData.serviceName === "Pro-Membership") {
             router.push('/(user)/pro-onboarding');
+        } else if (paymentData.serviceName === "Valuation Service") {
+            router.push('/(user)/valuation-onboarding');
         }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {

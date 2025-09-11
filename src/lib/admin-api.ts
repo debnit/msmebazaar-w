@@ -54,6 +54,19 @@ export interface RedemptionRequest {
     };
 }
 
+export interface ValuationRequest {
+    id: string;
+    turnover: number;
+    assets: string;
+    liabilities: string;
+    phone: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
 export interface AdminDashboardData {
     totalRevenue: number;
     totalUsers: number;
@@ -104,3 +117,4 @@ export const getLoanApplications = (query: string = ""): Promise<LoanApplication
 export const getPayments = (query: string = ""): Promise<PaymentTransaction[] | null> => fetcher(`/api/admin/payments?query=${query}`);
 export const getUsers = (query: string = ""): Promise<UserWithCounts[] | null> => fetcher(`/api/admin/users?query=${query}`);
 export const getRedemptionRequests = (query: string = ""): Promise<RedemptionRequest[] | null> => fetcher(`/api/admin/redemptions?query=${query}`);
+export const getValuationRequests = (query: string = ""): Promise<ValuationRequest[] | null> => fetcher(`/api/admin/valuations?query=${query}`);

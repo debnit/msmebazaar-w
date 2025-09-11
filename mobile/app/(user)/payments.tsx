@@ -37,7 +37,7 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.initiatePayment({ amount, serviceName, description });
       if (result.success) {
-        if(serviceName !== "Pro-Membership") {
+        if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service") {
             Alert.alert('Payment Successful', `Your payment for ${serviceName} was successful.`,
               [{ text: 'OK', onPress: resetPayment }]
             );
@@ -59,7 +59,7 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.payWithWallet({ serviceName, amount });
        if (result.success) {
-         if(serviceName !== "Pro-Membership") {
+         if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service") {
             Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
          }
         setWalletBalance(prev => (prev !== null ? prev - amount : null));

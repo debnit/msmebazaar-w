@@ -32,7 +32,18 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         "Raw Material Procurement Support"
       ]
     },
-    { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 199 },
+    { 
+      id: '2', 
+      name: "Valuation Service", 
+      description: "Get a professional valuation for your business.", 
+      price: 199,
+      features: [
+          "Upload Balance Sheet (optional)",
+          "Upload GST Returns (optional)",
+          "Fill in asset and liability details",
+          "Our team will provide a detailed report"
+      ]
+    },
     { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 }
   ],
   selectedService: null,

@@ -68,7 +68,18 @@ export default function PaymentsPage() {
               "Raw Material Procurement Support"
             ]
           },
-          { id: '2', name: "Valuation Service", description: "Get a comprehensive, professional valuation for your business.", price: 199 },
+          { 
+            id: '2', 
+            name: "Valuation Service", 
+            description: "Get a comprehensive, professional valuation for your business.", 
+            price: 199,
+            features: [
+              "Upload Balance Sheet (optional)",
+              "Upload Annual GST Returns (optional)",
+              "Fill in asset and liability details",
+              "Our team will provide a detailed report"
+            ]
+          },
           { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with our flagship expert guidance service.", price: 299 },
         ]);
         
@@ -108,6 +119,8 @@ export default function PaymentsPage() {
         });
         if(serviceName === "Pro-Membership") {
           router.push('/payments/pro-onboarding');
+        } else if (serviceName === "Valuation Service") {
+          router.push(`/payments/valuation-onboarding?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }

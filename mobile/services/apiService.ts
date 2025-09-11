@@ -40,6 +40,15 @@ export interface ProProfileData {
     consultationNotes: string;
 }
 
+export interface ValuationOnboardingData {
+    turnover: number;
+    assets: string;
+    liabilities: string;
+    phone: string;
+    balanceSheetUrl?: string;
+    gstReturnsUrl?: string;
+}
+
 
 // API Response Structures
 export interface DashboardData {
@@ -121,6 +130,21 @@ export interface RedemptionRequest {
         name: string;
         email: string;
     };
+}
+
+export interface ValuationRequest {
+    id: string;
+    turnover: number;
+    assets: string;
+    liabilities: string;
+    phone: string;
+    balanceSheetUrl?: string | null;
+    gstReturnsUrl?: string | null;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    }
 }
 
 
@@ -224,6 +248,15 @@ class ApiService {
         return { success: false, error: error.message };
     }
   }
+  
+  async submitValuationRequest(data: ValuationOnboardingData): Promise<{ success: boolean; error?: string }> {
+    try {
+        await this.fetch('/user/valuation-request', { method: 'POST', body: JSON.stringify(data) });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
 
   // Admin APIs
   async getAdminDashboardData(): Promise<{ success: boolean; data?: AdminDashboardData; error?: string }> {
@@ -296,6 +329,15 @@ class ApiService {
       } catch (error: any) {
           return { success: false, error: error.message };
       }
+  }
+  
+  async getValuationRequests(query: string = ''): Promise<{ success: boolean; data?: ValuationRequest[]; error?: string }> {
+    try {
+        const data = await this.fetch(`/admin/valuations?query=${query}`);
+        return { success: true, data };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
   }
 
   async getUsers(query: string = ''): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
