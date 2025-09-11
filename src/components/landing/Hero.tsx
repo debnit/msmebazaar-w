@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { Locale } from "@/i18n-config";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,10 +10,11 @@ type HeroProps = {
     subtitle: string;
     apply_loan: string;
     contact_sales: string;
-  }
+  },
+  lang: Locale
 }
 
-const Hero = ({ dict }: HeroProps) => {
+const Hero = ({ dict, lang }: HeroProps) => {
   return (
     <section className="bg-card">
       <div className="container grid md:grid-cols-2 gap-8 items-center py-12 md:py-24">
@@ -25,10 +27,10 @@ const Hero = ({ dict }: HeroProps) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="/loan-application">{dict.apply_loan}</Link>
+              <Link href={`/${lang}/loan-application`}>{dict.apply_loan}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/enquiry">{dict.contact_sales}</Link>
+              <Link href={`/${lang}/enquiry`}>{dict.contact_sales}</Link>
             </Button>
           </div>
         </div>

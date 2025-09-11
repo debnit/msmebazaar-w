@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { getDictionary } from '@/lib/dictionary';
 import { Locale } from '@/i18n-config';
 
-const GetTheApp = () => {
+const GetTheApp = ({ lang }: { lang: Locale }) => {
   // This URL can be updated to a smart link that directs to the correct app store
   const appUrl = "https://msmeconnect.com/mobile"; 
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(appUrl)}`;
@@ -27,10 +27,10 @@ const GetTheApp = () => {
             </p>
             <div className='flex gap-4'>
                 <Button asChild size="lg" variant="outline">
-                    <Link href="#">App Store</Link>
+                    <Link href={`/${lang}/#`}>App Store</Link>
                 </Button>
                  <Button asChild size="lg" variant="outline">
-                    <Link href="#">Google Play</Link>
+                    <Link href={`/${lang}/#`}>Google Play</Link>
                 </Button>
             </div>
           </div>
@@ -56,11 +56,11 @@ export default async function Home({ params: { lang } }: { params: { lang: Local
   const dict = await getDictionary(lang);
   return (
     <div className="flex flex-col">
-      <Hero dict={dict.hero} />
+      <Hero dict={dict.hero} lang={lang} />
       <Features />
       <Testimonials />
-      <GetTheApp />
-      <CTA />
+      <GetTheApp lang={lang} />
+      <CTA lang={lang} />
     </div>
   );
 }

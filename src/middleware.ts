@@ -22,13 +22,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Skip middleware for API routes and static assets
-  if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/static/') ||
-    pathname.startsWith('/_next/image/') ||
-    pathname.endsWith('.ico') ||
-    pathname.endsWith('.png')
-    ) {
+  const publicPaths = ['/api/', '/_next/static/', '/_next/image/', '.ico', '.png', '.svg', '.jpg', '.jpeg', '.webp'];
+  if (publicPaths.some(p => pathname.includes(p))) {
     return NextResponse.next();
   }
 
@@ -76,9 +71,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user is not logged in and path is protected, redirect to login
-  const protectedPaths = ['/dashboard', '/loan-application', '/notifications'];
-  if (protectedPaths.some(p => pathnameWithoutLocale.startsWith(p)) || isAdminPath) {
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+  const protectedPaths = ['/dashboard', '/loan-application', '/notifications', '/admin'];
+  if (protectedPaths.some(p => pathnameWithoutLocale.startsWith(p))) {
+    return NextResponse.redirect(new URL(`/${locale}/login?callbackUrl=${request.url}`, request.url));
   }
 
   return NextResponse.next();
@@ -86,6 +81,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sw.js).*)',
+    '/((?!api|_next/static|_next/image|.*\\..*|sw.js).*)',
   ],
 }
