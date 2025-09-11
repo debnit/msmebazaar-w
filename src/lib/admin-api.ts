@@ -1,4 +1,3 @@
-
 "use client";
 
 import { toast } from "@/hooks/use-toast";
@@ -132,6 +131,7 @@ export interface UserWithCounts {
     name: string;
     email: string;
     isAdmin: boolean;
+    isAgent: boolean;
     createdAt: string;
     _count: {
         loanApplications: number;

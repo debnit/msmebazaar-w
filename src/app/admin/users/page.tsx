@@ -21,6 +21,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { getUsers, UserWithCounts } from '@/lib/admin-api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { UserAgentUpdater } from '@/components/admin/UserAgentUpdater';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -104,14 +105,17 @@ export default function UsersPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={user.isAdmin ? 'destructive' : 'secondary'}>
-                    {user.isAdmin ? 'Admin' : 'User'}
-                  </Badge>
+                  <div className='flex flex-col gap-2'>
+                    {user.isAdmin && <Badge variant={'destructive'}>Admin</Badge>}
+                    {user.isAgent && <Badge variant={'outline'}>Agent</Badge>}
+                    {!user.isAdmin && !user.isAgent && <Badge variant={'secondary'}>User</Badge>}
+                  </div>
                 </TableCell>
                 <TableCell>{user._count.enquiries}</TableCell>
                 <TableCell>{user._count.loanApplications}</TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
+                  <UserAgentUpdater userId={user.id} isAgent={user.isAgent} onUpdate={fetchUsers} />
                   <UserRoleUpdater userId={user.id} isAdmin={user.isAdmin} onUpdate={fetchUsers} />
                 </TableCell>
               </TableRow>
