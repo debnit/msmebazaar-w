@@ -33,6 +33,13 @@ export interface RedemptionData {
     details: string;
 }
 
+export interface ProProfileData {
+    businessName: string;
+    businessNature: string;
+    helpNeeded: string;
+    consultationNotes: string;
+}
+
 
 // API Response Structures
 export interface DashboardData {
@@ -102,6 +109,20 @@ export interface Payment {
         email: string;
     }
 }
+
+export interface RedemptionRequest {
+    id: string;
+    amount: number;
+    method: string;
+    details: string;
+    status: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
 
 export interface AdminDashboardData {
     totalRevenue: number;
@@ -195,6 +216,15 @@ class ApiService {
       }
   }
 
+  async submitProProfile(data: ProProfileData): Promise<{ success: boolean; error?: string }> {
+    try {
+        await this.fetch('/user/pro-profile', { method: 'POST', body: JSON.stringify(data) });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+
   // Admin APIs
   async getAdminDashboardData(): Promise<{ success: boolean; data?: AdminDashboardData; error?: string }> {
       try {
@@ -245,6 +275,24 @@ class ApiService {
       try {
           const data = await this.fetch(`/admin/payments?query=${query}`);
           return { success: true, data };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+  
+  async getRedemptionRequests(query: string = ''): Promise<{ success: boolean; data?: RedemptionRequest[]; error?: string }> {
+    try {
+        const data = await this.fetch(`/admin/redemptions?query=${query}`);
+        return { success: true, data };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+
+  async updateRedemptionStatus(id: string, status: string): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch(`/admin/redemptions/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+          return { success: true };
       } catch (error: any) {
           return { success: false, error: error.message };
       }

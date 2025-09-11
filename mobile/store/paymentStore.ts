@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 
 export interface PaymentService {
@@ -5,6 +6,7 @@ export interface PaymentService {
   name: string;
   description: string;
   price: number;
+  features?: string[];
 }
 
 interface PaymentState {
@@ -18,7 +20,18 @@ interface PaymentState {
 
 export const usePaymentStore = create<PaymentState>((set) => ({
   services: [
-    { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and support.", price: 99 },
+    { 
+      id: '1', 
+      name: "Pro-Membership", 
+      description: "Unlock exclusive features and support.", 
+      price: 99,
+      features: [
+        "24/7 Free Consultation",
+        "Expert Mentoring",
+        "Assistance to Sell Products",
+        "Raw Material Procurement Support"
+      ]
+    },
     { id: '2', name: "Valuation Service", description: "Get a professional valuation for your business.", price: 199 },
     { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with expert guidance.", price: 299 }
   ],

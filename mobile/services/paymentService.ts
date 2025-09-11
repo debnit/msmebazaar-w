@@ -1,5 +1,7 @@
+
 import RazorpayCheckout from '@react-native-razorpay/react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const RAZORPAY_KEY_ID = process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID;
@@ -81,6 +83,9 @@ export const paymentService = {
       const data = await response.json();
 
       if (response.ok) {
+        if(paymentData.serviceName === "Pro-Membership") {
+            router.push('/(user)/pro-onboarding');
+        }
         return { success: true, paymentId: data.paymentId };
       } else {
         return { success: false, error: data.error || 'Wallet payment failed' };
@@ -138,6 +143,9 @@ export const paymentService = {
       });
 
       if (isVerified) {
+        if(paymentData.serviceName === "Pro-Membership") {
+            router.push('/(user)/pro-onboarding');
+        }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {
         return { success: false, error: 'Payment verification failed' };

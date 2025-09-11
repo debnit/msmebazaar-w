@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Star, BarChart, Route, Wallet, Loader2 } from "lucide-react";
+import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check } from "lucide-react";
 import RazorpayCheckout from "@/components/RazorpayCheckout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,7 @@ type Service = {
   name: string;
   description: string;
   price: number;
+  features?: string[];
 };
 
 type PaymentDetails = {
@@ -52,10 +53,21 @@ export default function PaymentsPage() {
     const fetchServicesAndBalance = async () => {
       setLoadingServices(true);
       try {
-        // Fetch services
+        // Mock fetching services
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
-          { id: '1', name: "Pro-Membership", description: "Unlock exclusive features and premium support.", price: 99 },
+          { 
+            id: '1', 
+            name: "Pro-Membership", 
+            description: "Unlock exclusive features and premium support.", 
+            price: 99,
+            features: [
+              "24/7 Free Consultation",
+              "Expert Mentoring",
+              "Assistance to Sell Products",
+              "Raw Material Procurement Support"
+            ]
+          },
           { id: '2', name: "Valuation Service", description: "Get a comprehensive, professional valuation for your business.", price: 199 },
           { id: '3', name: "Exit Strategy (NavArambh)", description: "Plan your business exit with our flagship expert guidance service.", price: 299 },
         ]);
@@ -94,7 +106,11 @@ export default function PaymentsPage() {
           title: "Payment Successful",
           description: `Paid for ${serviceName} using wallet balance.`,
         });
-        router.push('/payments/success');
+        if(serviceName === "Pro-Membership") {
+          router.push('/payments/pro-onboarding');
+        } else {
+          router.push('/payments/success');
+        }
       } else {
          toast({
           title: "Payment Failed",
@@ -152,7 +168,7 @@ export default function PaymentsPage() {
               const isProcessing = isProcessingWallet === service.id;
               
               return (
-              <Card key={service.id}>
+              <Card key={service.id} className="flex flex-col">
                 <CardHeader className="flex flex-row items-center gap-4">
                   {serviceIcons[service.name] || <CreditCard className="h-8 w-8 text-primary" />}
                   <div>
@@ -160,10 +176,20 @@ export default function PaymentsPage() {
                     <CardDescription>{service.description}</CardDescription>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(service.price)}</p>
+                <CardContent className="flex-grow">
+                  <p className="text-3xl font-bold mb-4">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(service.price)}</p>
+                  {service.features && (
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {service.features.map((feature, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-green-500" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </CardContent>
-                <CardFooter className="flex flex-col gap-2">
+                <CardFooter className="flex flex-col gap-2 mt-auto pt-6">
                   {canPayWithWallet ? (
                      <Button className="w-full" onClick={() => handlePayWithWallet(service.price, service.name, service.id)} disabled={isProcessing}>
                        {isProcessing ? <Loader2 className="animate-spin" /> : <Wallet className="mr-2" />}

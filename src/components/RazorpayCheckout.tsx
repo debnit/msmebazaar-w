@@ -94,7 +94,11 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                     });
 
                     if (verificationRes.ok) {
-                        router.push(`/payments/success`);
+                        if(serviceName === "Pro-Membership") {
+                            router.push(`/payments/pro-onboarding`);
+                        } else {
+                            router.push(`/payments/success`);
+                        }
                     } else {
                         router.push(`/payments/failure`);
                     }

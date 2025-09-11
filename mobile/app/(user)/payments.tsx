@@ -4,8 +4,9 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityInd
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePaymentStore } from '@/store/paymentStore';
 import { paymentService } from '@/services/paymentService';
-import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet } from 'lucide-react-native';
+import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Check } from 'lucide-react-native';
 import { apiService } from '@/services/apiService';
+import { router } from 'expo-router';
 
 const serviceIcons: { [key: string]: React.ReactNode } = {
   "Pro-Membership": <Star size={32} color="#1e2a4a" />,
@@ -36,9 +37,11 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.initiatePayment({ amount, serviceName, description });
       if (result.success) {
-        Alert.alert('Payment Successful', `Your payment for ${serviceName} was successful.`,
-          [{ text: 'OK', onPress: resetPayment }]
-        );
+        if(serviceName !== "Pro-Membership") {
+            Alert.alert('Payment Successful', `Your payment for ${serviceName} was successful.`,
+              [{ text: 'OK', onPress: resetPayment }]
+            );
+        }
       } else {
         Alert.alert('Payment Failed', result.error || 'Payment could not be processed');
       }
@@ -56,7 +59,9 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.payWithWallet({ serviceName, amount });
        if (result.success) {
-        Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
+         if(serviceName !== "Pro-Membership") {
+            Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
+         }
         setWalletBalance(prev => (prev !== null ? prev - amount : null));
       } else {
         Alert.alert('Payment Failed', result.error || 'Could not process wallet payment.');
@@ -114,6 +119,18 @@ export default function PaymentsScreen() {
                 </View>
               </View>
               <Text className="text-3xl font-bold text-accent mb-4">₹{service.price}</Text>
+
+                {service.features && (
+                    <View className="space-y-2 mb-4">
+                        {service.features.map((feature, i) => (
+                        <View key={i} className="flex-row items-center gap-2">
+                            <Check className="h-4 w-4 text-green-500" />
+                            <Text className="text-sm text-muted-foreground">{feature}</Text>
+                        </View>
+                        ))}
+                    </View>
+                )}
+
 
               {canPayWithWallet ? (
                  <TouchableOpacity
