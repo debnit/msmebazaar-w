@@ -24,12 +24,17 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const session = await getSession();
 
-  // Skip middleware for API routes, static assets, and images
-  const publicPaths = ['/api/', '/_next/static/', '/_next/image', '/favicon.ico', '/sw.js', '/manifest.json'];
-  if (publicPaths.some(p => pathname.startsWith(p))) {
+  // Skip middleware for API routes and public assets
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.png')
+  ) {
     return NextResponse.next();
   }
-
+  
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
@@ -37,13 +42,30 @@ export async function middleware(request: NextRequest) {
   // Redirect if there is no locale
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
-    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+    
+    // Check if the user is authenticated and trying to access a protected route without locale
+    const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/admin');
+    if (session && isProtectedRoute) {
+        return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+    }
+    
+    return NextResponse.rewrite(new URL(`/${locale}${pathname}`, request.url));
   }
   
-  // Redirect authenticated users from auth pages to dashboard
-  const currentLocale = pathname.split('/')[1];
-  if (session && (pathname.endsWith('/login') || pathname.endsWith('/register'))) {
-      return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, request.url));
+  // Protect routes
+  const currentLocale = pathname.split('/')[1] || i18n.defaultLocale;
+
+  if (!session && (pathname.startsWith(`/${currentLocale}/admin`) || pathname.startsWith(`/${currentLocale}/dashboard`))) {
+    const callbackUrl = request.nextUrl.pathname;
+    const loginUrl = new URL(`/${currentLocale}/login`, request.url);
+    if (!loginUrl.searchParams.has('callbackUrl')) {
+        loginUrl.searchParams.set('callbackUrl', callbackUrl);
+    }
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (session && (pathname.startsWith(`/${currentLocale}/login`) || pathname.startsWith(`/${currentLocale}/register`))) {
+    return NextResponse.redirect(new URL(`/${currentLocale}/dashboard`, request.url));
   }
 
   return NextResponse.next();
@@ -51,6 +73,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|.*\\..*|sw.js).*)',
+    '/((?!_next|.*\\..*|api).*)',
   ],
 }

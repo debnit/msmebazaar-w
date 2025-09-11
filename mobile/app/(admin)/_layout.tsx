@@ -1,6 +1,6 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { LayoutDashboard, FileText, Briefcase, Banknote, Users } from 'lucide-react-native';
+import { LayoutDashboard, FileText, Briefcase, IndianRupee, Users } from 'lucide-react-native';
 
 export default function AdminLayout() {
   const { isAuthenticated, isLoading, user } = useAuthStore();
@@ -53,7 +53,7 @@ export default function AdminLayout() {
         name="payments"
         options={{
           title: 'Payments',
-          tabBarIcon: ({ color }) => <Banknote color={color} size={24} />,
+          tabBarIcon: ({ color }) => <IndianRupee color={color} size={24} />,
         }}
       />
       <Tabs.Screen

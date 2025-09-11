@@ -1,4 +1,3 @@
-
 import RazorpayCheckout from '@react-native-razorpay/react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -92,6 +91,10 @@ export const paymentService = {
   },
 
   async initiatePayment(paymentData: PaymentData): Promise<PaymentResponse> {
+    if (!RAZORPAY_KEY_ID) {
+      return { success: false, error: 'Razorpay Key ID is not configured. Please set EXPO_PUBLIC_RAZORPAY_KEY_ID.' };
+    }
+    
     try {
       // Create order
       const orderData = await this.createOrder(paymentData.amount);
@@ -140,10 +143,13 @@ export const paymentService = {
         return { success: false, error: 'Payment verification failed' };
       }
     } catch (error: any) {
+      // Razorpay error codes: 0 for network, 1 for cancelled, 2 for error
       if (error.code === 1) { // PAYMENT_CANCELLED
         return { success: false, error: 'Payment was cancelled' };
+      } else if (error.code === 2) {
+        return { success: false, error: error.description || 'An unknown Razorpay error occurred' };
       } else {
-        return { success: false, error: error.description || 'Payment failed' };
+        return { success: false, error: error.description || 'Payment failed due to a network error' };
       }
     }
   },

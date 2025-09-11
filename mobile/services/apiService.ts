@@ -1,7 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User } from './authService';
+
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
+// Request Payloads
 export interface LoanApplicationData {
   fullName: string;
   email: string;
@@ -23,6 +26,7 @@ export interface EnquiryData {
   message: string;
 }
 
+// API Response Structures
 export interface DashboardData {
   user: {
     name: string;
@@ -56,6 +60,59 @@ export interface DashboardData {
   }>;
 }
 
+export interface Enquiry {
+    id: string;
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+    status: string;
+    createdAt: string;
+}
+
+export interface Loan {
+    id: string;
+    loanAmount: number;
+    loanPurpose: string;
+    status: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
+export interface Payment {
+    id: string;
+    serviceName: string;
+    amount: number;
+    status: string;
+    createdAt: string;
+    razorpayPaymentId: string;
+    user: {
+        name: string;
+        email: string;
+    }
+}
+
+export interface AdminDashboardData {
+    totalRevenue: number;
+    totalUsers: number;
+    totalLoans: number;
+    totalEnquiries: number;
+    recentLoans: Loan[];
+    recentUsers: User[];
+}
+
+export interface AdminUser extends User {
+    _count: {
+        loanApplications: number;
+        enquiries: number;
+    }
+    createdAt: string;
+}
+
+// API Service Class
 class ApiService {
   private async getAuthHeaders() {
     const token = await AsyncStorage.getItem('token');
@@ -67,41 +124,39 @@ class ApiService {
 
   private async fetch(endpoint: string, options: RequestInit = {}) {
     const headers = await this.getAuthHeaders();
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers: { ...headers, ...options.headers },
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers: { ...headers, ...options.headers },
+        });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Request failed with status ${response.status}`);
+        }
+        
+        return response.json();
+    } catch (error: any) {
+        throw new Error(error.message || 'Network error, please check your connection and API_BASE_URL');
     }
-    
-    return response.json();
   }
 
-
+  // General User APIs
   async submitLoanApplication(data: LoanApplicationData): Promise<{ success: boolean; error?: string }> {
     try {
-      await this.fetch('/loan-application', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      await this.fetch('/loan-application', { method: 'POST', body: JSON.stringify(data) });
       return { success: true };
     } catch (error: any) {
-      return { success: false, error: error.message || 'Network error' };
+      return { success: false, error: error.message };
     }
   }
 
   async submitEnquiry(data: EnquiryData): Promise<{ success: boolean; error?: string }> {
     try {
-       await this.fetch('/enquiry', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+       await this.fetch('/enquiry', { method: 'POST', body: JSON.stringify(data) });
       return { success: true };
     } catch (error: any) {
-      return { success: false, error: error.message || 'Network error' };
+      return { success: false, error: error.message };
     }
   }
 
@@ -110,21 +165,92 @@ class ApiService {
       const data = await this.fetch('/user/dashboard');
       return { success: true, data };
     } catch (error: any) {
-      return { success: false, error: error.message || 'Network error' };
+      return { success: false, error: error.message };
     }
   }
 
   async getCreditScore(pan: string): Promise<{ success: boolean; score?: number; error?: string }> {
     try {
-        const data = await this.fetch('/credit-score', {
-            method: 'POST',
-            body: JSON.stringify({ pan }),
-        });
+        const data = await this.fetch('/credit-score', { method: 'POST', body: JSON.stringify({ pan }) });
         return { success: true, score: data.score };
     } catch (error: any) {
-        return { success: false, error: error.message || 'Network error' };
+        return { success: false, error: error.message };
     }
   }
+
+  // Admin APIs
+  async getAdminDashboardData(): Promise<{ success: boolean; data?: AdminDashboardData; error?: string }> {
+      try {
+          const data = await this.fetch('/admin/dashboard-data');
+          return { success: true, data };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async getEnquiries(): Promise<{ success: boolean; data?: Enquiry[]; error?: string }> {
+    try {
+        const data = await this.fetch('/admin/enquiries');
+        return { success: true, data };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+  
+  async updateEnquiryStatus(id: string, status: string): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch(`/admin/enquiries/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+          return { success: true };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async getLoans(): Promise<{ success: boolean; data?: Loan[]; error?: string }> {
+      try {
+          const data = await this.fetch('/admin/loans');
+          return { success: true, data };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async updateLoanStatus(id: string, status: string): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch(`/admin/loans/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+          return { success: true };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async getPayments(): Promise<{ success: boolean; data?: Payment[]; error?: string }> {
+      try {
+          const data = await this.fetch('/admin/payments');
+          return { success: true, data };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async getUsers(): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
+      try {
+          const data = await this.fetch('/admin/users');
+          return { success: true, data };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
+  async updateUserRole(id: string, isAdmin: boolean): Promise<{ success: boolean; error?: string }> {
+      try {
+          await this.fetch(`/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ isAdmin }) });
+          return { success: true };
+      } catch (error: any) {
+          return { success: false, error: error.message };
+      }
+  }
+
 }
 
 export const apiService = new ApiService();

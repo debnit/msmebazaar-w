@@ -15,44 +15,23 @@ export interface RegisterData {
   referralCode?: string;
 }
 
-export interface AuthResponse {
-  success: boolean;
-  user?: {
+export interface User {
     id: string;
     name: string;
     email: string;
     isAdmin: boolean;
-  };
-  token?: string;
-  error?: string;
 }
 
-// This is a simplified fetcher. In a real app, you'd want a more robust solution.
-async function apiFetch(endpoint: string, options: RequestInit = {}) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-  const isJson = response.headers.get('content-type')?.includes('application/json');
-  const data = isJson ? await response.json() : await response.text();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'API Error');
-  }
-
-  return data;
+export interface AuthResponse {
+  success: boolean;
+  user?: User;
+  token?: string;
+  error?: string;
 }
 
 export const authService = {
   async login(data: LoginData): Promise<AuthResponse> {
     try {
-      // The web version login sets an http-only cookie.
-      // For mobile, the backend needs to return user/token info.
-      // Assuming backend is modified to do so for non-web clients.
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,16 +44,13 @@ export const authService = {
          return { success: false, error: result.error || 'Login failed' };
       }
 
-      // We need to fetch user data separately because login API only sets cookie.
-      const userResponse = await this.getCurrentUser(result.token);
+      const { user, token } = result;
       
-      if (userResponse.success) {
-        await AsyncStorage.setItem('token', result.token);
-        await AsyncStorage.setItem('user', JSON.stringify(userResponse.user));
-        return { success: true, user: userResponse.user, token: result.token };
-      } else {
-        return { success: false, error: 'Could not fetch user profile after login.' };
-      }
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      return { success: true, user, token };
+
     } catch (error: any) {
       return { success: false, error: error.message || 'Network error' };
     }
@@ -93,17 +69,14 @@ export const authService = {
       if (!response.ok) {
         return { success: false, error: result.error || 'Registration failed' };
       }
-      
-      // We need to fetch user data separately because register API only sets cookie.
-      const userResponse = await this.getCurrentUser(result.token);
 
-      if (userResponse.success) {
-        await AsyncStorage.setItem('token', result.token);
-        await AsyncStorage.setItem('user', JSON.stringify(userResponse.user));
-        return { success: true, user: userResponse.user, token: result.token };
-      } else {
-        return { success: false, error: 'Could not fetch user profile after registration.' };
-      }
+      const { user, token } = result;
+
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      
+      return { success: true, user, token };
+
     } catch (error: any) {
       return { success: false, error: error.message || 'Network error' };
     }
@@ -111,8 +84,6 @@ export const authService = {
 
   async getCurrentUser(token: string): Promise<AuthResponse> {
     try {
-        // This endpoint doesn't exist on the webapp, but is needed for mobile
-        // to get user data from a token. Assuming it exists.
         const response = await fetch(`${API_BASE_URL}/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
