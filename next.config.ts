@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  allowedDevOrigins: [
+    "d352bc32-2442-4a84-99e6-20f7d3241266-00-3u78fkvfb9aa8.kirk.replit.dev",
+    "127.0.0.1"
+  ],
   images: {
     remotePatterns: [
       {

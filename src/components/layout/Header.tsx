@@ -41,7 +41,8 @@ const NavLink = ({ href, label, pathname }: { href: string; label: string; pathn
 );
 
 export default async function Header({ session }: { session: Session | null }) {
-  const pathname = headers().get('x-pathname') || "";
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || "";
 
   const handleLogout = async () => {
     "use server"
