@@ -1,4 +1,4 @@
-# Firebase Studio - MSMEConnect
+tch# Firebase Studio - MSMEConnect
 
 This is a Next.js application for MSMEConnect, providing financial services for Micro, Small, and Medium Enterprises.
 
