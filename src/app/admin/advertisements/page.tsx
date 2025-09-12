@@ -79,6 +79,8 @@ export default function AdvertisementsPage() {
               <TableHead>Customer</TableHead>
               <TableHead>Business Name</TableHead>
               <TableHead>Business Nature</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Contact</TableHead>
               <TableHead>Photos</TableHead>
               <TableHead>Videos</TableHead>
               <TableHead>Date</TableHead>
@@ -92,6 +94,8 @@ export default function AdvertisementsPage() {
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-20" /></TableCell>
@@ -108,6 +112,8 @@ export default function AdvertisementsPage() {
                 </TableCell>
                 <TableCell>{req.businessName}</TableCell>
                 <TableCell>{req.businessNature}</TableCell>
+                <TableCell>{req.businessAddress}</TableCell>
+                <TableCell>{req.contactDetails}</TableCell>
                 <TableCell>{req.photosUrl ? <Link href={req.photosUrl} target="_blank" className="underline">View</Link> : 'N/A'}</TableCell>
                 <TableCell>{req.videosUrl ? <Link href={req.videosUrl} target="_blank" className="underline">View</Link> : 'N/A'}</TableCell>
                 <TableCell>{new Date(req.createdAt).toLocaleDateString()}</TableCell>

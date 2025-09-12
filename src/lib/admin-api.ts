@@ -100,6 +100,8 @@ export interface Advertisement {
     id: string;
     businessName: string;
     businessNature: string;
+    businessAddress: string;
+    contactDetails: string;
     photosUrl: string | null;
     videosUrl: string | null;
     createdAt: string;

@@ -20,10 +20,13 @@ import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   businessName: z.string().min(2, { message: "Business name is required." }),
   businessNature: z.string().min(3, { message: "Please describe the nature of your business." }),
+  businessAddress: z.string().min(10, { message: "Please enter a valid business address." }),
+  contactDetails: z.string().min(10, { message: "Please enter valid contact details (phone or email)." }),
   photos: z.any().optional(),
   videos: z.any().optional(),
 });
@@ -40,6 +43,8 @@ export default function AdvertisementOnboardingPage() {
     defaultValues: {
       businessName: "",
       businessNature: "",
+      businessAddress: "",
+      contactDetails: "",
     },
   });
 
@@ -53,6 +58,8 @@ export default function AdvertisementOnboardingPage() {
     const payload = {
         businessName: values.businessName,
         businessNature: values.businessNature,
+        businessAddress: values.businessAddress,
+        contactDetails: values.contactDetails,
         photosUrl,
         videosUrl,
         paymentId,
@@ -124,6 +131,32 @@ export default function AdvertisementOnboardingPage() {
                       <FormLabel>Nature of Business</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., Manufacturing, IT Services, Retail" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="businessAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Business Address</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Your full business address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="contactDetails"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Info</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., your@email.com or +91 9876543210" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

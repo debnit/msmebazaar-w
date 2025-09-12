@@ -11,6 +11,8 @@ export default function AdvertisementOnboardingScreen() {
   const [formData, setFormData] = useState<AdvertisementOnboardingData>({
     businessName: '',
     businessNature: '',
+    businessAddress: '',
+    contactDetails: '',
     photosUrl: '',
     videosUrl: '',
   });
@@ -27,7 +29,7 @@ export default function AdvertisementOnboardingScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.businessName || !formData.businessNature) {
+    if (!formData.businessName || !formData.businessNature || !formData.businessAddress || !formData.contactDetails) {
       Alert.alert('Validation Error', 'Please fill in all required fields.');
       return;
     }
@@ -78,6 +80,25 @@ export default function AdvertisementOnboardingScreen() {
                   placeholder="e.g., Handicrafts, Technology"
                   value={formData.businessNature}
                   onChangeText={(text) => updateFormData('businessNature', text)}
+                />
+              </View>
+              <View>
+                <Text className="text-sm font-medium text-foreground mb-2">Business Address</Text>
+                <TextInput
+                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
+                  placeholder="Your full business address"
+                  value={formData.businessAddress}
+                  onChangeText={(text) => updateFormData('businessAddress', text)}
+                  multiline
+                />
+              </View>
+              <View>
+                <Text className="text-sm font-medium text-foreground mb-2">Contact Details</Text>
+                <TextInput
+                  className="border border-input bg-background px-3 py-3 rounded-md text-foreground"
+                  placeholder="e.g., your@email.com or phone number"
+                  value={formData.contactDetails}
+                  onChangeText={(text) => updateFormData('contactDetails', text)}
                 />
               </View>
               

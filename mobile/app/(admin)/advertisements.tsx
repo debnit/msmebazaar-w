@@ -88,6 +88,14 @@ export default function AdminAdvertisementsScreen() {
                                             <Text className="font-semibold text-primary">Nature of Business:</Text>
                                             <Text className="text-muted-foreground">{req.businessNature}</Text>
                                         </View>
+                                        <View>
+                                            <Text className="font-semibold text-primary">Address:</Text>
+                                            <Text className="text-muted-foreground">{req.businessAddress}</Text>
+                                        </View>
+                                        <View>
+                                            <Text className="font-semibold text-primary">Contact:</Text>
+                                            <Text className="text-muted-foreground">{req.contactDetails}</Text>
+                                        </View>
                                          <View>
                                             <Text className="font-semibold text-primary">Photos:</Text>
                                             <Text className="text-muted-foreground">{req.photosUrl || 'Not provided'}</Text>

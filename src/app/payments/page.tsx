@@ -112,8 +112,9 @@ export default function PaymentsPage() {
             description: "Boost your online presence to reach more customers.",
             price: 99,
             features: [
-              "Business Name",
-              "Nature of Business",
+              "Business Name & Nature",
+              "Business Address",
+              "Contact Details",
               "Upload Photos & Videos (Optional)",
               "Our team will contact you for your online presence"
             ]
