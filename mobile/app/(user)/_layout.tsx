@@ -99,6 +99,7 @@ export default function UserLayout() {
       <Tabs.Screen name="valuation-onboarding" options={{ href: null, title: 'Valuation Details' }} />
       <Tabs.Screen name="navarambh-onboarding" options={{ href: null, title: 'NavArambh Details' }} />
       <Tabs.Screen name="plant-machinery-onboarding" options={{ href: null, title: 'Plant & Machinery' }} />
+      <Tabs.Screen name="advertisement-onboarding" options={{ href: null, title: 'Advertise Your Business' }} />
       <Tabs.Screen name="profile-edit" options={{ href: null, title: 'Edit Profile' }} />
     </Tabs>
   );

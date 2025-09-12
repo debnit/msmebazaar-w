@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench } from "lucide-react";
+import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench, Megaphone } from "lucide-react";
 import RazorpayCheckout from "@/components/RazorpayCheckout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +24,7 @@ const serviceIcons: { [key: string]: React.ReactNode } = {
   "Valuation Service": <BarChart className="h-8 w-8 text-primary" />,
   "Exit Strategy (NavArambh)": <Route className="h-8 w-8 text-primary" />,
   "Plant and Machinery": <Wrench className="h-8 w-8 text-primary" />,
+  "Advertise Your Business": <Megaphone className="h-8 w-8 text-primary" />,
 };
 
 type Service = {
@@ -104,6 +105,18 @@ export default function PaymentsPage() {
               "Free Consultation",
               "Expert Help",
             ]
+          },
+          {
+            id: '5',
+            name: "Advertise Your Business",
+            description: "Boost your online presence to reach more customers.",
+            price: 99,
+            features: [
+              "Business Name",
+              "Nature of Business",
+              "Upload Photos & Videos (Optional)",
+              "Our team will contact you for your online presence"
+            ]
           }
         ]);
         
@@ -149,6 +162,8 @@ export default function PaymentsPage() {
           router.push(`/payments/navarambh-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Plant and Machinery") {
           router.push(`/payments/plant-machinery-onboarding?paymentId=${data.paymentId}`);
+        } else if (serviceName === "Advertise Your Business") {
+          router.push(`/payments/advertisement-onboarding?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }

@@ -65,6 +65,13 @@ export interface PlantAndMachineryOnboardingData {
   details: string;
 }
 
+export interface AdvertisementOnboardingData {
+    businessName: string;
+    businessNature: string;
+    photosUrl?: string;
+    videosUrl?: string;
+}
+
 export interface UserProfileUpdateData {
     name: string;
     profilePictureUrl?: string;
@@ -196,6 +203,19 @@ export interface PlantAndMachineryRequest {
     name: string;
     phone: string;
     details: string;
+    createdAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+}
+
+export interface Advertisement {
+    id: string;
+    businessName: string;
+    businessNature: string;
+    photosUrl?: string | null;
+    videosUrl?: string | null;
     createdAt: string;
     user: {
         name: string;
@@ -338,6 +358,15 @@ class ApiService {
   async submitPlantAndMachineryRequest(data: PlantAndMachineryOnboardingData): Promise<{ success: boolean; error?: string }> {
     try {
         await this.fetch('/user/plant-machinery-request', { method: 'POST', body: JSON.stringify(data) });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+  
+  async submitAdvertisement(data: AdvertisementOnboardingData): Promise<{ success: boolean; error?: string }> {
+    try {
+        await this.fetch('/user/advertisement', { method: 'POST', body: JSON.stringify(data) });
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -491,6 +520,15 @@ class ApiService {
   async getPlantAndMachineryRequests(query: string = ''): Promise<{ success: boolean; data?: PlantAndMachineryRequest[]; error?: string }> {
     try {
         const data = await this.fetch(`/admin/plant-machinery?query=${query}`);
+        return { success: true, data };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+  }
+  
+  async getAdvertisements(query: string = ''): Promise<{ success: boolean; data?: Advertisement[]; error?: string }> {
+    try {
+        const data = await this.fetch(`/admin/advertisements?query=${query}`);
         return { success: true, data };
     } catch (error: any) {
         return { success: false, error: error.message };

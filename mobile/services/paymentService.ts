@@ -91,6 +91,8 @@ export const paymentService = {
             router.push('/(user)/navarambh-onboarding');
         } else if (paymentData.serviceName === "Plant and Machinery") {
             router.push('/(user)/plant-machinery-onboarding');
+        } else if (paymentData.serviceName === "Advertise Your Business") {
+            router.push('/(user)/advertisement-onboarding');
         }
         return { success: true, paymentId: data.paymentId };
       } else {
@@ -157,6 +159,8 @@ export const paymentService = {
             router.push('/(user)/navarambh-onboarding');
         } else if (paymentData.serviceName === "Plant and Machinery") {
             router.push('/(user)/plant-machinery-onboarding');
+        } else if (paymentData.serviceName === "Advertise Your Business") {
+            router.push('/(user)/advertisement-onboarding');
         }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {

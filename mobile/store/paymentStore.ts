@@ -67,6 +67,18 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         "Free Consultation",
         "Expert Help",
       ]
+    },
+    {
+      id: '5',
+      name: "Advertise Your Business",
+      description: "Boost your online presence and reach more customers.",
+      price: 99,
+      features: [
+        "Provide Business Name & Nature",
+        "Upload Photos & Videos (Optional)",
+        "Our team will contact you",
+        "Enhance your online presence"
+      ]
     }
   ],
   selectedService: null,

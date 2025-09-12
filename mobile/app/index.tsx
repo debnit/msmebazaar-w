@@ -4,13 +4,19 @@ import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
-import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit } from 'lucide-react-native';
+import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit, Megaphone } from 'lucide-react-native';
 
 const features = [
   {
     icon: <Route size={32} color="#1e2a4a" />,
     title: "NavArambh Exit Strategy",
     description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
+    onPress: () => router.push('/payments')
+  },
+  {
+    icon: <Megaphone size={32} color="#1e2a4a" />,
+    title: "Advertise Your Business",
+    description: "Get your business noticed. We help create and boost your online presence to reach a wider audience.",
     onPress: () => router.push('/payments')
   },
   {

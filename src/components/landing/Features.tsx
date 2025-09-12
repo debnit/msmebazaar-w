@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit } from "lucide-react";
+import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit, Megaphone } from "lucide-react";
 import Link from "next/link";
 
 const features = [
@@ -8,6 +8,12 @@ const features = [
     icon: <Route className="h-10 w-10 text-primary" />,
     title: "NavArambh Exit Strategy",
     description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
+    href: "/payments"
+  },
+  {
+    icon: <Megaphone className="h-10 w-10 text-primary" />,
+    title: "Advertise Your Business",
+    description: "Get your business noticed by the right people. We help create and boost your online presence to reach a wider audience and grow your customer base.",
     href: "/payments"
   },
   {
@@ -42,7 +48,7 @@ const Features = () => {
             From strategic exits to daily operations, we offer a comprehensive suite of services designed for your success.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
              <Link href={feature.href} key={index} className="flex">
                 <Card className="text-center group hover:shadow-xl transition-shadow duration-300 flex flex-col w-full">
