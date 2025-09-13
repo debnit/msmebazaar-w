@@ -74,9 +74,9 @@ export const usePaymentStore = create<PaymentState>((set) => ({
       description: "Boost your online presence and reach more customers.",
       price: 99,
       features: [
-        "Provide Business Name & Nature",
-        "Fill in Business Address",
-        "Fill in Contact Details",
+        "Business Name & Nature",
+        "Fill your business address",
+        "Fill your contact details",
         "Upload Photos & Videos (Optional)",
         "Our team will contact you for your online presence"
       ]

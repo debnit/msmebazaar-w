@@ -4,7 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityInd
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePaymentStore } from '@/store/paymentStore';
 import { paymentService } from '@/services/paymentService';
-import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Check, Wrench } from 'lucide-react-native';
+import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Check, Wrench, Megaphone } from 'lucide-react-native';
 import { apiService } from '@/services/apiService';
 import { router } from 'expo-router';
 
@@ -13,6 +13,7 @@ const serviceIcons: { [key: string]: React.ReactNode } = {
   "Valuation Service": <BarChart size={32} color="#1e2a4a" />,
   "Exit Strategy (NavArambh)": <Route size={32} color="#1e2a4a" />,
   "Plant and Machinery": <Wrench size={32} color="#1e2a4a" />,
+  "Advertise Your Business": <Megaphone size={32} color="#1e2a4a" />,
 };
 
 export default function PaymentsScreen() {
@@ -38,7 +39,7 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.initiatePayment({ amount, serviceName, description });
       if (result.success) {
-        if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery") {
+        if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business") {
             Alert.alert('Payment Successful', `Your payment for ${serviceName} was successful.`,
               [{ text: 'OK', onPress: resetPayment }]
             );
@@ -60,7 +61,7 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.payWithWallet({ serviceName, amount });
        if (result.success) {
-         if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery") {
+         if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business") {
             Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
          }
         setWalletBalance(prev => (prev !== null ? prev - amount : null));

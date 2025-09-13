@@ -113,8 +113,8 @@ export default function PaymentsPage() {
             price: 99,
             features: [
               "Business Name & Nature",
-              "Business Address",
-              "Contact Details",
+              "Fill your business address",
+              "Fill your contact details",
               "Upload Photos & Videos (Optional)",
               "Our team will contact you for your online presence"
             ]
@@ -212,15 +212,18 @@ export default function PaymentsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {loadingServices ? (
-            <>
-              <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-10 w-1/2" /></CardContent><CardFooter><Skeleton className="h-10 w-full" /></CardFooter></Card>
-              <Card><CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader><CardContent><Skeleton className="h-10 w-1/2" /></CardContent><CardFooter><Skeleton className="h-10 w-full" /></CardFooter></Card>
-            </>
-          ) : (
-            fixedServices.map((service) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+        {loadingServices ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader><Skeleton className="h-8 w-3/4" /></CardHeader>
+              <CardContent><Skeleton className="h-10 w-1/2" /></CardContent>
+              <CardFooter><Skeleton className="h-10 w-full" /></CardFooter>
+            </Card>
+          ))
+        ) : (
+          <>
+            {fixedServices.map((service) => {
               const canPayWithWallet = walletBalance !== null && walletBalance >= service.price;
               const isProcessing = isProcessingWallet === service.id;
               
@@ -262,60 +265,59 @@ export default function PaymentsPage() {
                   )}
                 </CardFooter>
               </Card>
-            )})
-          )}
-        </div>
-        
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline flex items-center gap-2">
-                <CreditCard className="h-6 w-6 text-primary" />
-                Custom Payment
-              </CardTitle>
-              <CardDescription>
-                Paying for a different service? Enter the details below.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="service-name">Service Name</Label>
-                <Input 
-                  id="service-name" 
-                  placeholder="e.g., Consultation Fee" 
-                  value={customServiceName}
-                  onChange={(e) => setCustomServiceName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount (₹)</Label>
-                <Input 
-                  id="amount" 
-                  type="number" 
-                  placeholder="e.g., 500" 
-                  value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                />
-              </div>
-               {walletBalance !== null && (
-                 <div className="text-sm text-muted-foreground flex items-center gap-2">
-                   <Wallet size={16} /> 
-                   <span>Available Balance: ₹{walletBalance.toFixed(2)}</span>
-                 </div>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
-                onClick={handleCustomPay}
-                disabled={isProcessingWallet === 'custom' || !customAmount || !customServiceName}
-              >
-                 {isProcessingWallet === 'custom' ? <Loader2 className="animate-spin" /> : null}
-                Proceed to Pay
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+            )})}
+
+            {/* Custom Payment Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <CreditCard className="h-6 w-6 text-primary" />
+                  Custom Payment
+                </CardTitle>
+                <CardDescription>
+                  Paying for a different service? Enter the details below.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="service-name">Service Name</Label>
+                  <Input 
+                    id="service-name" 
+                    placeholder="e.g., Consultation Fee" 
+                    value={customServiceName}
+                    onChange={(e) => setCustomServiceName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount (₹)</Label>
+                  <Input 
+                    id="amount" 
+                    type="number" 
+                    placeholder="e.g., 500" 
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                  />
+                </div>
+                {walletBalance !== null && (
+                  <div className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Wallet size={16} /> 
+                    <span>Available Balance: ₹{walletBalance.toFixed(2)}</span>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" 
+                  onClick={handleCustomPay}
+                  disabled={isProcessingWallet === 'custom' || !customAmount || !customServiceName}
+                >
+                  {isProcessingWallet === 'custom' ? <Loader2 className="animate-spin" /> : null}
+                  Proceed to Pay
+                </Button>
+              </CardFooter>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
