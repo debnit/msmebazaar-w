@@ -59,7 +59,6 @@ const steps = [
 
 export function LoanApplicationForm() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   
@@ -77,7 +76,11 @@ export function LoanApplicationForm() {
     const fieldsToValidate = steps[currentStep - 1].fields;
     const isValid = await form.trigger(fieldsToValidate);
     if (isValid) {
-      setCurrentStep(currentStep + 1);
+      if (currentStep === steps.length) {
+        onSubmit(form.getValues());
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
@@ -86,45 +89,24 @@ export function LoanApplicationForm() {
   };
 
   async function onSubmit(values: FormData) {
-    setIsSubmitting(true);
     try {
-      const response = await fetch('/api/loan-application', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+      // Store form data in localStorage
+      localStorage.setItem('loanApplicationData', JSON.stringify(values));
+      
+      toast({
+        title: "Details Saved",
+        description: "Please complete the payment to submit your application.",
       });
 
-      if (response.ok) {
-        toast({
-          title: "Application Submitted!",
-          description: "We have received your loan application and will review it shortly.",
-        });
-        router.push("/dashboard");
-      } else {
-        const data = await response.json();
-        if (response.status === 401) {
-          toast({
-            title: "Authentication Error",
-            description: "Please log in to submit a loan application.",
-            variant: "destructive",
-          });
-          router.push("/login");
-        } else {
-          toast({
-            title: "Submission Failed",
-            description: data.error || "An unexpected error occurred.",
-            variant: "destructive",
-          });
-        }
-      }
+      // Redirect to payment page
+      router.push("/payments?service=Quick Business Loan File Processing");
+
     } catch (error) {
       toast({
-        title: "Submission Failed",
-        description: "An error occurred. Please try again.",
+        title: "Error",
+        description: "Could not save your details. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -143,7 +125,7 @@ export function LoanApplicationForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form className="space-y-6">
             {currentStep === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem> )} />
@@ -172,13 +154,9 @@ export function LoanApplicationForm() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                 </Button>
               ) : <div></div>}
-              {currentStep < steps.length ? (
-                <Button type="button" onClick={handleNext} className="bg-primary hover:bg-primary/90">Next Step</Button>
-              ) : (
-                <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
-                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                </Button>
-              )}
+              <Button type="button" onClick={handleNext} className="bg-primary hover:bg-primary/90">
+                {currentStep < steps.length ? 'Next Step' : 'Proceed to Payment'}
+              </Button>
             </CardFooter>
           </form>
         </Form>

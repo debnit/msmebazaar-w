@@ -90,7 +90,24 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                     const verificationData = await verificationRes.json();
 
                     if (verificationRes.ok) {
-                        if (serviceName === "Valuation Service") {
+                        if (serviceName === "Quick Business Loan File Processing") {
+                            // After successful payment for a loan, submit the stored application data
+                            const storedData = localStorage.getItem('loanApplicationData');
+                            if (storedData) {
+                                const loanData = JSON.parse(storedData);
+                                await fetch('/api/loan-application', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ ...loanData, paymentId: verificationData.paymentId }),
+                                });
+                                localStorage.removeItem('loanApplicationData');
+                                router.push(`/payments/success`);
+                            } else {
+                                // If no data, something went wrong, but payment was made.
+                                toast({ title: "Payment successful, but loan data was lost."});
+                                router.push('/dashboard');
+                            }
+                        } else if (serviceName === "Valuation Service") {
                             router.push(`/payments/valuation-onboarding?paymentId=${verificationData.paymentId}`);
                         } else if (serviceName === "Exit Strategy (NavArambh)") {
                             router.push(`/payments/navarambh-onboarding?paymentId=${verificationData.paymentId}`);
@@ -98,8 +115,6 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                              router.push(`/payments/plant-machinery-onboarding?paymentId=${verificationData.paymentId}`);
                         } else if (serviceName === "Advertise Your Business") {
                              router.push(`/payments/advertisement-onboarding?paymentId=${verificationData.paymentId}`);
-                        } else if (serviceName === "Quick Business Loan File Processing") {
-                             router.push(`/loan-application?paymentId=${verificationData.paymentId}`);
                         } else {
                             router.push(`/payments/success`);
                         }
@@ -120,7 +135,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                 },
                 modal: {
                     ondismiss: function() {
-                        // Redirect to failure if user closes the modal
+                        // Redirect if user closes the modal
                         router.replace(`/payments`);
                     }
                 }

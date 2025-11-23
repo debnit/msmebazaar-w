@@ -17,7 +17,7 @@ import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench, Mega
 import RazorpayCheckout from "@/components/RazorpayCheckout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSession } from "@/lib/auth-actions";
 import type { Session } from "@/types/auth";
 
@@ -52,6 +52,7 @@ export default function PaymentsPage() {
   const [isProcessingWallet, setIsProcessingWallet] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -134,6 +135,12 @@ export default function PaymentsPage() {
             setWalletBalance(data.user.walletBalance);
             }
         }
+
+        const serviceParam = searchParams.get('service');
+        if (serviceParam === "Quick Business Loan File Processing") {
+            handlePay(99, serviceParam);
+        }
+
       } catch (error) {
         console.error("Failed to fetch data", error);
       } finally {
@@ -141,7 +148,7 @@ export default function PaymentsPage() {
       }
     };
     fetchServicesAndBalance();
-  }, []);
+  }, [searchParams]);
 
   const handlePay = (amount: number, serviceName: string) => {
     setPaymentDetails({ amount, serviceName });
@@ -166,7 +173,21 @@ export default function PaymentsPage() {
           title: "Payment Successful",
           description: `Paid for ${serviceName} using wallet balance.`,
         });
-        if (serviceName === "Valuation Service") {
+        if (serviceName === "Quick Business Loan File Processing") {
+            const storedData = localStorage.getItem('loanApplicationData');
+            if (storedData) {
+                await fetch('/api/loan-application', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...JSON.parse(storedData), paymentId: data.paymentId }),
+                });
+                localStorage.removeItem('loanApplicationData');
+                router.push(`/payments/success`);
+            } else {
+                toast({ title: "Payment successful, but loan data was lost."});
+                router.push('/dashboard');
+            }
+        } else if (serviceName === "Valuation Service") {
           router.push(`/payments/valuation-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Exit Strategy (NavArambh)") {
           router.push(`/payments/navarambh-onboarding?paymentId=${data.paymentId}`);
@@ -174,8 +195,6 @@ export default function PaymentsPage() {
           router.push(`/payments/plant-machinery-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Advertise Your Business") {
           router.push(`/payments/advertisement-onboarding?paymentId=${data.paymentId}`);
-        } else if (serviceName === "Quick Business Loan File Processing") {
-            router.push(`/loan-application?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }

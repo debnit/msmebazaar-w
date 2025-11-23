@@ -17,7 +17,7 @@ export interface LoanApplicationData {
   annualTurnover: number;
   loanAmount: number;
   loanPurpose: string;
-  paymentId?: string;
+  paymentId: string;
 }
 
 export interface EnquiryData {

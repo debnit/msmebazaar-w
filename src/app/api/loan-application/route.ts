@@ -16,10 +16,10 @@ export async function POST(req: NextRequest) {
     if (
       !fullName || !email || !phone || !pan || !businessName ||
       !businessType || !yearsInBusiness || !annualTurnover ||
-      !loanAmount || !loanPurpose
+      !loanAmount || !loanPurpose || !paymentId
     ) {
       return NextResponse.json(
-        {error: 'Missing required fields'},
+        {error: 'Missing required fields, including paymentId'},
         {status: 400}
       );
     }
@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       ...body,
     };
     
+    // If a user is logged in, associate the application with them
     if (session?.user?.id) {
       loanData.userId = session.user.id;
     }

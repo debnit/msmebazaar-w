@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { apiService, LoanApplicationData } from '@/services/apiService';
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react-native';
 import { useAuthStore } from '@/store/authStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const steps = [
   { id: 1, title: "Personal Information", description: "Let's start with the basics. Please provide your personal details." },
@@ -19,7 +20,7 @@ export default function LoanScreen() {
   const { user } = useAuthStore();
   const { paymentId } = useLocalSearchParams();
   
-  const [formData, setFormData] = useState<LoanApplicationData>({
+  const [formData, setFormData] = useState<Omit<LoanApplicationData, 'paymentId'>>({
     fullName: user?.name || '',
     email: user?.email || '',
     phone: '',
@@ -30,10 +31,9 @@ export default function LoanScreen() {
     annualTurnover: 0,
     loanAmount: 10000,
     loanPurpose: '',
-    paymentId: typeof paymentId === 'string' ? paymentId : undefined,
   });
 
-  const updateFormData = (field: keyof LoanApplicationData, value: string | number) => {
+  const updateFormData = (field: keyof typeof formData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -50,28 +50,94 @@ export default function LoanScreen() {
   };
 
   const handleNext = () => {
-    if (validateStep(currentStep)) setCurrentStep(currentStep + 1);
+    if (validateStep(currentStep)) {
+      if(currentStep === steps.length) {
+        handleSubmit();
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
+    }
     else Alert.alert('Validation Error', 'Please fill in all fields correctly to continue.');
   };
 
   const handlePrev = () => setCurrentStep(currentStep - 1);
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) {
-      Alert.alert('Validation Error', 'Please complete all steps correctly.');
-      return;
-    }
     setIsSubmitting(true);
-    const result = await apiService.submitLoanApplication(formData);
-    if (result.success) {
-      Alert.alert('Application Submitted!', 'We have received your loan application and will be in touch soon.',
-        [{ text: 'OK', onPress: () => router.push('/(user)/dashboard') }]
+    try {
+      await AsyncStorage.setItem('loanApplicationData', JSON.stringify(formData));
+      Alert.alert(
+        'Details Saved',
+        'Please complete the payment to submit your application.',
+        [{ text: 'OK', onPress: () => router.push({ pathname: '/(user)/payments', params: { service: 'Quick Business Loan File Processing' }}) }]
       );
-    } else {
-      Alert.alert('Submission Failed', result.error || 'An unexpected error occurred');
+    } catch (e) {
+       Alert.alert('Error', 'Could not save your details. Please try again.');
+    } finally {
+        setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
+  
+  const renderStepContent = () => {
+    switch(currentStep) {
+        case 1:
+            return (
+                <View className="space-y-4">
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Full Name</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.fullName} onChangeText={t => updateFormData('fullName', t)} />
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Email</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.email} onChangeText={t => updateFormData('email', t)} keyboardType="email-address"/>
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Phone</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.phone} onChangeText={t => updateFormData('phone', t)} keyboardType="phone-pad"/>
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">PAN</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.pan} onChangeText={t => updateFormData('pan', t.toUpperCase())} autoCapitalize="characters" maxLength={10}/>
+                  </View>
+                </View>
+            );
+        case 2:
+             return (
+                <View className="space-y-4">
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Business Name</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.businessName} onChangeText={t => updateFormData('businessName', t)} />
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Business Type</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.businessType} onChangeText={t => updateFormData('businessType', t)} />
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Years In Business</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={String(formData.yearsInBusiness)} onChangeText={t => updateFormData('yearsInBusiness', Number(t))} keyboardType="numeric"/>
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Annual Turnover (₹)</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={String(formData.annualTurnover)} onChangeText={t => updateFormData('annualTurnover', Number(t))} keyboardType="numeric" />
+                  </View>
+                </View>
+             );
+        case 3:
+            return (
+                <View className="space-y-4">
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Loan Amount (₹)</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={String(formData.loanAmount)} onChangeText={t => updateFormData('loanAmount', Number(t))} keyboardType="numeric"/>
+                  </View>
+                  <View>
+                    <Text className="text-sm font-medium text-foreground mb-2">Loan Purpose</Text>
+                    <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" value={formData.loanPurpose} onChangeText={t => updateFormData('loanPurpose', t)} />
+                  </View>
+                </View>
+            );
+        default: return null;
+    }
+  }
 
   const progress = (currentStep / steps.length) * 100;
   const currentStepInfo = steps[currentStep-1];
@@ -100,17 +166,14 @@ export default function LoanScreen() {
                 </TouchableOpacity>
               ) : <View />}
 
-              {currentStep < steps.length ? (
-                <TouchableOpacity className="flex-row items-center bg-primary py-3 px-6 rounded-lg" onPress={handleNext}>
-                  <Text className="text-primary-foreground font-semibold mr-2">Next Step</Text>
-                  <ArrowRight size={16} color="#ffffff" />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity className={`flex-row items-center py-3 px-6 rounded-lg ${isSubmitting ? 'bg-muted' : 'bg-accent'}`} onPress={handleSubmit} disabled={isSubmitting}>
-                  {isSubmitting ? <ActivityIndicator color="#ffffff"/> : <Send size={16} color="#ffffff" />}
-                  <Text className="text-accent-foreground font-semibold ml-2">{isSubmitting ? 'Submitting...' : 'Submit Application'}</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity className="flex-row items-center bg-primary py-3 px-6 rounded-lg" onPress={handleNext} disabled={isSubmitting}>
+                  {isSubmitting ? <ActivityIndicator color="#ffffff"/> : 
+                  <>
+                    <Text className="text-primary-foreground font-semibold mr-2">{currentStep < steps.length ? 'Next Step' : 'Proceed to Payment'}</Text>
+                    {currentStep < steps.length ? <ArrowRight size={16} color="#ffffff" /> : <Send size={16} color="#ffffff" />}
+                  </>
+                }
+              </TouchableOpacity>
             </View>
           </View>
         </View>
