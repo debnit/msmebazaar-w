@@ -24,19 +24,13 @@ export const usePaymentStore = create<PaymentState>((set) => ({
       id: '1', 
       name: "Pro-Membership", 
       description: "Unlock exclusive features and support.", 
-      price: 99,
-      features: [
-        "24/7 Free Consultation",
-        "Expert Mentoring",
-        "Assistance to Sell Products",
-        "Raw Material Procurement Support"
-      ]
+      price: 99
     },
     { 
       id: '2', 
       name: "Valuation Service", 
       description: "Get a professional valuation for your business.", 
-      price: 199,
+      price: 99,
       features: [
           "Upload Balance Sheet (optional)",
           "Upload Annual GST Returns (optional)",
@@ -48,7 +42,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         id: '3', 
         name: "Exit Strategy (NavArambh)", 
         description: "Plan your business exit with expert guidance.", 
-        price: 299,
+        price: 99,
         features: [
             "Fill in Asset, Turnover & Loan Details",
             "Describe your business challenges",

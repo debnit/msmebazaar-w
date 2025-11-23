@@ -17,29 +17,29 @@ const Hero = () => {
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-8 items-stretch">
-          {/* NavArambh Card */}
+          {/* Advertise your Business Card */}
           <Card className="flex flex-col">
             <CardHeader>
               <div className="relative h-48 w-full rounded-lg overflow-hidden">
                 <Image
-                  src="https://picsum.photos/seed/exit-strategy/800/400"
-                  alt="Exit strategy planning"
+                  src="https://picsum.photos/seed/online-presence/800/400"
+                  alt="Advertise your business"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
-                  data-ai-hint="exit strategy"
+                  data-ai-hint="online presence"
                 />
               </div>
             </CardHeader>
             <CardContent className="flex-1">
-              <CardTitle className="font-headline text-2xl">Plan Your Perfect Exit with NavArambh</CardTitle>
+              <CardTitle className="font-headline text-2xl">Advertise Your Business</CardTitle>
               <CardDescription className="mt-2">
-                Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit.
+                Get your business noticed. We help create and boost your online presence to reach a wider audience.
               </CardDescription>
             </CardContent>
             <div className="p-6 pt-0">
               <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90">
-                <Link href="/payments">Explore Exit Strategies</Link>
+                <Link href="/payments">Explore Advertising</Link>
               </Button>
             </div>
           </Card>
