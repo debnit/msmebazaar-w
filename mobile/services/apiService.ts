@@ -17,6 +17,7 @@ export interface LoanApplicationData {
   annualTurnover: number;
   loanAmount: number;
   loanPurpose: string;
+  paymentId?: string;
 }
 
 export interface EnquiryData {
@@ -31,13 +32,6 @@ export interface RedemptionData {
     amount: number;
     method: string;
     details: string;
-}
-
-export interface ProProfileData {
-    businessName: string;
-    businessNature: string;
-    helpNeeded: string;
-    consultationNotes: string;
 }
 
 export interface ValuationOnboardingData {
@@ -241,7 +235,6 @@ export interface AdminDashboardData {
 
 export interface AdminUser extends User {
     isAgent: boolean;
-    isPro: boolean;
     _count: {
         loanApplications: number;
         enquiries: number;
@@ -330,15 +323,6 @@ class ApiService {
       } catch (error: any) {
           return { success: false, error: error.message };
       }
-  }
-
-  async submitProProfile(data: ProProfileData): Promise<{ success: boolean; error?: string }> {
-    try {
-        await this.fetch('/user/pro-profile', { method: 'POST', body: JSON.stringify(data) });
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
   }
   
   async submitValuationRequest(data: ValuationOnboardingData): Promise<{ success: boolean; error?: string }> {
@@ -539,7 +523,7 @@ class ApiService {
     }
   }
 
-  async getUsers(query: string = '', role: 'all' | 'admin' | 'agent' | 'pro' | 'user' = 'all'): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
+  async getUsers(query: string = '', role: 'all' | 'admin' | 'agent' | 'user' = 'all'): Promise<{ success: boolean; data?: AdminUser[]; error?: string }> {
       try {
           const data = await this.fetch(`/admin/users?query=${query}&role=${role}`);
           return { success: true, data };

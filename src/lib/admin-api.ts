@@ -149,7 +149,6 @@ export interface UserWithCounts {
     email: string;
     isAdmin: boolean;
     isAgent: boolean;
-    isPro: boolean;
     createdAt: string;
     _count: {
         loanApplications: number;

@@ -4,16 +4,17 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityInd
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePaymentStore } from '@/store/paymentStore';
 import { paymentService } from '@/services/paymentService';
-import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Check, Wrench, Megaphone } from 'lucide-react-native';
+import { CreditCard, CheckCircle, Star, BarChart, Route, Wallet, Check, Wrench, Megaphone, Briefcase } from 'lucide-react-native';
 import { apiService } from '@/services/apiService';
 import { router } from 'expo-router';
+import { useAuthStore } from '@/store/authStore';
 
 const serviceIcons: { [key: string]: React.ReactNode } = {
-  "Pro-Membership": <Star size={32} color="#1e2a4a" />,
   "Valuation Service": <BarChart size={32} color="#1e2a4a" />,
   "Exit Strategy (NavArambh)": <Route size={32} color="#1e2a4a" />,
   "Plant and Machinery": <Wrench size={32} color="#1e2a4a" />,
   "Advertise Your Business": <Megaphone size={32} color="#1e2a4a" />,
+  "Quick Business Loan File Processing": <Briefcase size={32} color="#1e2a4a" />,
 };
 
 export default function PaymentsScreen() {
@@ -21,16 +22,19 @@ export default function PaymentsScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const fetchBalance = async () => {
-      const res = await apiService.getDashboardData();
-      if(res.success && res.data) {
-        setWalletBalance(res.data.user.walletBalance);
+      if (user) {
+        const res = await apiService.getDashboardData();
+        if(res.success && res.data) {
+          setWalletBalance(res.data.user.walletBalance);
+        }
       }
     }
     fetchBalance();
-  }, [])
+  }, [user])
   
 
   const handlePayment = async (serviceName: string, amount: number, description?: string) => {
@@ -39,7 +43,7 @@ export default function PaymentsScreen() {
     try {
       const result = await paymentService.initiatePayment({ amount, serviceName, description });
       if (result.success) {
-        if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business") {
+        if(serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business" && serviceName !== "Quick Business Loan File Processing") {
             Alert.alert('Payment Successful', `Your payment for ${serviceName} was successful.`,
               [{ text: 'OK', onPress: resetPayment }]
             );
@@ -56,12 +60,17 @@ export default function PaymentsScreen() {
   };
 
   const handlePayWithWallet = async (serviceName: string, amount: number) => {
+    if (!user) {
+        Alert.alert("Login Required", "You must be logged in to use your wallet.");
+        router.push('/login');
+        return;
+    }
     setProcessingId(serviceName);
     setIsProcessing(true);
     try {
       const result = await paymentService.payWithWallet({ serviceName, amount });
        if (result.success) {
-         if(serviceName !== "Pro-Membership" && serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business") {
+         if(serviceName !== "Valuation Service" && serviceName !== "Exit Strategy (NavArambh)" && serviceName !== "Plant and Machinery" && serviceName !== "Advertise Your Business" && serviceName !== "Quick Business Loan File Processing") {
             Alert.alert('Payment Successful', `Paid for ${serviceName} using your wallet balance.`);
          }
         setWalletBalance(prev => (prev !== null ? prev - amount : null));
@@ -81,7 +90,7 @@ export default function PaymentsScreen() {
       Alert.alert('Error', 'Please enter a valid amount');
       return;
     }
-    if (walletBalance !== null && customAmount <= walletBalance) {
+    if (user && walletBalance !== null && customAmount <= walletBalance) {
       handlePayWithWallet('Custom Payment', customAmount);
     } else {
       handlePayment('Custom Payment', customAmount, 'Custom payment amount');
@@ -96,7 +105,7 @@ export default function PaymentsScreen() {
           <Text className="text-muted-foreground">Choose a service or make a custom payment to suit your needs.</Text>
         </View>
         
-        {walletBalance !== null && (
+        {user && walletBalance !== null && (
              <View className="bg-card p-4 rounded-lg shadow-sm mb-6 flex-row items-center space-x-3">
                 <Wallet size={24} color="#1e2a4a" />
                 <View>
@@ -108,7 +117,7 @@ export default function PaymentsScreen() {
 
         <View className="space-y-4 mb-8">
           {services.map((service) => {
-            const canPayWithWallet = walletBalance !== null && walletBalance >= service.price;
+            const canPayWithWallet = user && walletBalance !== null && walletBalance >= service.price;
             const isProcessingThis = isProcessing && processingId === service.name;
 
             return (
@@ -157,7 +166,7 @@ export default function PaymentsScreen() {
                   </Text>
                 </TouchableOpacity>
               )}
-               {!canPayWithWallet && walletBalance !== null && walletBalance > 0 && (
+               {!canPayWithWallet && user && walletBalance !== null && walletBalance > 0 && (
                   <Text className="text-xs text-red-500 text-center mt-2">Insufficient wallet balance</Text>
                )}
             </View>

@@ -13,18 +13,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench, Megaphone } from "lucide-react";
+import { CreditCard, Star, BarChart, Route, Wallet, Loader2, Check, Wrench, Megaphone, Briefcase } from "lucide-react";
 import RazorpayCheckout from "@/components/RazorpayCheckout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { getSession } from "@/lib/auth-actions";
+import type { Session } from "@/types/auth";
 
 const serviceIcons: { [key: string]: React.ReactNode } = {
-  "Pro-Membership": <Star className="h-8 w-8 text-primary" />,
   "Valuation Service": <BarChart className="h-8 w-8 text-primary" />,
   "Exit Strategy (NavArambh)": <Route className="h-8 w-8 text-primary" />,
   "Plant and Machinery": <Wrench className="h-8 w-8 text-primary" />,
   "Advertise Your Business": <Megaphone className="h-8 w-8 text-primary" />,
+  "Quick Business Loan File Processing": <Briefcase className="h-8 w-8 text-primary" />,
 };
 
 type Service = {
@@ -50,20 +52,18 @@ export default function PaymentsPage() {
   const [isProcessingWallet, setIsProcessingWallet] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     const fetchServicesAndBalance = async () => {
       setLoadingServices(true);
       try {
+        const currentSession = await getSession();
+        setSession(currentSession);
+
         // Mock fetching services
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
-          { 
-            id: '1', 
-            name: "Pro-Membership", 
-            description: "Unlock exclusive features and premium support.", 
-            price: 99
-          },
           { 
             id: '2', 
             name: "Valuation Service", 
@@ -112,16 +112,28 @@ export default function PaymentsPage() {
               "Upload Photos & Videos (Optional)",
               "Our team will contact you for your online presence"
             ]
+          },
+          {
+            id: '6',
+            name: "Quick Business Loan File Processing",
+            description: "Get your loan application processed quickly.",
+            price: 99,
+            features: [
+              "Priority processing",
+              "Dedicated loan officer",
+              "Faster approval process"
+            ]
           }
         ]);
         
-        // Fetch wallet balance
-        const response = await fetch('/api/user/dashboard');
-        if (response.ok) {
-          const data = await response.json();
-          setWalletBalance(data.user.walletBalance);
+        // Fetch wallet balance if user is logged in
+        if (currentSession?.user) {
+            const response = await fetch('/api/user/dashboard');
+            if (response.ok) {
+            const data = await response.json();
+            setWalletBalance(data.user.walletBalance);
+            }
         }
-
       } catch (error) {
         console.error("Failed to fetch data", error);
       } finally {
@@ -136,6 +148,11 @@ export default function PaymentsPage() {
   };
   
   const handlePayWithWallet = async (amount: number, serviceName: string, serviceId: string) => {
+    if (!session?.user) {
+        toast({ title: "Login Required", description: "Please log in to use your wallet.", variant: "destructive" });
+        router.push('/login');
+        return;
+    }
     setIsProcessingWallet(serviceId);
     try {
       const response = await fetch('/api/payment/wallet-pay', {
@@ -149,9 +166,7 @@ export default function PaymentsPage() {
           title: "Payment Successful",
           description: `Paid for ${serviceName} using wallet balance.`,
         });
-        if(serviceName === "Pro-Membership") {
-          router.push('/payments/pro-onboarding');
-        } else if (serviceName === "Valuation Service") {
+        if (serviceName === "Valuation Service") {
           router.push(`/payments/valuation-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Exit Strategy (NavArambh)") {
           router.push(`/payments/navarambh-onboarding?paymentId=${data.paymentId}`);
@@ -159,6 +174,8 @@ export default function PaymentsPage() {
           router.push(`/payments/plant-machinery-onboarding?paymentId=${data.paymentId}`);
         } else if (serviceName === "Advertise Your Business") {
           router.push(`/payments/advertisement-onboarding?paymentId=${data.paymentId}`);
+        } else if (serviceName === "Quick Business Loan File Processing") {
+            router.push(`/loan-application?paymentId=${data.paymentId}`);
         } else {
           router.push('/payments/success');
         }
@@ -183,7 +200,7 @@ export default function PaymentsPage() {
   const handleCustomPay = () => {
     const amount = parseFloat(customAmount);
     if (amount > 0 && customServiceName) {
-      if (walletBalance !== null && amount <= walletBalance) {
+      if (session?.user && walletBalance !== null && amount <= walletBalance) {
          handlePayWithWallet(amount, customServiceName, 'custom');
       } else {
          handlePay(amount, customServiceName);
@@ -218,7 +235,7 @@ export default function PaymentsPage() {
         ) : (
           <>
             {fixedServices.map((service) => {
-              const canPayWithWallet = walletBalance !== null && walletBalance >= service.price;
+              const canPayWithWallet = session?.user && walletBalance !== null && walletBalance >= service.price;
               const isProcessing = isProcessingWallet === service.id;
               
               return (
@@ -247,14 +264,14 @@ export default function PaymentsPage() {
                   {canPayWithWallet ? (
                      <Button className="w-full" onClick={() => handlePayWithWallet(service.price, service.name, service.id)} disabled={isProcessing}>
                        {isProcessing ? <Loader2 className="animate-spin" /> : <Wallet className="mr-2" />}
-                       Pay with Wallet (Balance: ₹{walletBalance.toFixed(2)})
+                       Pay with Wallet (Balance: ₹{walletBalance!.toFixed(2)})
                      </Button>
                   ) : (
                     <Button className="w-full" onClick={() => handlePay(service.price, service.name)}>
                       Pay Now
                     </Button>
                   )}
-                  {!canPayWithWallet && walletBalance !== null && walletBalance > 0 && (
+                  {!canPayWithWallet && session?.user && walletBalance !== null && walletBalance > 0 && (
                     <p className="text-xs text-muted-foreground">Insufficient wallet balance (₹{walletBalance.toFixed(2)})</p>
                   )}
                 </CardFooter>
@@ -292,7 +309,7 @@ export default function PaymentsPage() {
                     onChange={(e) => setCustomAmount(e.target.value)}
                   />
                 </div>
-                {walletBalance !== null && (
+                {session?.user && walletBalance !== null && (
                   <div className="text-sm text-muted-foreground flex items-center gap-2">
                     <Wallet size={16} /> 
                     <span>Available Balance: ₹{walletBalance.toFixed(2)}</span>

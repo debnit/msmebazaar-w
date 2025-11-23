@@ -66,7 +66,7 @@ const Hero = () => {
             </CardContent>
             <div className="p-6 pt-0">
                <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Link href="/loan-application">Apply for a Loan</Link>
+                <Link href="/payments">Apply for a Loan</Link>
               </Button>
             </div>
           </Card>

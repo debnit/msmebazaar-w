@@ -21,12 +21,6 @@ interface PaymentState {
 export const usePaymentStore = create<PaymentState>((set) => ({
   services: [
     { 
-      id: '1', 
-      name: "Pro-Membership", 
-      description: "Unlock exclusive features and support.", 
-      price: 99
-    },
-    { 
       id: '2', 
       name: "Valuation Service", 
       description: "Get a professional valuation for your business.", 
@@ -74,6 +68,17 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         "Upload Photos & Videos (Optional)",
         "Our team will contact you for your online presence"
       ]
+    },
+    {
+        id: '6',
+        name: "Quick Business Loan File Processing",
+        description: "Get your loan application processed quickly.",
+        price: 99,
+        features: [
+            "Priority processing",
+            "Dedicated loan officer",
+            "Faster approval process"
+        ]
     }
   ],
   selectedService: null,

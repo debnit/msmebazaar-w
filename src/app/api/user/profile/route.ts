@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest) {
       where: { id: session.user.id },
       data: {
         name,
-        ...(profilePictureUrl && { profilePictureUrl }),
+        profilePictureUrl: profilePictureUrl || null,
       },
     });
 

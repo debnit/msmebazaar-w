@@ -6,6 +6,8 @@ import useScript from "@/hooks/use-script";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { getSession } from "@/lib/auth-actions";
+import { Session } from "@/types/auth";
 
 declare global {
     interface Window {
@@ -47,6 +49,8 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
     const initiatePayment = async () => {
         setLoading(true);
         try {
+            const session = await getSession();
+
             // 1. Create Order
             const orderRes = await fetch("/api/payment/create-order", {
                 method: "POST",
@@ -56,17 +60,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
 
             if (!orderRes.ok) {
                 const errorData = await orderRes.json();
-                if (orderRes.status === 401) {
-                    toast({
-                        title: "Authentication Error",
-                        description: "Please log in to make a payment.",
-                        variant: "destructive",
-                    });
-                    router.push(`/login`);
-                } else {
-                    throw new Error(errorData.error || "Failed to create payment order.");
-                }
-                return;
+                throw new Error(errorData.error || "Failed to create payment order.");
             }
 
             const orderData = await orderRes.json();
@@ -96,9 +90,7 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                     const verificationData = await verificationRes.json();
 
                     if (verificationRes.ok) {
-                        if(serviceName === "Pro-Membership") {
-                            router.push(`/payments/pro-onboarding`);
-                        } else if (serviceName === "Valuation Service") {
+                        if (serviceName === "Valuation Service") {
                             router.push(`/payments/valuation-onboarding?paymentId=${verificationData.paymentId}`);
                         } else if (serviceName === "Exit Strategy (NavArambh)") {
                             router.push(`/payments/navarambh-onboarding?paymentId=${verificationData.paymentId}`);
@@ -106,6 +98,8 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                              router.push(`/payments/plant-machinery-onboarding?paymentId=${verificationData.paymentId}`);
                         } else if (serviceName === "Advertise Your Business") {
                              router.push(`/payments/advertisement-onboarding?paymentId=${verificationData.paymentId}`);
+                        } else if (serviceName === "Quick Business Loan File Processing") {
+                             router.push(`/loan-application?paymentId=${verificationData.paymentId}`);
                         } else {
                             router.push(`/payments/success`);
                         }
@@ -114,9 +108,9 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
                     }
                 },
                 prefill: {
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    contact: "9999999999",
+                    name: session?.user?.name || "Valued Customer",
+                    email: session?.user?.email || "",
+                    contact: "",
                 },
                 notes: {
                     service: serviceName,

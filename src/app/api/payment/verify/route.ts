@@ -7,10 +7,6 @@ import { getSession } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await req.json();
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, serviceName, amount } = body;
 
@@ -26,27 +22,27 @@ export async function POST(req: NextRequest) {
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
       .update(text)
       .digest('hex');
+      
+    const paymentData: any = {
+      serviceName,
+      amount: amount / 100, // Convert from paise to rupees
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+    };
+    
+    if (session?.user?.id) {
+        paymentData.userId = session.user.id;
+    }
 
     if (generated_signature === razorpay_signature) {
       // Payment is successful, save to DB
       const payment = await prisma.paymentTransaction.create({
         data: {
-          userId: session.user.id,
-          serviceName,
-          amount: amount / 100, // Convert from paise to rupees
-          razorpayOrderId: razorpay_order_id,
-          razorpayPaymentId: razorpay_payment_id,
-          razorpaySignature: razorpay_signature,
+          ...paymentData,
           status: 'Success',
         }
       });
-      
-      if(serviceName === "Pro-Membership") {
-          await prisma.user.update({
-              where: { id: session.user.id },
-              data: { isPro: true }
-          });
-      }
       
       return NextResponse.json(
         {status: 'success', message: 'Payment verified successfully', paymentId: payment.id},
@@ -56,12 +52,7 @@ export async function POST(req: NextRequest) {
       // Payment failed
       await prisma.paymentTransaction.create({
         data: {
-          userId: session.user.id,
-          serviceName,
-          amount: amount / 100,
-          razorpayOrderId: razorpay_order_id,
-          razorpayPaymentId: razorpay_payment_id,
-          razorpaySignature: razorpay_signature,
+          ...paymentData,
           status: 'Failed',
         }
       });

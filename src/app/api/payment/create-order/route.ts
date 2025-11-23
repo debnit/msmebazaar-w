@@ -14,11 +14,6 @@ function getRazorpay() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await req.json();
     const {amount, currency = 'INR'} = body;
 

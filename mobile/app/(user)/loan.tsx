@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { apiService, LoanApplicationData } from '@/services/apiService';
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react-native';
 import { useAuthStore } from '@/store/authStore';
@@ -17,6 +17,8 @@ export default function LoanScreen() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuthStore();
+  const { paymentId } = useLocalSearchParams();
+  
   const [formData, setFormData] = useState<LoanApplicationData>({
     fullName: user?.name || '',
     email: user?.email || '',
@@ -28,6 +30,7 @@ export default function LoanScreen() {
     annualTurnover: 0,
     loanAmount: 10000,
     loanPurpose: '',
+    paymentId: typeof paymentId === 'string' ? paymentId : undefined,
   });
 
   const updateFormData = (field: keyof LoanApplicationData, value: string | number) => {
@@ -72,79 +75,6 @@ export default function LoanScreen() {
 
   const progress = (currentStep / steps.length) * 100;
   const currentStepInfo = steps[currentStep-1];
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <View className="space-y-4">
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Full Name</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="John Doe" value={formData.fullName} onChangeText={(text) => updateFormData('fullName', text)} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Email</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="john.doe@example.com" value={formData.email} onChangeText={(text) => updateFormData('email', text)} keyboardType="email-address" autoCapitalize="none" />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Phone Number</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="+91 98765 43210" value={formData.phone} onChangeText={(text) => updateFormData('phone', text)} keyboardType="phone-pad" />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">PAN Card Number</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="ABCDE1234F" value={formData.pan} onChangeText={(text) => updateFormData('pan', text.toUpperCase())} autoCapitalize="characters" maxLength={10} />
-            </View>
-          </View>
-        );
-      case 2:
-        return (
-          <View className="space-y-4">
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Business Name</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="Acme Inc." value={formData.businessName} onChangeText={(text) => updateFormData('businessName', text)} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Type of Business</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="py-2">
-                {['Sole Proprietorship', 'Partnership', 'Private Limited', 'Other'].map((type) => (
-                  <TouchableOpacity key={type} className={`px-4 py-2 rounded-full mr-2 ${formData.businessType === type.toLowerCase().replace(/ /g, '-') ? 'bg-primary' : 'bg-secondary'}`} onPress={() => updateFormData('businessType', type.toLowerCase().replace(/ /g, '-'))}>
-                    <Text className={`text-sm ${formData.businessType === type.toLowerCase().replace(/ /g, '-') ? 'text-primary-foreground' : 'text-foreground'}`}>{type}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Years in Business</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="e.g., 5" value={formData.yearsInBusiness > 0 ? formData.yearsInBusiness.toString() : ''} onChangeText={(text) => updateFormData('yearsInBusiness', parseInt(text) || 0)} keyboardType="numeric" />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Annual Turnover (in ₹)</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="e.g., 500000" value={formData.annualTurnover > 0 ? formData.annualTurnover.toString() : ''} onChangeText={(text) => updateFormData('annualTurnover', parseInt(text) || 0)} keyboardType="numeric" />
-            </View>
-          </View>
-        );
-      case 3:
-        return (
-          <View className="space-y-4">
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Loan Amount Required (in ₹)</Text>
-              <TextInput className="border border-input bg-background px-3 py-3 rounded-md text-foreground" placeholder="e.g., 200000" value={formData.loanAmount > 0 ? formData.loanAmount.toString() : ''} onChangeText={(text) => updateFormData('loanAmount', parseInt(text) || 0)} keyboardType="numeric" />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-foreground mb-2">Purpose of Loan</Text>
-               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="py-2">
-                  {['Working Capital', 'Business Expansion', 'Equipment Purchase', 'Other'].map((purpose) => (
-                    <TouchableOpacity key={purpose} className={`px-4 py-2 rounded-full mr-2 ${formData.loanPurpose === purpose.toLowerCase().replace(/ /g, '-') ? 'bg-primary' : 'bg-secondary'}`} onPress={() => updateFormData('loanPurpose', purpose.toLowerCase().replace(/ /g, '-'))}>
-                      <Text className={`text-sm ${formData.loanPurpose === purpose.toLowerCase().replace(/ /g, '-') ? 'text-primary-foreground' : 'text-foreground'}`}>{purpose}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-            </View>
-          </View>
-        );
-      default: return null;
-    }
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-background">

@@ -5,16 +5,12 @@ import { getSession } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await req.json();
     
     // Basic validation
     const {
       fullName, email, phone, pan, businessName, businessType,
-      yearsInBusiness, annualTurnover, loanAmount, loanPurpose
+      yearsInBusiness, annualTurnover, loanAmount, loanPurpose, paymentId
     } = body;
 
     if (
@@ -27,12 +23,17 @@ export async function POST(req: NextRequest) {
         {status: 400}
       );
     }
+    
+    const loanData: any = {
+      ...body,
+    };
+    
+    if (session?.user?.id) {
+      loanData.userId = session.user.id;
+    }
 
     await prisma.loanApplication.create({
-      data: {
-        ...body,
-        userId: session.user.id,
-      },
+      data: loanData,
     });
 
     return NextResponse.json(

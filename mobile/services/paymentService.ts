@@ -55,7 +55,7 @@ export const paymentService = {
     razorpay_signature: string;
     serviceName: string;
     amount: number; // This is in paise
-  }): Promise<boolean> {
+  }): Promise<{ok: boolean, paymentId?: string}> {
     try {
       const headers = await this.getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/payment/verify`, {
@@ -64,10 +64,12 @@ export const paymentService = {
         body: JSON.stringify(paymentData),
       });
 
-      return response.ok;
+      const data = await response.json();
+
+      return { ok: response.ok, paymentId: data.paymentId };
     } catch (error) {
       console.error('Error verifying payment:', error);
-      return false;
+      return { ok: false };
     }
   },
 
@@ -83,16 +85,16 @@ export const paymentService = {
       const data = await response.json();
 
       if (response.ok) {
-        if(paymentData.serviceName === "Pro-Membership") {
-            router.push('/(user)/pro-onboarding');
-        } else if (paymentData.serviceName === "Valuation Service") {
-            router.push('/(user)/valuation-onboarding');
+        if (paymentData.serviceName === "Valuation Service") {
+            router.push({ pathname: '/(user)/valuation-onboarding', params: { paymentId: data.paymentId }});
         } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
-            router.push('/(user)/navarambh-onboarding');
+            router.push({ pathname: '/(user)/navarambh-onboarding', params: { paymentId: data.paymentId }});
         } else if (paymentData.serviceName === "Plant and Machinery") {
-            router.push('/(user)/plant-machinery-onboarding');
+            router.push({ pathname: '/(user)/plant-machinery-onboarding', params: { paymentId: data.paymentId }});
         } else if (paymentData.serviceName === "Advertise Your Business") {
-            router.push('/(user)/advertisement-onboarding');
+            router.push({ pathname: '/(user)/advertisement-onboarding', params: { paymentId: data.paymentId }});
+        } else if (paymentData.serviceName === "Quick Business Loan File Processing") {
+            router.push({ pathname: '/(user)/loan', params: { paymentId: data.paymentId }});
         }
         return { success: true, paymentId: data.paymentId };
       } else {
@@ -142,7 +144,7 @@ export const paymentService = {
       const result = await RazorpayCheckout.open(options);
       
       // Verify payment
-      const isVerified = await this.verifyPayment({
+      const verification = await this.verifyPayment({
         razorpay_payment_id: result.razorpay_payment_id,
         razorpay_order_id: result.razorpay_order_id,
         razorpay_signature: result.razorpay_signature,
@@ -150,17 +152,17 @@ export const paymentService = {
         amount: orderData.amount,
       });
 
-      if (isVerified) {
-        if(paymentData.serviceName === "Pro-Membership") {
-            router.push('/(user)/pro-onboarding');
-        } else if (paymentData.serviceName === "Valuation Service") {
-            router.push('/(user)/valuation-onboarding');
+      if (verification.ok) {
+        if(paymentData.serviceName === "Valuation Service") {
+            router.push({ pathname: '/(user)/valuation-onboarding', params: { paymentId: verification.paymentId }});
         } else if (paymentData.serviceName === "Exit Strategy (NavArambh)") {
-            router.push('/(user)/navarambh-onboarding');
+            router.push({ pathname: '/(user)/navarambh-onboarding', params: { paymentId: verification.paymentId }});
         } else if (paymentData.serviceName === "Plant and Machinery") {
-            router.push('/(user)/plant-machinery-onboarding');
+            router.push({ pathname: '/(user)/plant-machinery-onboarding', params: { paymentId: verification.paymentId }});
         } else if (paymentData.serviceName === "Advertise Your Business") {
-            router.push('/(user)/advertisement-onboarding');
+            router.push({ pathname: '/(user)/advertisement-onboarding', params: { paymentId: verification.paymentId }});
+        } else if (paymentData.serviceName === "Quick Business Loan File Processing") {
+            router.push({ pathname: '/(user)/loan', params: { paymentId: verification.paymentId }});
         }
         return { success: true, paymentId: result.razorpay_payment_id };
       } else {

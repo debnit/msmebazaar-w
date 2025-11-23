@@ -34,10 +34,6 @@ export async function POST(req: NextRequest) {
             decrement: amount,
           },
       };
-
-      if(serviceName === "Pro-Membership") {
-          updateData.isPro = true;
-      }
       
       await tx.user.update({
         where: { id: session.user.id },

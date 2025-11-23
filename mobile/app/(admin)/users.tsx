@@ -6,7 +6,7 @@ import { apiService, AdminUser } from '@/services/apiService';
 import { useAuthStore } from '@/store/authStore';
 import { Search } from 'lucide-react-native';
 
-type RoleFilter = 'all' | 'admin' | 'agent' | 'pro' | 'user';
+type RoleFilter = 'all' | 'admin' | 'agent' | 'user';
 
 // Custom hook for debouncing
 function useDebounce(value: string, delay: number) {
@@ -126,9 +126,6 @@ export default function AdminUsersScreen() {
                     <TouchableOpacity onPress={() => setRoleFilter('agent')} className={`px-3 py-2 rounded-full ${roleFilter === 'agent' ? 'bg-primary' : 'bg-secondary'}`}>
                         <Text className={`text-xs ${roleFilter === 'agent' ? 'text-primary-foreground' : 'text-secondary-foreground'}`}>Agents</Text>
                     </TouchableOpacity>
-                     <TouchableOpacity onPress={() => setRoleFilter('pro')} className={`px-3 py-2 rounded-full ${roleFilter === 'pro' ? 'bg-primary' : 'bg-secondary'}`}>
-                        <Text className={`text-xs ${roleFilter === 'pro' ? 'text-primary-foreground' : 'text-secondary-foreground'}`}>Pro</Text>
-                    </TouchableOpacity>
                      <TouchableOpacity onPress={() => setRoleFilter('user')} className={`px-3 py-2 rounded-full ${roleFilter === 'user' ? 'bg-primary' : 'bg-secondary'}`}>
                         <Text className={`text-xs ${roleFilter === 'user' ? 'text-primary-foreground' : 'text-secondary-foreground'}`}>Users</Text>
                     </TouchableOpacity>
@@ -161,9 +158,6 @@ export default function AdminUsersScreen() {
                                           {user.isAgent && (
                                               <Text className="font-semibold px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Agent</Text>
                                           )}
-                                          {user.isPro && (
-                                                <Text className="font-semibold px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Pro</Text>
-                                           )}
                                         </View>
                                     </View>
                                     <View className="flex-row space-x-2">
