@@ -20,6 +20,30 @@ interface PaymentState {
 
 export const usePaymentStore = create<PaymentState>((set) => ({
   services: [
+    {
+      id: '5',
+      name: "Advertise Your Business",
+      description: "Boost your online presence and reach more customers.",
+      price: 99,
+      features: [
+        "Business Name & Nature",
+        "Fill your business address",
+        "Fill your contact details",
+        "Upload Photos & Videos (Optional)",
+        "Our team will contact you for your online presence"
+      ]
+    },
+    {
+        id: '6',
+        name: "Quick Business Loan File Processing",
+        description: "Get your loan application processed quickly.",
+        price: 99,
+        features: [
+            "Priority processing",
+            "Dedicated loan officer",
+            "Faster approval process"
+        ]
+    },
     { 
       id: '2', 
       name: "Valuation Service", 
@@ -56,30 +80,6 @@ export const usePaymentStore = create<PaymentState>((set) => ({
         "Expert Help",
       ]
     },
-    {
-      id: '5',
-      name: "Advertise Your Business",
-      description: "Boost your online presence and reach more customers.",
-      price: 99,
-      features: [
-        "Business Name & Nature",
-        "Fill your business address",
-        "Fill your contact details",
-        "Upload Photos & Videos (Optional)",
-        "Our team will contact you for your online presence"
-      ]
-    },
-    {
-        id: '6',
-        name: "Quick Business Loan File Processing",
-        description: "Get your loan application processed quickly.",
-        price: 99,
-        features: [
-            "Priority processing",
-            "Dedicated loan officer",
-            "Faster approval process"
-        ]
-    }
   ],
   selectedService: null,
   customAmount: 0,

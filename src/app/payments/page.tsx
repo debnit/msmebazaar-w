@@ -64,6 +64,30 @@ export default function PaymentsPage() {
         // Mock fetching services
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
+          {
+            id: '5',
+            name: "Advertise Your Business",
+            description: "Boost your online presence to reach more customers.",
+            price: 99,
+            features: [
+              "Business Name & Nature",
+              "Fill your business address",
+              "Fill your contact details",
+              "Upload Photos & Videos (Optional)",
+              "Our team will contact you for your online presence"
+            ]
+          },
+          {
+              id: '6',
+              name: "Quick Business Loan File Processing",
+              description: "Get your loan application processed quickly.",
+              price: 99,
+              features: [
+                  "Priority processing",
+                  "Dedicated loan officer",
+                  "Faster approval process"
+              ]
+          },
           { 
             id: '2', 
             name: "Valuation Service", 
@@ -98,30 +122,6 @@ export default function PaymentsPage() {
               "Buy/Lease/Sell Plant & Machinery",
               "Free Consultation",
               "Expert Help",
-            ]
-          },
-          {
-            id: '5',
-            name: "Advertise Your Business",
-            description: "Boost your online presence to reach more customers.",
-            price: 99,
-            features: [
-              "Business Name & Nature",
-              "Fill your business address",
-              "Fill your contact details",
-              "Upload Photos & Videos (Optional)",
-              "Our team will contact you for your online presence"
-            ]
-          },
-          {
-            id: '6',
-            name: "Quick Business Loan File Processing",
-            description: "Get your loan application processed quickly.",
-            price: 99,
-            features: [
-              "Priority processing",
-              "Dedicated loan officer",
-              "Faster approval process"
             ]
           }
         ]);
