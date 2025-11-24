@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import Logo from "./Logo";
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github, Twitter, Linkedin, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -13,6 +13,16 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">
               Empowering MSMEs with seamless financial solutions.
             </p>
+             <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                    <Phone size={16} className="text-muted-foreground" />
+                    <a href="tel:+918260895728" className="text-muted-foreground hover:text-primary">+91-8260895728</a>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Mail size={16} className="text-muted-foreground" />
+                    <a href="mailto:support@msmeconnect.com" className="text-muted-foreground hover:text-primary">support@msmeconnect.com</a>
+                </div>
+            </div>
             <div className="flex space-x-4">
               <Link href="#" className="text-muted-foreground hover:text-primary">
                 <Github size={20} />
@@ -50,6 +60,7 @@ const Footer = () => {
               <li><Link href="/privacy-policy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
               <li><Link href="/terms-of-service" className="text-muted-foreground hover:text-primary">Terms of Service</Link></li>
               <li><Link href="/disclaimer" className="text-muted-foreground hover:text-primary">Disclaimer</Link></li>
+              <li><Link href="/refund-policy" className="text-muted-foreground hover:text-primary">Refund Policy</Link></li>
             </ul>
           </div>
         </div>

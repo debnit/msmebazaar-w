@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,8 +20,8 @@ const WhatsAppIcon = () => (
 );
 
 const WhatsAppButton = () => {
-    const phoneNumber = "8260895728"; // Replace with your WhatsApp number
-    const message = "Hello! I'm interested in your services."; // Pre-filled message
+    const phoneNumber = "+918260895728";
+    const message = "Hello! I'm interested in your services.";
   
     const handleClick = () => {
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(

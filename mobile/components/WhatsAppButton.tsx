@@ -4,7 +4,7 @@ import { TouchableOpacity, Linking, Alert } from 'react-native';
 import { MessageCircle } from 'lucide-react-native';
 
 const WhatsAppButton = () => {
-    const phoneNumber = "8260895728";
+    const phoneNumber = "+918260895728";
     const message = "Hello! I'm interested in your services.";
   
     const handlePress = () => {
