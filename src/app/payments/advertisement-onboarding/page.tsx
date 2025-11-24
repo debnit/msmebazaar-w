@@ -75,7 +75,7 @@ export default function AdvertisementOnboardingPage() {
       if (response.ok) {
         toast({
           title: "Details Submitted!",
-          description: "Thank you! Our team will contact you shortly to get your business online.",
+          description: "Thank you! Our team will get back to you in 15 minutes.",
         });
         router.push("/dashboard");
       } else {

@@ -39,7 +39,7 @@ export default function AdvertisementOnboardingScreen() {
     if (result.success) {
       Alert.alert(
         'Details Submitted!',
-        'Thank you! Our team will contact you shortly to finalize your online presence.',
+        'Thank you! Our team will get back to you in 15 minutes.',
         [{ text: 'OK', onPress: () => router.push('/(user)/dashboard') }]
       );
     } else {

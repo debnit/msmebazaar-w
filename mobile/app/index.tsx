@@ -8,15 +8,15 @@ import { HandCoins, FileText, Banknote, Rocket, Route, Award, BrainCircuit, Mega
 
 const features = [
   {
-    icon: <Route size={32} color="#1e2a4a" />,
-    title: "NavArambh Exit Strategy",
-    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
-    onPress: () => router.push('/payments')
-  },
-  {
     icon: <Megaphone size={32} color="#1e2a4a" />,
     title: "Advertise Your Business",
     description: "Get your business noticed. We help create and boost your online presence to reach a wider audience.",
+    onPress: () => router.push('/payments')
+  },
+  {
+    icon: <Route size={32} color="#1e2a4a" />,
+    title: "NavArambh Exit Strategy",
+    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
     onPress: () => router.push('/payments')
   },
   {

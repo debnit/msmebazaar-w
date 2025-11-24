@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         data: {
             userId,
             title: "Advertisement Submitted",
-            message: "Your business details have been submitted. Our team will contact you shortly."
+            message: "Your business details have been submitted. Our team will contact you within 15 minutes."
         }
     });
 

@@ -5,15 +5,15 @@ import Link from "next/link";
 
 const features = [
   {
-    icon: <Route className="h-10 w-10 text-primary" />,
-    title: "NavArambh Exit Strategy",
-    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
-    href: "/payments"
-  },
-  {
     icon: <Megaphone className="h-10 w-10 text-primary" />,
     title: "Advertise Your Business",
     description: "Get your business noticed by the right people. We help create and boost your online presence to reach a wider audience and grow your customer base.",
+    href: "/payments/features/advertise-your-business"
+  },
+  {
+    icon: <Route className="h-10 w-10 text-primary" />,
+    title: "NavArambh Exit Strategy",
+    description: "Our flagship service provides comprehensive business valuation and strategic guidance for a profitable exit, ensuring you get the maximum value for your hard work.",
     href: "/payments"
   },
   {

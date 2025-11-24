@@ -39,7 +39,7 @@ const Hero = () => {
             </CardContent>
             <div className="p-6 pt-0">
               <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90">
-                <Link href="/payments">Explore Advertising</Link>
+                <Link href="/payments/features/advertise-your-business">Explore Advertising</Link>
               </Button>
             </div>
           </Card>

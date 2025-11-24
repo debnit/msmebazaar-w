@@ -65,15 +65,13 @@ export default function PaymentsPage() {
         // Mock fetching services
         await new Promise(res => setTimeout(res, 500));
         setFixedServices([
-          {
+            {
             id: '5',
             name: "Advertise Your Business",
-            description: "Boost your online presence to reach more customers.",
+            description: "Boost your online presence and reach more customers.",
             price: 99,
             features: [
-              "Business Name & Nature",
-              "Fill your business address",
-              "Fill your contact details",
+              "Fill your business details",
               "Upload Photos & Videos (Optional)",
               "Our team will contact you for your online presence"
             ]
