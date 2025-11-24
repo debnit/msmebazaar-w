@@ -3,6 +3,7 @@ import RazorpayCheckout from '@react-native-razorpay/react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { apiService } from './apiService';
+import { Alert } from 'react-native';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const RAZORPAY_KEY_ID = process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID;
@@ -113,6 +114,10 @@ export const paymentService = {
 
   async initiatePayment(paymentData: PaymentData): Promise<PaymentResponse> {
     if (!RAZORPAY_KEY_ID) {
+      Alert.alert(
+        'Configuration Error',
+        'Razorpay Key ID is not configured. Please set EXPO_PUBLIC_RAZORPAY_KEY_ID in your environment.'
+      );
       return { success: false, error: 'Razorpay Key ID is not configured. Please set EXPO_PUBLIC_RAZORPAY_KEY_ID.' };
     }
     

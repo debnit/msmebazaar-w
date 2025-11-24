@@ -48,6 +48,18 @@ const RazorpayCheckout = ({ amount, serviceName }: RazorpayCheckoutProps) => {
 
     const initiatePayment = async () => {
         setLoading(true);
+
+        if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+            toast({
+                title: "Configuration Error",
+                description: "Razorpay Key ID is not configured. Payment cannot be processed.",
+                variant: "destructive",
+            });
+            router.push('/payments');
+            return;
+        }
+
+
         try {
             const session = await getSession();
 
